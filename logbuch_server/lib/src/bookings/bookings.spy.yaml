@@ -1,0 +1,8 @@
+class: Booking
+table: bookings
+fields:
+  createdAt: DateTime, default=now
+  title: String
+  from: DateTime?
+  to: DateTime?
+  lead: Contact

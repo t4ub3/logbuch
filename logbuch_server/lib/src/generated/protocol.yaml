@@ -9,5 +9,13 @@ emailIdp:
   - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
+booking:
+  - getAll:
+  - getById:
+  - add:
+contact:
+  - getAll:
+  - getById:
+  - add:
 greeting:
   - hello:

@@ -10,6 +10,10 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:logbuch_server/src/generated/bookings/bookings.dart'
+    as _iz54m678;
+import 'package:logbuch_server/src/generated/contacts/contact.dart'
+    as _i4e319y1;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -17,6 +21,8 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
 import '../auth/email_idp_endpoint.dart' as _iuc1hd5t;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
+import '../bookings/booking_endpoint.dart' as _i7f5j1eo;
+import '../contacts/contact_endpoint.dart' as _i468fl3m;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
 
 class Endpoints extends _is.EndpointDispatch {
@@ -33,6 +39,18 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'jwtRefresh',
+          null,
+        ),
+      'booking': _i7f5j1eo.BookingEndpoint()
+        ..initialize(
+          server,
+          'booking',
+          null,
+        ),
+      'contact': _i468fl3m.ContactEndpoint()
+        ..initialize(
+          server,
+          'contact',
           null,
         ),
       'greeting': _il624ik7.GreetingEndpoint()
@@ -245,6 +263,114 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         refreshToken: params['refreshToken'],
                       ),
+        ),
+      },
+    );
+    connectors['booking'] = _is.EndpointConnector(
+      name: 'booking',
+      endpoint: endpoints['booking']!,
+      methodConnectors: {
+        'getAll': _is.MethodConnector(
+          name: 'getAll',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['booking'] as _i7f5j1eo.BookingEndpoint)
+                  .getAll(session),
+        ),
+        'getById': _is.MethodConnector(
+          name: 'getById',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['booking'] as _i7f5j1eo.BookingEndpoint).getById(
+                    session,
+                    params['id'],
+                  ),
+        ),
+        'add': _is.MethodConnector(
+          name: 'add',
+          params: {
+            'booking': _is.ParameterDescription(
+              name: 'booking',
+              type: _is.getType<_iz54m678.Booking>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['booking'] as _i7f5j1eo.BookingEndpoint).add(
+                    session,
+                    params['booking'],
+                  ),
+        ),
+      },
+    );
+    connectors['contact'] = _is.EndpointConnector(
+      name: 'contact',
+      endpoint: endpoints['contact']!,
+      methodConnectors: {
+        'getAll': _is.MethodConnector(
+          name: 'getAll',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['contact'] as _i468fl3m.ContactEndpoint)
+                  .getAll(session),
+        ),
+        'getById': _is.MethodConnector(
+          name: 'getById',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['contact'] as _i468fl3m.ContactEndpoint).getById(
+                    session,
+                    params['id'],
+                  ),
+        ),
+        'add': _is.MethodConnector(
+          name: 'add',
+          params: {
+            'contact': _is.ParameterDescription(
+              name: 'contact',
+              type: _is.getType<_i4e319y1.Contact>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['contact'] as _i468fl3m.ContactEndpoint).add(
+                    session,
+                    params['contact'],
+                  ),
         ),
       },
     );

@@ -11,13 +11,21 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:logbuch_server/src/generated/bookings/bookings.dart'
+    as _iz54m678;
+import 'package:logbuch_server/src/generated/contacts/contact.dart'
+    as _i4e319y1;
 import 'package:serverpod/protocol.dart' as _isp;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
+import 'bookings/bookings.dart' as _iikb94hp;
+import 'contacts/contact.dart' as _io9atw8a;
 import 'greetings/greeting.dart' as _izw8z7ou;
+export 'bookings/bookings.dart';
+export 'contacts/contact.dart';
 export 'greetings/greeting.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
@@ -28,6 +36,92 @@ class Protocol extends _is.DatabaseSerializationManager {
   static final Protocol _instance = Protocol._().._registerHostProtocols();
 
   static List<_isp.TableDefinition> get targetTableDefinitions => [
+    _isp.TableDefinition(
+      name: 'bookings',
+      dartName: 'Booking',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'now',
+        ),
+        _isp.ColumnDefinition(
+          name: 'title',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'from',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'to',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'lead',
+          columnType: _isp.ColumnType.json,
+          isNullable: false,
+          dartType: 'protocol:Contact',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'contacts',
+      dartName: 'Contact',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'now',
+        ),
+        _isp.ColumnDefinition(
+          name: 'firstName',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'lastName',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [],
+      managed: true,
+    ),
     ..._iais.Protocol.targetTableDefinitions,
     ..._iacs.Protocol.targetTableDefinitions,
     ..._isp.Protocol.targetTableDefinitions,
@@ -60,11 +154,35 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
 
+    if (t == _iikb94hp.Booking) {
+      return _iikb94hp.Booking.fromJson(data) as T;
+    }
+    if (t == _io9atw8a.Contact) {
+      return _io9atw8a.Contact.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
+    if (t == _is.getType<_iikb94hp.Booking?>()) {
+      return (data != null ? _iikb94hp.Booking.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_io9atw8a.Contact?>()) {
+      return (data != null ? _io9atw8a.Contact.fromJson(data) : null) as T;
+    }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == List<_iz54m678.Booking>) {
+      return (data as List)
+              .map((e) => deserialize<_iz54m678.Booking>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i4e319y1.Contact>) {
+      return (data as List)
+              .map((e) => deserialize<_i4e319y1.Contact>(e))
+              .toList()
+          as T;
     }
     try {
       return _iais.Protocol().deserialize<T>(data, t);
@@ -80,6 +198,8 @@ class Protocol extends _is.DatabaseSerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _iikb94hp.Booking => 'Booking',
+      _io9atw8a.Contact => 'Contact',
       _izw8z7ou.Greeting => 'Greeting',
       _ => null,
     };
@@ -95,6 +215,10 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
 
     switch (data) {
+      case _iikb94hp.Booking():
+        return 'Booking';
+      case _io9atw8a.Contact():
+        return 'Contact';
       case _izw8z7ou.Greeting():
         return 'Greeting';
     }
@@ -122,6 +246,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     var dataClassName = data['className'];
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
+    }
+    if (dataClassName == 'Booking') {
+      return deserialize<_iikb94hp.Booking>(data['data']);
+    }
+    if (dataClassName == 'Contact') {
+      return deserialize<_io9atw8a.Contact>(data['data']);
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
@@ -165,6 +295,12 @@ class Protocol extends _is.DatabaseSerializationManager {
       if (table != null) {
         return table;
       }
+    }
+    switch (t) {
+      case _iikb94hp.Booking:
+        return _iikb94hp.Booking.t;
+      case _io9atw8a.Contact:
+        return _io9atw8a.Contact.t;
     }
     return null;
   }

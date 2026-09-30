@@ -12,6 +12,9 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
 import 'package:http/http.dart' as _i85jenna;
+import 'package:logbuch_client/src/protocol/bookings/bookings.dart'
+    as _iey0gn1f;
+import 'package:logbuch_client/src/protocol/contacts/contact.dart' as _izv2jndr;
 import 'package:logbuch_client/src/protocol/greetings/greeting.dart'
     as _ij8ru2br;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
@@ -246,6 +249,64 @@ class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
       );
 }
 
+/// {@category Endpoint}
+class EndpointBooking extends _isc.EndpointRef {
+  EndpointBooking(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'booking';
+
+  _ida.Future<List<_iey0gn1f.Booking>> getAll() =>
+      caller.callServerEndpoint<List<_iey0gn1f.Booking>>(
+        'booking',
+        'getAll',
+        {},
+      );
+
+  _ida.Future<_iey0gn1f.Booking?> getById(int id) =>
+      caller.callServerEndpoint<_iey0gn1f.Booking?>(
+        'booking',
+        'getById',
+        {'id': id},
+      );
+
+  _ida.Future<_iey0gn1f.Booking> add(_iey0gn1f.Booking booking) =>
+      caller.callServerEndpoint<_iey0gn1f.Booking>(
+        'booking',
+        'add',
+        {'booking': booking},
+      );
+}
+
+/// {@category Endpoint}
+class EndpointContact extends _isc.EndpointRef {
+  EndpointContact(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'contact';
+
+  _ida.Future<List<_izv2jndr.Contact>> getAll() =>
+      caller.callServerEndpoint<List<_izv2jndr.Contact>>(
+        'contact',
+        'getAll',
+        {},
+      );
+
+  _ida.Future<_izv2jndr.Contact?> getById(int id) =>
+      caller.callServerEndpoint<_izv2jndr.Contact?>(
+        'contact',
+        'getById',
+        {'id': id},
+      );
+
+  _ida.Future<_izv2jndr.Contact> add(_izv2jndr.Contact contact) =>
+      caller.callServerEndpoint<_izv2jndr.Contact>(
+        'contact',
+        'add',
+        {'contact': contact},
+      );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -304,6 +365,8 @@ class Client extends _isc.ServerpodClientShared {
        ) {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    booking = EndpointBooking(this);
+    contact = EndpointContact(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
@@ -311,6 +374,10 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointEmailIdp emailIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
+
+  late final EndpointBooking booking;
+
+  late final EndpointContact contact;
 
   late final EndpointGreeting greeting;
 
@@ -320,6 +387,8 @@ class Client extends _isc.ServerpodClientShared {
   Map<String, _isc.EndpointRef> get endpointRefLookup => {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
+    'booking': booking,
+    'contact': contact,
     'greeting': greeting,
   };
 

@@ -1,0 +1,6 @@
+class: Contact
+table: contacts
+fields:
+  createdAt: DateTime, default=now
+  firstName: String
+  lastName: String

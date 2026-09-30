@@ -11,12 +11,19 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:logbuch_client/src/protocol/bookings/bookings.dart'
+    as _iey0gn1f;
+import 'package:logbuch_client/src/protocol/contacts/contact.dart' as _izv2jndr;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _iaic;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'bookings/bookings.dart' as _iikb94hp;
+import 'contacts/contact.dart' as _io9atw8a;
 import 'greetings/greeting.dart' as _izw8z7ou;
+export 'bookings/bookings.dart';
+export 'contacts/contact.dart';
 export 'greetings/greeting.dart';
 export 'client.dart';
 
@@ -54,11 +61,35 @@ class Protocol extends _isc.SerializationManager {
       }
     }
 
+    if (t == _iikb94hp.Booking) {
+      return _iikb94hp.Booking.fromJson(data) as T;
+    }
+    if (t == _io9atw8a.Contact) {
+      return _io9atw8a.Contact.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
+    if (t == _isc.getType<_iikb94hp.Booking?>()) {
+      return (data != null ? _iikb94hp.Booking.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_io9atw8a.Contact?>()) {
+      return (data != null ? _io9atw8a.Contact.fromJson(data) : null) as T;
+    }
     if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == List<_iey0gn1f.Booking>) {
+      return (data as List)
+              .map((e) => deserialize<_iey0gn1f.Booking>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_izv2jndr.Contact>) {
+      return (data as List)
+              .map((e) => deserialize<_izv2jndr.Contact>(e))
+              .toList()
+          as T;
     }
     try {
       return _iaic.Protocol().deserialize<T>(data, t);
@@ -71,6 +102,8 @@ class Protocol extends _isc.SerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _iikb94hp.Booking => 'Booking',
+      _io9atw8a.Contact => 'Contact',
       _izw8z7ou.Greeting => 'Greeting',
       _ => null,
     };
@@ -86,6 +119,10 @@ class Protocol extends _isc.SerializationManager {
     }
 
     switch (data) {
+      case _iikb94hp.Booking():
+        return 'Booking';
+      case _io9atw8a.Contact():
+        return 'Contact';
       case _izw8z7ou.Greeting():
         return 'Greeting';
     }
@@ -109,6 +146,12 @@ class Protocol extends _isc.SerializationManager {
     var dataClassName = data['className'];
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
+    }
+    if (dataClassName == 'Booking') {
+      return deserialize<_iikb94hp.Booking>(data['data']);
+    }
+    if (dataClassName == 'Contact') {
+      return deserialize<_io9atw8a.Contact>(data['data']);
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);

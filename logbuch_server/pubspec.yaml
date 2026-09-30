@@ -4,7 +4,7 @@ description: Starting point for a Serverpod server.
 # homepage: https://www.example.com
 
 environment:
-  sdk: '^3.12.2'
+  sdk: "^3.12.2"
 
 resolution: workspace
 
@@ -14,7 +14,7 @@ dependencies:
   serverpod_cloud_storage: 4.0.3
 
 dev_dependencies:
-  lints: '>=3.0.0 <7.0.0'
+  lints: ">=3.0.0 <7.0.0"
   serverpod_test: 4.0.3
   test: ^1.25.5
 
@@ -62,4 +62,4 @@ serverpod:
       displayName: "Logbuch app"
       auto_launch: true
       target: lib/driver.dart
-      device: macos
+      device: windows
