@@ -57,9 +57,25 @@ class MenuComponent extends StatelessWidget {
   Widget _buildMenu(BuildContext context) {
     return Column(
       children: [
-        Placeholder(
-          fallbackHeight: 150,
+        Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text.rich(
+            TextSpan(
+              children: [
+                const TextSpan(text: 'Log'),
+                TextSpan(
+                  text: '|',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const TextSpan(text: 'Buch'),
+              ],
+            ),
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
         ),
+        _divider(),
         Expanded(
           child: ListView(
             children: [
@@ -68,10 +84,14 @@ class MenuComponent extends StatelessWidget {
             ],
           ),
         ),
+        _divider(),
         _tile(context, MenuItem.settings),
       ],
     );
   }
+
+  /// A separator inset to line up with the menu items.
+  Widget _divider() => const Divider(height: 1, indent: 16, endIndent: 16);
 
   Widget _tile(BuildContext context, MenuItem item) {
     final isSelected = item == selected;
