@@ -1,0 +1,5 @@
+class: Room
+table: rooms
+fields:
+  roomNumber: String
+  bedAmount: int

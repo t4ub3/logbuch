@@ -7,7 +7,12 @@ class StatusBarComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Color(0xFFFF9000),
-      child: Text("status bar"),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text("status bar"),
+        ),
+      ),
     );
   }
 }

@@ -4,3 +4,5 @@ fields:
   createdAt: DateTime, default=now
   firstName: String
   lastName: String
+  mail: String?
+  phone: String?

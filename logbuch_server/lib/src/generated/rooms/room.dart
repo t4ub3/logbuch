@@ -12,114 +12,87 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _is;
 
-abstract class Contact
-    implements _is.TableRow<int?>, _is.ProtocolSerialization {
-  Contact._({
+abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
+  Room._({
     this.id,
-    DateTime? createdAt,
-    required this.firstName,
-    required this.lastName,
-    this.mail,
-    this.phone,
-  }) : createdAt = createdAt ?? DateTime.now();
+    required this.roomNumber,
+    required this.bedAmount,
+  });
 
-  factory Contact({
+  factory Room({
     int? id,
-    DateTime? createdAt,
-    required String firstName,
-    required String lastName,
-    String? mail,
-    String? phone,
-  }) = _ContactImpl;
+    required String roomNumber,
+    required int bedAmount,
+  }) = _RoomImpl;
 
-  factory Contact.fromJson(Map<String, dynamic> jsonSerialization) {
-    return Contact(
+  factory Room.fromJson(Map<String, dynamic> jsonSerialization) {
+    return Room(
       id: jsonSerialization['id'] as int?,
-      createdAt: jsonSerialization['createdAt'] == null
-          ? null
-          : _is.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
-      firstName: jsonSerialization['firstName'] as String,
-      lastName: jsonSerialization['lastName'] as String,
-      mail: jsonSerialization['mail'] as String?,
-      phone: jsonSerialization['phone'] as String?,
+      roomNumber: jsonSerialization['roomNumber'] as String,
+      bedAmount: jsonSerialization['bedAmount'] as int,
     );
   }
 
-  static final t = ContactTable();
+  static final t = RoomTable();
 
-  static const db = ContactRepository._();
+  static const db = RoomRepository._();
 
   @override
   int? id;
 
-  DateTime createdAt;
+  String roomNumber;
 
-  String firstName;
-
-  String lastName;
-
-  String? mail;
-
-  String? phone;
+  int bedAmount;
 
   @override
   _is.Table<int?> get table => t;
 
-  /// Returns a shallow copy of this [Contact]
+  /// Returns a shallow copy of this [Room]
   /// with some or all fields replaced by the given arguments.
   @_is.useResult
-  Contact copyWith({
+  Room copyWith({
     int? id,
-    DateTime? createdAt,
-    String? firstName,
-    String? lastName,
-    String? mail,
-    String? phone,
+    String? roomNumber,
+    int? bedAmount,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      '__className__': 'Contact',
+      '__className__': 'Room',
       if (id != null) 'id': id,
-      'createdAt': createdAt.toJson(),
-      'firstName': firstName,
-      'lastName': lastName,
-      if (mail != null) 'mail': mail,
-      if (phone != null) 'phone': phone,
+      'roomNumber': roomNumber,
+      'bedAmount': bedAmount,
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      '__className__': 'Contact',
+      '__className__': 'Room',
       if (id != null) 'id': id,
-      'createdAt': createdAt.toJson(),
-      'firstName': firstName,
-      'lastName': lastName,
-      if (mail != null) 'mail': mail,
-      if (phone != null) 'phone': phone,
+      'roomNumber': roomNumber,
+      'bedAmount': bedAmount,
     };
   }
 
-  static ContactInclude include() {
-    return ContactInclude._();
+  static RoomInclude include() {
+    return RoomInclude._();
   }
 
-  static ContactIncludeList includeList({
-    _is.WhereExpressionBuilder<ContactTable>? where,
+  static RoomIncludeList includeList({
+    _is.WhereExpressionBuilder<RoomTable>? where,
     int? limit,
     int? offset,
-    _is.OrderByBuilder<ContactTable>? orderBy,
-    _is.OrderByListBuilder<ContactTable>? orderByList,
-    ContactInclude? include,
+    _is.OrderByBuilder<RoomTable>? orderBy,
+    _is.OrderByListBuilder<RoomTable>? orderByList,
+    RoomInclude? include,
   }) {
-    return ContactIncludeList._(
+    return RoomIncludeList._(
       where: where,
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(Contact.t),
-      orderByList: orderByList?.call(Contact.t),
+      orderBy: orderBy?.call(Room.t),
+      orderByList: orderByList?.call(Room.t),
       include: include,
     );
   }
@@ -132,158 +105,108 @@ abstract class Contact
 
 class _Undefined {}
 
-class _ContactImpl extends Contact {
-  _ContactImpl({
+class _RoomImpl extends Room {
+  _RoomImpl({
     int? id,
-    DateTime? createdAt,
-    required String firstName,
-    required String lastName,
-    String? mail,
-    String? phone,
+    required String roomNumber,
+    required int bedAmount,
   }) : super._(
          id: id,
-         createdAt: createdAt,
-         firstName: firstName,
-         lastName: lastName,
-         mail: mail,
-         phone: phone,
+         roomNumber: roomNumber,
+         bedAmount: bedAmount,
        );
 
-  /// Returns a shallow copy of this [Contact]
+  /// Returns a shallow copy of this [Room]
   /// with some or all fields replaced by the given arguments.
   @_is.useResult
   @override
-  Contact copyWith({
+  Room copyWith({
     Object? id = _Undefined,
-    DateTime? createdAt,
-    String? firstName,
-    String? lastName,
-    Object? mail = _Undefined,
-    Object? phone = _Undefined,
+    String? roomNumber,
+    int? bedAmount,
   }) {
-    return Contact(
+    return Room(
       id: id is int? ? id : this.id,
-      createdAt: createdAt ?? this.createdAt,
-      firstName: firstName ?? this.firstName,
-      lastName: lastName ?? this.lastName,
-      mail: mail is String? ? mail : this.mail,
-      phone: phone is String? ? phone : this.phone,
+      roomNumber: roomNumber ?? this.roomNumber,
+      bedAmount: bedAmount ?? this.bedAmount,
     );
   }
 }
 
-class ContactUpdateTable extends _is.UpdateTable<ContactTable> {
-  ContactUpdateTable(super.table);
+class RoomUpdateTable extends _is.UpdateTable<RoomTable> {
+  RoomUpdateTable(super.table);
 
-  _is.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
-      _is.ColumnValue(
-        table.createdAt,
-        value,
-      );
-
-  _is.ColumnValue<String, String> firstName(String value) => _is.ColumnValue(
-    table.firstName,
+  _is.ColumnValue<String, String> roomNumber(String value) => _is.ColumnValue(
+    table.roomNumber,
     value,
   );
 
-  _is.ColumnValue<String, String> lastName(String value) => _is.ColumnValue(
-    table.lastName,
-    value,
-  );
-
-  _is.ColumnValue<String, String> mail(String? value) => _is.ColumnValue(
-    table.mail,
-    value,
-  );
-
-  _is.ColumnValue<String, String> phone(String? value) => _is.ColumnValue(
-    table.phone,
+  _is.ColumnValue<int, int> bedAmount(int value) => _is.ColumnValue(
+    table.bedAmount,
     value,
   );
 }
 
-class ContactTable extends _is.Table<int?> {
-  ContactTable({super.tableRelation}) : super(tableName: 'contacts') {
-    updateTable = ContactUpdateTable(this);
-    createdAt = _is.ColumnDateTime(
-      'createdAt',
-      this,
-      hasDefault: true,
-    );
-    firstName = _is.ColumnString(
-      'firstName',
+class RoomTable extends _is.Table<int?> {
+  RoomTable({super.tableRelation}) : super(tableName: 'rooms') {
+    updateTable = RoomUpdateTable(this);
+    roomNumber = _is.ColumnString(
+      'roomNumber',
       this,
     );
-    lastName = _is.ColumnString(
-      'lastName',
-      this,
-    );
-    mail = _is.ColumnString(
-      'mail',
-      this,
-    );
-    phone = _is.ColumnString(
-      'phone',
+    bedAmount = _is.ColumnInt(
+      'bedAmount',
       this,
     );
   }
 
-  late final ContactUpdateTable updateTable;
+  late final RoomUpdateTable updateTable;
 
-  late final _is.ColumnDateTime createdAt;
+  late final _is.ColumnString roomNumber;
 
-  late final _is.ColumnString firstName;
-
-  late final _is.ColumnString lastName;
-
-  late final _is.ColumnString mail;
-
-  late final _is.ColumnString phone;
+  late final _is.ColumnInt bedAmount;
 
   @override
   List<_is.Column> get columns => [
     id,
-    createdAt,
-    firstName,
-    lastName,
-    mail,
-    phone,
+    roomNumber,
+    bedAmount,
   ];
 }
 
-class ContactInclude extends _is.IncludeObject {
-  ContactInclude._();
+class RoomInclude extends _is.IncludeObject {
+  RoomInclude._();
 
   @override
   Map<String, _is.Include?> get includes => {};
 
   @override
-  _is.Table<int?> get table => Contact.t;
+  _is.Table<int?> get table => Room.t;
 }
 
-class ContactIncludeList extends _is.IncludeList {
-  ContactIncludeList._({
-    _is.WhereExpressionBuilder<ContactTable>? where,
+class RoomIncludeList extends _is.IncludeList {
+  RoomIncludeList._({
+    _is.WhereExpressionBuilder<RoomTable>? where,
     super.limit,
     super.offset,
     super.orderBy,
     super.orderByList,
     super.include,
   }) {
-    super.where = where?.call(Contact.t);
+    super.where = where?.call(Room.t);
   }
 
   @override
   Map<String, _is.Include?> get includes => include?.includes ?? {};
 
   @override
-  _is.Table<int?> get table => Contact.t;
+  _is.Table<int?> get table => Room.t;
 }
 
-class ContactRepository {
-  const ContactRepository._();
+class RoomRepository {
+  const RoomRepository._();
 
-  /// Returns a list of [Contact]s matching the given query parameters.
+  /// Returns a list of [Room]s matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -305,21 +228,21 @@ class ContactRepository {
   ///   limit: 100,
   /// );
   /// ```
-  Future<List<Contact>> find(
+  Future<List<Room>> find(
     _is.DatabaseSession session, {
-    _is.WhereExpressionBuilder<ContactTable>? where,
+    _is.WhereExpressionBuilder<RoomTable>? where,
     int? limit,
     int? offset,
-    _is.OrderByBuilder<ContactTable>? orderBy,
-    _is.OrderByListBuilder<ContactTable>? orderByList,
+    _is.OrderByBuilder<RoomTable>? orderBy,
+    _is.OrderByListBuilder<RoomTable>? orderByList,
     _is.Transaction? transaction,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
-    return session.db.find<Contact>(
-      where: where?.call(Contact.t),
-      orderBy: orderBy?.call(Contact.t),
-      orderByList: orderByList?.call(Contact.t),
+    return session.db.find<Room>(
+      where: where?.call(Room.t),
+      orderBy: orderBy?.call(Room.t),
+      orderByList: orderByList?.call(Room.t),
       limit: limit,
       offset: offset,
       transaction: transaction,
@@ -328,7 +251,7 @@ class ContactRepository {
     );
   }
 
-  /// Returns the first matching [Contact] matching the given query parameters.
+  /// Returns the first matching [Room] matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -345,20 +268,20 @@ class ContactRepository {
   ///   orderBy: (t) => t.age,
   /// );
   /// ```
-  Future<Contact?> findFirstRow(
+  Future<Room?> findFirstRow(
     _is.DatabaseSession session, {
-    _is.WhereExpressionBuilder<ContactTable>? where,
+    _is.WhereExpressionBuilder<RoomTable>? where,
     int? offset,
-    _is.OrderByBuilder<ContactTable>? orderBy,
-    _is.OrderByListBuilder<ContactTable>? orderByList,
+    _is.OrderByBuilder<RoomTable>? orderBy,
+    _is.OrderByListBuilder<RoomTable>? orderByList,
     _is.Transaction? transaction,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
-    return session.db.findFirstRow<Contact>(
-      where: where?.call(Contact.t),
-      orderBy: orderBy?.call(Contact.t),
-      orderByList: orderByList?.call(Contact.t),
+    return session.db.findFirstRow<Room>(
+      where: where?.call(Room.t),
+      orderBy: orderBy?.call(Room.t),
+      orderByList: orderByList?.call(Room.t),
       offset: offset,
       transaction: transaction,
       lockMode: lockMode,
@@ -366,15 +289,15 @@ class ContactRepository {
     );
   }
 
-  /// Finds a single [Contact] by its [id] or null if no such row exists.
-  Future<Contact?> findById(
+  /// Finds a single [Room] by its [id] or null if no such row exists.
+  Future<Room?> findById(
     _is.DatabaseSession session,
     int id, {
     _is.Transaction? transaction,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
-    return session.db.findById<Contact>(
+    return session.db.findById<Room>(
       id,
       transaction: transaction,
       lockMode: lockMode,
@@ -382,9 +305,9 @@ class ContactRepository {
     );
   }
 
-  /// Inserts all [Contact]s in the list and returns the inserted rows.
+  /// Inserts all [Room]s in the list and returns the inserted rows.
   ///
-  /// The returned [Contact]s will have their `id` fields set.
+  /// The returned [Room]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
@@ -396,14 +319,14 @@ class ContactRepository {
   /// If [noReturn] is set to `true`, the inserted rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<Contact>> insert(
+  Future<List<Room>> insert(
     _is.DatabaseSession session,
-    List<Contact> rows, {
+    List<Room> rows, {
     _is.Transaction? transaction,
     bool ignoreConflicts = false,
     bool noReturn = false,
   }) async {
-    return session.db.insert<Contact>(
+    return session.db.insert<Room>(
       rows,
       transaction: transaction,
       ignoreConflicts: ignoreConflicts,
@@ -411,21 +334,21 @@ class ContactRepository {
     );
   }
 
-  /// Inserts a single [Contact] and returns the inserted row.
+  /// Inserts a single [Room] and returns the inserted row.
   ///
-  /// The returned [Contact] will have its `id` field set.
-  Future<Contact> insertRow(
+  /// The returned [Room] will have its `id` field set.
+  Future<Room> insertRow(
     _is.DatabaseSession session,
-    Contact row, {
+    Room row, {
     _is.Transaction? transaction,
   }) async {
-    return session.db.insertRow<Contact>(
+    return session.db.insertRow<Room>(
       row,
       transaction: transaction,
     );
   }
 
-  /// Upserts all [Contact]s in the list and returns the resulting rows.
+  /// Upserts all [Room]s in the list and returns the resulting rows.
   ///
   /// If a row conflicts on the given [conflictColumns], the existing row is
   /// updated with the new values. Otherwise, a new row is inserted.
@@ -437,7 +360,7 @@ class ContactRepository {
   /// given expression. Conflicting rows that don't match are skipped and not
   /// returned, so the resulting list may be shorter than [rows].
   ///
-  /// The returned [Contact]s will have their `id` fields set.
+  /// The returned [Room]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails,
   /// none of the rows will be affected.
@@ -445,26 +368,26 @@ class ContactRepository {
   /// If [noReturn] is set to `true`, the resulting rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<Contact>> upsert(
+  Future<List<Room>> upsert(
     _is.DatabaseSession session,
-    List<Contact> rows, {
-    required _is.ColumnSelections<ContactTable> conflictColumns,
-    _is.ColumnSelections<ContactTable>? updateColumns,
-    _is.WhereExpressionBuilder<ContactTable>? updateWhere,
+    List<Room> rows, {
+    required _is.ColumnSelections<RoomTable> conflictColumns,
+    _is.ColumnSelections<RoomTable>? updateColumns,
+    _is.WhereExpressionBuilder<RoomTable>? updateWhere,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.upsert<Contact>(
+    return session.db.upsert<Room>(
       rows,
-      conflictColumns: conflictColumns(Contact.t),
-      updateColumns: updateColumns?.call(Contact.t),
-      updateWhere: updateWhere?.call(Contact.t),
+      conflictColumns: conflictColumns(Room.t),
+      updateColumns: updateColumns?.call(Room.t),
+      updateWhere: updateWhere?.call(Room.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Upserts a single [Contact] and returns the resulting row.
+  /// Upserts a single [Room] and returns the resulting row.
   ///
   /// If the row conflicts on the given [conflictColumns], the existing row is
   /// updated. Otherwise, a new row is inserted.
@@ -476,25 +399,25 @@ class ContactRepository {
   /// row matches the expression. Returns `null` if no row was affected — for
   /// example when [updateWhere] does not match the conflicting row.
   ///
-  /// The returned [Contact] will have its `id` field set.
-  Future<Contact?> upsertRow(
+  /// The returned [Room] will have its `id` field set.
+  Future<Room?> upsertRow(
     _is.DatabaseSession session,
-    Contact row, {
-    required _is.ColumnSelections<ContactTable> conflictColumns,
-    _is.ColumnSelections<ContactTable>? updateColumns,
-    _is.WhereExpressionBuilder<ContactTable>? updateWhere,
+    Room row, {
+    required _is.ColumnSelections<RoomTable> conflictColumns,
+    _is.ColumnSelections<RoomTable>? updateColumns,
+    _is.WhereExpressionBuilder<RoomTable>? updateWhere,
     _is.Transaction? transaction,
   }) async {
-    return session.db.upsertRow<Contact>(
+    return session.db.upsertRow<Room>(
       row,
-      conflictColumns: conflictColumns(Contact.t),
-      updateColumns: updateColumns?.call(Contact.t),
-      updateWhere: updateWhere?.call(Contact.t),
+      conflictColumns: conflictColumns(Room.t),
+      updateColumns: updateColumns?.call(Room.t),
+      updateWhere: updateWhere?.call(Room.t),
       transaction: transaction,
     );
   }
 
-  /// Updates all [Contact]s in the list and returns the updated rows. If
+  /// Updates all [Room]s in the list and returns the updated rows. If
   /// [columns] is provided, only those columns will be updated. Defaults to
   /// all columns.
   /// This is an atomic operation, meaning that if one of the rows fails to
@@ -503,82 +426,82 @@ class ContactRepository {
   /// If [noReturn] is set to `true`, the updated rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<Contact>> update(
+  Future<List<Room>> update(
     _is.DatabaseSession session,
-    List<Contact> rows, {
-    _is.ColumnSelections<ContactTable>? columns,
+    List<Room> rows, {
+    _is.ColumnSelections<RoomTable>? columns,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.update<Contact>(
+    return session.db.update<Room>(
       rows,
-      columns: columns?.call(Contact.t),
+      columns: columns?.call(Room.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Updates a single [Contact]. The row needs to have its id set.
+  /// Updates a single [Room]. The row needs to have its id set.
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
-  Future<Contact> updateRow(
+  Future<Room> updateRow(
     _is.DatabaseSession session,
-    Contact row, {
-    _is.ColumnSelections<ContactTable>? columns,
+    Room row, {
+    _is.ColumnSelections<RoomTable>? columns,
     _is.Transaction? transaction,
   }) async {
-    return session.db.updateRow<Contact>(
+    return session.db.updateRow<Room>(
       row,
-      columns: columns?.call(Contact.t),
+      columns: columns?.call(Room.t),
       transaction: transaction,
     );
   }
 
-  /// Updates a single [Contact] by its [id] with the specified [columnValues].
+  /// Updates a single [Room] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
-  Future<Contact?> updateById(
+  Future<Room?> updateById(
     _is.DatabaseSession session,
     int id, {
-    required _is.ColumnValueListBuilder<ContactUpdateTable> columnValues,
+    required _is.ColumnValueListBuilder<RoomUpdateTable> columnValues,
     _is.Transaction? transaction,
   }) async {
-    return session.db.updateById<Contact>(
+    return session.db.updateById<Room>(
       id,
-      columnValues: columnValues(Contact.t.updateTable),
+      columnValues: columnValues(Room.t.updateTable),
       transaction: transaction,
     );
   }
 
-  /// Updates all [Contact]s matching the [where] expression with the specified [columnValues].
+  /// Updates all [Room]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   ///
   /// If [noReturn] is set to `true`, the updated rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<Contact>> updateWhere(
+  Future<List<Room>> updateWhere(
     _is.DatabaseSession session, {
-    required _is.ColumnValueListBuilder<ContactUpdateTable> columnValues,
-    required _is.WhereExpressionBuilder<ContactTable> where,
+    required _is.ColumnValueListBuilder<RoomUpdateTable> columnValues,
+    required _is.WhereExpressionBuilder<RoomTable> where,
     int? limit,
     int? offset,
-    _is.OrderByBuilder<ContactTable>? orderBy,
-    _is.OrderByListBuilder<ContactTable>? orderByList,
+    _is.OrderByBuilder<RoomTable>? orderBy,
+    _is.OrderByListBuilder<RoomTable>? orderByList,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.updateWhere<Contact>(
-      columnValues: columnValues(Contact.t.updateTable),
-      where: where(Contact.t),
+    return session.db.updateWhere<Room>(
+      columnValues: columnValues(Room.t.updateTable),
+      where: where(Room.t),
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(Contact.t),
-      orderByList: orderByList?.call(Contact.t),
+      orderBy: orderBy?.call(Room.t),
+      orderByList: orderByList?.call(Room.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Deletes all [Contact]s in the list and returns the deleted rows.
+  /// Deletes all [Room]s in the list and returns the deleted rows.
   ///
   /// To specify the order of the returned rows use [orderBy] or [orderByList]
   /// when sorting by multiple columns.
@@ -589,30 +512,30 @@ class ContactRepository {
   /// If [noReturn] is set to `true`, the deleted rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<Contact>> delete(
+  Future<List<Room>> delete(
     _is.DatabaseSession session,
-    List<Contact> rows, {
-    _is.OrderByBuilder<ContactTable>? orderBy,
-    _is.OrderByListBuilder<ContactTable>? orderByList,
+    List<Room> rows, {
+    _is.OrderByBuilder<RoomTable>? orderBy,
+    _is.OrderByListBuilder<RoomTable>? orderByList,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.delete<Contact>(
+    return session.db.delete<Room>(
       rows,
-      orderBy: orderBy?.call(Contact.t),
-      orderByList: orderByList?.call(Contact.t),
+      orderBy: orderBy?.call(Room.t),
+      orderByList: orderByList?.call(Room.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Deletes a single [Contact].
-  Future<Contact> deleteRow(
+  /// Deletes a single [Room].
+  Future<Room> deleteRow(
     _is.DatabaseSession session,
-    Contact row, {
+    Room row, {
     _is.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<Contact>(
+    return session.db.deleteRow<Room>(
       row,
       transaction: transaction,
     );
@@ -626,18 +549,18 @@ class ContactRepository {
   /// If [noReturn] is set to `true`, the deleted rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<Contact>> deleteWhere(
+  Future<List<Room>> deleteWhere(
     _is.DatabaseSession session, {
-    required _is.WhereExpressionBuilder<ContactTable> where,
-    _is.OrderByBuilder<ContactTable>? orderBy,
-    _is.OrderByListBuilder<ContactTable>? orderByList,
+    required _is.WhereExpressionBuilder<RoomTable> where,
+    _is.OrderByBuilder<RoomTable>? orderBy,
+    _is.OrderByListBuilder<RoomTable>? orderByList,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.deleteWhere<Contact>(
-      where: where(Contact.t),
-      orderBy: orderBy?.call(Contact.t),
-      orderByList: orderByList?.call(Contact.t),
+    return session.db.deleteWhere<Room>(
+      where: where(Room.t),
+      orderBy: orderBy?.call(Room.t),
+      orderByList: orderByList?.call(Room.t),
       transaction: transaction,
       noReturn: noReturn,
     );
@@ -647,27 +570,27 @@ class ContactRepository {
   /// will return the count of all rows in the table.
   Future<int> count(
     _is.DatabaseSession session, {
-    _is.WhereExpressionBuilder<ContactTable>? where,
+    _is.WhereExpressionBuilder<RoomTable>? where,
     int? limit,
     _is.Transaction? transaction,
   }) async {
-    return session.db.count<Contact>(
-      where: where?.call(Contact.t),
+    return session.db.count<Room>(
+      where: where?.call(Room.t),
       limit: limit,
       transaction: transaction,
     );
   }
 
-  /// Acquires row-level locks on [Contact] rows matching the [where] expression.
+  /// Acquires row-level locks on [Room] rows matching the [where] expression.
   Future<void> lockRows(
     _is.DatabaseSession session, {
-    required _is.WhereExpressionBuilder<ContactTable> where,
+    required _is.WhereExpressionBuilder<RoomTable> where,
     required _is.LockMode lockMode,
     required _is.Transaction transaction,
     _is.LockBehavior lockBehavior = _is.LockBehavior.wait,
   }) async {
-    return session.db.lockRows<Contact>(
-      where: where(Contact.t),
+    return session.db.lockRows<Room>(
+      where: where(Room.t),
       lockMode: lockMode,
       lockBehavior: lockBehavior,
       transaction: transaction,

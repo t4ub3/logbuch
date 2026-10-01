@@ -17,6 +17,7 @@ import 'package:logbuch_client/src/protocol/bookings/bookings.dart'
 import 'package:logbuch_client/src/protocol/contacts/contact.dart' as _izv2jndr;
 import 'package:logbuch_client/src/protocol/greetings/greeting.dart'
     as _ij8ru2br;
+import 'package:logbuch_client/src/protocol/rooms/room.dart' as _i5smwbna;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
@@ -325,6 +326,35 @@ class EndpointGreeting extends _isc.EndpointRef {
       );
 }
 
+/// {@category Endpoint}
+class EndpointRoom extends _isc.EndpointRef {
+  EndpointRoom(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'room';
+
+  _ida.Future<List<_i5smwbna.Room>> getAll() =>
+      caller.callServerEndpoint<List<_i5smwbna.Room>>(
+        'room',
+        'getAll',
+        {},
+      );
+
+  _ida.Future<_i5smwbna.Room?> getById(int id) =>
+      caller.callServerEndpoint<_i5smwbna.Room?>(
+        'room',
+        'getById',
+        {'id': id},
+      );
+
+  _ida.Future<_i5smwbna.Room> add(_i5smwbna.Room room) =>
+      caller.callServerEndpoint<_i5smwbna.Room>(
+        'room',
+        'add',
+        {'room': room},
+      );
+}
+
 class Modules {
   Modules(Client client) {
     serverpod_auth_idp = _iaic.Caller(client);
@@ -368,6 +398,7 @@ class Client extends _isc.ServerpodClientShared {
     booking = EndpointBooking(this);
     contact = EndpointContact(this);
     greeting = EndpointGreeting(this);
+    room = EndpointRoom(this);
     modules = Modules(this);
   }
 
@@ -381,6 +412,8 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointGreeting greeting;
 
+  late final EndpointRoom room;
+
   late final Modules modules;
 
   @override
@@ -390,6 +423,7 @@ class Client extends _isc.ServerpodClientShared {
     'booking': booking,
     'contact': contact,
     'greeting': greeting,
+    'room': room,
   };
 
   @override

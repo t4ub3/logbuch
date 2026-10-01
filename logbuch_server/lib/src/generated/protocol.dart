@@ -15,6 +15,7 @@ import 'package:logbuch_server/src/generated/bookings/bookings.dart'
     as _iz54m678;
 import 'package:logbuch_server/src/generated/contacts/contact.dart'
     as _i4e319y1;
+import 'package:logbuch_server/src/generated/rooms/room.dart' as _iu0pobb2;
 import 'package:serverpod/protocol.dart' as _isp;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
@@ -24,9 +25,11 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
 import 'bookings/bookings.dart' as _iikb94hp;
 import 'contacts/contact.dart' as _io9atw8a;
 import 'greetings/greeting.dart' as _izw8z7ou;
+import 'rooms/room.dart' as _ix383f3m;
 export 'bookings/bookings.dart';
 export 'contacts/contact.dart';
 export 'greetings/greeting.dart';
+export 'rooms/room.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
   Protocol._();
@@ -117,6 +120,48 @@ class Protocol extends _is.DatabaseSerializationManager {
           isNullable: false,
           dartType: 'String',
         ),
+        _isp.ColumnDefinition(
+          name: 'mail',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'phone',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'rooms',
+      dartName: 'Room',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'roomNumber',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'bedAmount',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
       ],
       foreignKeys: [],
       indexes: [],
@@ -163,6 +208,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
+    if (t == _ix383f3m.Room) {
+      return _ix383f3m.Room.fromJson(data) as T;
+    }
     if (t == _is.getType<_iikb94hp.Booking?>()) {
       return (data != null ? _iikb94hp.Booking.fromJson(data) : null) as T;
     }
@@ -171,6 +219,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ix383f3m.Room?>()) {
+      return (data != null ? _ix383f3m.Room.fromJson(data) : null) as T;
     }
     if (t == List<_iz54m678.Booking>) {
       return (data as List)
@@ -182,6 +233,10 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data as List)
               .map((e) => deserialize<_i4e319y1.Contact>(e))
               .toList()
+          as T;
+    }
+    if (t == List<_iu0pobb2.Room>) {
+      return (data as List).map((e) => deserialize<_iu0pobb2.Room>(e)).toList()
           as T;
     }
     try {
@@ -201,6 +256,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _iikb94hp.Booking => 'Booking',
       _io9atw8a.Contact => 'Contact',
       _izw8z7ou.Greeting => 'Greeting',
+      _ix383f3m.Room => 'Room',
       _ => null,
     };
   }
@@ -221,6 +277,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'Contact';
       case _izw8z7ou.Greeting():
         return 'Greeting';
+      case _ix383f3m.Room():
+        return 'Room';
     }
     className = _iais.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -255,6 +313,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
+    }
+    if (dataClassName == 'Room') {
+      return deserialize<_ix383f3m.Room>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
@@ -301,6 +362,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _iikb94hp.Booking.t;
       case _io9atw8a.Contact:
         return _io9atw8a.Contact.t;
+      case _ix383f3m.Room:
+        return _ix383f3m.Room.t;
     }
     return null;
   }

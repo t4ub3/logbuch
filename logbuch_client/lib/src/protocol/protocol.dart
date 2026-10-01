@@ -14,6 +14,7 @@
 import 'package:logbuch_client/src/protocol/bookings/bookings.dart'
     as _iey0gn1f;
 import 'package:logbuch_client/src/protocol/contacts/contact.dart' as _izv2jndr;
+import 'package:logbuch_client/src/protocol/rooms/room.dart' as _i5smwbna;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
@@ -22,9 +23,11 @@ import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import 'bookings/bookings.dart' as _iikb94hp;
 import 'contacts/contact.dart' as _io9atw8a;
 import 'greetings/greeting.dart' as _izw8z7ou;
+import 'rooms/room.dart' as _ix383f3m;
 export 'bookings/bookings.dart';
 export 'contacts/contact.dart';
 export 'greetings/greeting.dart';
+export 'rooms/room.dart';
 export 'client.dart';
 
 class Protocol extends _isc.SerializationManager {
@@ -70,6 +73,9 @@ class Protocol extends _isc.SerializationManager {
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
+    if (t == _ix383f3m.Room) {
+      return _ix383f3m.Room.fromJson(data) as T;
+    }
     if (t == _isc.getType<_iikb94hp.Booking?>()) {
       return (data != null ? _iikb94hp.Booking.fromJson(data) : null) as T;
     }
@@ -78,6 +84,9 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ix383f3m.Room?>()) {
+      return (data != null ? _ix383f3m.Room.fromJson(data) : null) as T;
     }
     if (t == List<_iey0gn1f.Booking>) {
       return (data as List)
@@ -89,6 +98,10 @@ class Protocol extends _isc.SerializationManager {
       return (data as List)
               .map((e) => deserialize<_izv2jndr.Contact>(e))
               .toList()
+          as T;
+    }
+    if (t == List<_i5smwbna.Room>) {
+      return (data as List).map((e) => deserialize<_i5smwbna.Room>(e)).toList()
           as T;
     }
     try {
@@ -105,6 +118,7 @@ class Protocol extends _isc.SerializationManager {
       _iikb94hp.Booking => 'Booking',
       _io9atw8a.Contact => 'Contact',
       _izw8z7ou.Greeting => 'Greeting',
+      _ix383f3m.Room => 'Room',
       _ => null,
     };
   }
@@ -125,6 +139,8 @@ class Protocol extends _isc.SerializationManager {
         return 'Contact';
       case _izw8z7ou.Greeting():
         return 'Greeting';
+      case _ix383f3m.Room():
+        return 'Room';
     }
     className = _iaic.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -155,6 +171,9 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
+    }
+    if (dataClassName == 'Room') {
+      return deserialize<_ix383f3m.Room>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);

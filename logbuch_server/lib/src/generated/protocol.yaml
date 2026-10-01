@@ -19,3 +19,7 @@ contact:
   - add:
 greeting:
   - hello:
+room:
+  - getAll:
+  - getById:
+  - add:

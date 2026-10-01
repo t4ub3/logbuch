@@ -14,6 +14,7 @@ import 'package:logbuch_server/src/generated/bookings/bookings.dart'
     as _iz54m678;
 import 'package:logbuch_server/src/generated/contacts/contact.dart'
     as _i4e319y1;
+import 'package:logbuch_server/src/generated/rooms/room.dart' as _iu0pobb2;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -24,6 +25,7 @@ import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../bookings/booking_endpoint.dart' as _i7f5j1eo;
 import '../contacts/contact_endpoint.dart' as _i468fl3m;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
+import '../rooms/room_endpoint.dart' as _idkvzxf4;
 
 class Endpoints extends _is.EndpointDispatch {
   @override
@@ -57,6 +59,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'greeting',
+          null,
+        ),
+      'room': _idkvzxf4.RoomEndpoint()
+        ..initialize(
+          server,
+          'room',
           null,
         ),
     };
@@ -396,6 +404,58 @@ class Endpoints extends _is.EndpointDispatch {
                     session,
                     params['name'],
                   ),
+        ),
+      },
+    );
+    connectors['room'] = _is.EndpointConnector(
+      name: 'room',
+      endpoint: endpoints['room']!,
+      methodConnectors: {
+        'getAll': _is.MethodConnector(
+          name: 'getAll',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['room'] as _idkvzxf4.RoomEndpoint).getAll(session),
+        ),
+        'getById': _is.MethodConnector(
+          name: 'getById',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['room'] as _idkvzxf4.RoomEndpoint).getById(
+                session,
+                params['id'],
+              ),
+        ),
+        'add': _is.MethodConnector(
+          name: 'add',
+          params: {
+            'room': _is.ParameterDescription(
+              name: 'room',
+              type: _is.getType<_iu0pobb2.Room>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['room'] as _idkvzxf4.RoomEndpoint).add(
+                session,
+                params['room'],
+              ),
         ),
       },
     );

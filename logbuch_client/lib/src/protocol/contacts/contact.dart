@@ -19,6 +19,8 @@ abstract class Contact
     DateTime? createdAt,
     required this.firstName,
     required this.lastName,
+    this.mail,
+    this.phone,
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory Contact({
@@ -26,6 +28,8 @@ abstract class Contact
     DateTime? createdAt,
     required String firstName,
     required String lastName,
+    String? mail,
+    String? phone,
   }) = _ContactImpl;
 
   factory Contact.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -36,6 +40,8 @@ abstract class Contact
           : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       firstName: jsonSerialization['firstName'] as String,
       lastName: jsonSerialization['lastName'] as String,
+      mail: jsonSerialization['mail'] as String?,
+      phone: jsonSerialization['phone'] as String?,
     );
   }
 
@@ -50,6 +56,10 @@ abstract class Contact
 
   String lastName;
 
+  String? mail;
+
+  String? phone;
+
   /// Returns a shallow copy of this [Contact]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -58,6 +68,8 @@ abstract class Contact
     DateTime? createdAt,
     String? firstName,
     String? lastName,
+    String? mail,
+    String? phone,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -67,6 +79,8 @@ abstract class Contact
       'createdAt': createdAt.toJson(),
       'firstName': firstName,
       'lastName': lastName,
+      if (mail != null) 'mail': mail,
+      if (phone != null) 'phone': phone,
     };
   }
 
@@ -78,6 +92,8 @@ abstract class Contact
       'createdAt': createdAt.toJson(),
       'firstName': firstName,
       'lastName': lastName,
+      if (mail != null) 'mail': mail,
+      if (phone != null) 'phone': phone,
     };
   }
 
@@ -95,11 +111,15 @@ class _ContactImpl extends Contact {
     DateTime? createdAt,
     required String firstName,
     required String lastName,
+    String? mail,
+    String? phone,
   }) : super._(
          id: id,
          createdAt: createdAt,
          firstName: firstName,
          lastName: lastName,
+         mail: mail,
+         phone: phone,
        );
 
   /// Returns a shallow copy of this [Contact]
@@ -111,12 +131,16 @@ class _ContactImpl extends Contact {
     DateTime? createdAt,
     String? firstName,
     String? lastName,
+    Object? mail = _Undefined,
+    Object? phone = _Undefined,
   }) {
     return Contact(
       id: id is int? ? id : this.id,
       createdAt: createdAt ?? this.createdAt,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
+      mail: mail is String? ? mail : this.mail,
+      phone: phone is String? ? phone : this.phone,
     );
   }
 }
