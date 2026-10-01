@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logbuch_flutter/components/menu_component.dart';
+import 'package:logbuch_flutter/components/status_bar_component.dart';
 import 'package:yaru/yaru.dart';
 
 class MainScreen extends StatelessWidget {
@@ -13,41 +13,32 @@ class MainScreen extends StatelessWidget {
       child: const Center(child: Text('pane')),
     );
 
-    return YaruPanedView(
-      pane: pane,
-      page: YaruPanedView(
-        pane: pane,
-        page: YaruPanedView(
-          pane: pane,
-          page: YaruPanedView(
-            pane: pane,
-            page: const Center(child: Text('YaruPanedView Inception')),
-            layoutDelegate: const YaruResizablePaneDelegate(
-              initialPaneSize: 200,
-              minPaneSize: 25,
-              minPageSize: 25,
-              paneSide: YaruPaneSide.bottom,
+    return Scaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                MenuComponent(),
+                Expanded(
+                  child: YaruPanedView(
+                    pane: pane,
+                    page: const Center(child: Text('YaruPanedView Inception')),
+                    layoutDelegate: const YaruResizablePaneDelegate(
+                      initialPaneSize: 200,
+                      minPaneSize: 25,
+                      minPageSize: 25,
+                      paneSide: YaruPaneSide.right,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          layoutDelegate: const YaruResizablePaneDelegate(
-            initialPaneSize: 200,
-            minPaneSize: 25,
-            minPageSize: 25,
-            paneSide: YaruPaneSide.end,
-          ),
-        ),
-        layoutDelegate: const YaruResizablePaneDelegate(
-          initialPaneSize: 200,
-          minPaneSize: 25,
-          minPageSize: 50,
-          paneSide: YaruPaneSide.top,
-        ),
-      ),
-      layoutDelegate: const YaruResizablePaneDelegate(
-        initialPaneSize: 200,
-        minPaneSize: 25,
-        minPageSize: 50,
-        paneSide: YaruPaneSide.start,
+          StatusBarComponent(),
+        ],
       ),
     );
   }

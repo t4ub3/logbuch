@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logbuch_flutter/screens/greetings_screen.dart';
 import 'package:logbuch_flutter/screens/main_screen.dart';
 import 'package:yaru/yaru.dart';
 
