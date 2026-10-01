@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logbuch_client/logbuch_client.dart';
+import 'package:logbuch_flutter/components/async_list_view.dart';
+import 'package:logbuch_flutter/providers/contacts_provider.dart';
+import 'package:yaru/yaru.dart';
 
-class ContactsPanel extends StatelessWidget {
+class ContactsPanel extends ConsumerWidget {
   const ContactsPanel({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'Contact Panel',
-        style: Theme.of(context).textTheme.displaySmall,
+  Widget build(BuildContext context, WidgetRef ref) {
+    return AsyncListView<Contact>(
+      value: ref.watch(contactsProvider),
+      onRetry: () => ref.refresh(contactsProvider.future),
+      emptyText: 'No contacts',
+      itemBuilder: (context, contact) => YaruListTile(
+        leading: const Icon(Icons.person),
+        titleText: '${contact.firstName} ${contact.lastName}',
+        subtitleText: [contact.mail, contact.phone].nonNulls.join(' · '),
       ),
     );
   }
