@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_extensions.dart';
 import 'package:logbuch_flutter/providers/bookings_provider.dart';
 import 'package:logbuch_flutter/providers/bookings_view_provider.dart';
+import 'package:logbuch_flutter/providers/settings_provider.dart';
 
 /// Monthly calendar grid with each booking drawn as a colored bar on the days
 /// it covers.
@@ -14,6 +16,9 @@ class BookingsMonthView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final month = ref.watch(displayedMonthProvider);
     final bookings = ref.watch(bookingsProvider);
+    final startOfWeek = ref.watch(
+      settingsProvider.select((s) => s.startOfWeek),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -23,10 +28,11 @@ class BookingsMonthView extends ConsumerWidget {
           child: switch (bookings) {
             AsyncData(:final value) => _MonthGrid(
               month: month,
+              firstWeekday: startOfWeek.firstDayOfWeekIndex,
               bookings: [...value]..sort(compareByStart),
             ),
             AsyncError(:final error) => Center(
-              child: Text('Failed to load: $error'),
+              child: Text(context.t.common.loadFailed(error: error)),
             ),
             _ => const Center(child: CircularProgressIndicator()),
           },
@@ -50,12 +56,12 @@ class _MonthHeader extends ConsumerWidget {
       child: Row(
         children: [
           IconButton(
-            tooltip: 'Previous month',
+            tooltip: context.t.bookings.previousMonth,
             icon: const Icon(Icons.chevron_left),
             onPressed: notifier.previous,
           ),
           IconButton(
-            tooltip: 'Next month',
+            tooltip: context.t.bookings.nextMonth,
             icon: const Icon(Icons.chevron_right),
             onPressed: notifier.next,
           ),
@@ -65,7 +71,10 @@ class _MonthHeader extends ConsumerWidget {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const Spacer(),
-          OutlinedButton(onPressed: notifier.today, child: const Text('Today')),
+          OutlinedButton(
+            onPressed: notifier.today,
+            child: Text(context.t.bookings.today),
+          ),
         ],
       ),
     );
@@ -73,16 +82,21 @@ class _MonthHeader extends ConsumerWidget {
 }
 
 class _MonthGrid extends StatelessWidget {
-  const _MonthGrid({required this.month, required this.bookings});
+  const _MonthGrid({
+    required this.month,
+    required this.firstWeekday,
+    required this.bookings,
+  });
 
   final DateTime month;
+
+  /// 0 = Sunday, 1 = Monday. DateTime.weekday % 7 uses the same numbering.
+  final int firstWeekday;
   final List<Booking> bookings;
 
   @override
   Widget build(BuildContext context) {
     final l10n = MaterialLocalizations.of(context);
-    // 0 = Sunday. DateTime.weekday % 7 uses the same numbering.
-    final firstWeekday = l10n.firstDayOfWeekIndex;
     final leadingDays = (month.weekday % 7 - firstWeekday) % 7;
     final daysInMonth = DateUtils.getDaysInMonth(month.year, month.month);
     final weeks = ((leadingDays + daysInMonth) / 7).ceil();
@@ -182,7 +196,7 @@ class _DayCell extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
-                  '+${dayBookings.length - _maxBars} more',
+                  context.t.bookings.more(n: dayBookings.length - _maxBars),
                   style: theme.textTheme.labelSmall,
                 ),
               ),
@@ -250,7 +264,7 @@ class _BookingBar extends StatelessWidget {
       message: [
         booking.title,
         booking.dateRangeLabel(context),
-        'Lead: ${booking.leadName}',
+        booking.leadLabel(context),
       ].nonNulls.join('\n'),
       child: Container(
         // Bars run edge to edge between days so multi-day bookings read as

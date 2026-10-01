@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/components/async_list_view.dart';
@@ -19,13 +20,13 @@ class BookingsAgendaView extends ConsumerWidget {
           .watch(bookingsProvider)
           .whenData((bookings) => _upcoming(bookings, today)),
       onRetry: () => ref.refresh(bookingsProvider.future),
-      emptyText: 'No upcoming bookings',
+      emptyText: context.t.bookings.noUpcoming,
       itemBuilder: (context, booking) => YaruListTile(
         leading: Icon(Icons.event, color: booking.color),
         titleText: booking.title,
         subtitleText: [
           booking.dateRangeLabel(context),
-          'Lead: ${booking.leadName}',
+          booking.leadLabel(context),
         ].nonNulls.join(' · '),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 
 const _bookingColors = [
@@ -38,6 +39,9 @@ extension BookingX on Booking {
   Color get color => _bookingColors[(id ?? 0) % _bookingColors.length];
 
   String get leadName => '${lead.firstName} ${lead.lastName}';
+
+  String leadLabel(BuildContext context) =>
+      context.t.bookings.lead(name: leadName);
 
   String? dateRangeLabel(BuildContext context) {
     final l10n = MaterialLocalizations.of(context);

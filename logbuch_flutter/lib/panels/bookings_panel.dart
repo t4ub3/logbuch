@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/panels/bookings/bookings_agenda_view.dart';
 import 'package:logbuch_flutter/panels/bookings/bookings_month_view.dart';
@@ -19,21 +20,21 @@ class BookingsPanel extends ConsumerWidget {
           padding: const EdgeInsets.all(8),
           child: Center(
             child: SegmentedButton<BookingsView>(
-              segments: const [
+              segments: [
                 ButtonSegment(
                   value: BookingsView.agenda,
-                  label: Text('Agenda'),
-                  icon: Icon(Icons.view_agenda),
+                  label: Text(context.t.bookings.agenda),
+                  icon: const Icon(Icons.view_agenda),
                 ),
                 ButtonSegment(
                   value: BookingsView.month,
-                  label: Text('Month'),
-                  icon: Icon(Icons.calendar_view_month),
+                  label: Text(context.t.bookings.month),
+                  icon: const Icon(Icons.calendar_view_month),
                 ),
                 ButtonSegment(
                   value: BookingsView.year,
-                  label: Text('Year'),
-                  icon: Icon(Icons.calendar_today),
+                  label: Text(context.t.bookings.year),
+                  icon: const Icon(Icons.calendar_today),
                 ),
               ],
               selected: {view},

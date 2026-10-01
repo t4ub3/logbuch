@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/components/async_list_view.dart';
@@ -13,12 +14,11 @@ class RoomsPanel extends ConsumerWidget {
     return AsyncListView<Room>(
       value: ref.watch(roomsProvider),
       onRetry: () => ref.refresh(roomsProvider.future),
-      emptyText: 'No rooms',
+      emptyText: context.t.rooms.empty,
       itemBuilder: (context, room) => YaruListTile(
         leading: const Icon(Icons.bed),
-        titleText: 'Room ${room.roomNumber}',
-        subtitleText:
-            '${room.bedAmount} ${room.bedAmount == 1 ? 'bed' : 'beds'}',
+        titleText: context.t.rooms.room(number: room.roomNumber),
+        subtitleText: context.t.rooms.beds(n: room.bedAmount),
       ),
     );
   }

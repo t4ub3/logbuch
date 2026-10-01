@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logbuch_flutter/i18n/strings.g.dart';
 
 class BookingsYearView extends StatelessWidget {
   const BookingsYearView({super.key});
@@ -7,7 +8,7 @@ class BookingsYearView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Text(
-        'Yearly view',
+        context.t.bookings.yearlyView,
         style: Theme.of(context).textTheme.displaySmall,
       ),
     );

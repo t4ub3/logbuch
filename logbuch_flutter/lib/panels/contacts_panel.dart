@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/components/async_list_view.dart';
@@ -13,7 +14,7 @@ class ContactsPanel extends ConsumerWidget {
     return AsyncListView<Contact>(
       value: ref.watch(contactsProvider),
       onRetry: () => ref.refresh(contactsProvider.future),
-      emptyText: 'No contacts',
+      emptyText: context.t.contacts.empty,
       itemBuilder: (context, contact) => YaruListTile(
         leading: const Icon(Icons.person),
         titleText: '${contact.firstName} ${contact.lastName}',

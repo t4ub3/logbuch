@@ -5,12 +5,21 @@ class StatusBarComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
-      color: Color(0xFFFF9000),
+      // A subtle tint of the accent color, kept opaque.
+      color: Color.alphaBlend(
+        colorScheme.primary.withValues(alpha: 0.4),
+        colorScheme.surface,
+      ),
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text("status bar"),
+          child: Text(
+            "status bar",
+            style: TextStyle(color: colorScheme.onSurface),
+          ),
         ),
       ),
     );
