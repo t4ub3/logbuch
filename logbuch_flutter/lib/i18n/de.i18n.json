@@ -1,45 +1,46 @@
 {
-  "common": {
-    "loadFailed": "Laden fehlgeschlagen: {error}",
-    "retry": "Erneut versuchen",
-    "noEntries": "Keine Einträge"
-  },
-  "menu": {
-    "bookings": "Buchungen",
-    "contacts": "Kontakte",
-    "rooms": "Zimmer",
-    "settings": "Einstellungen"
-  },
-  "bookings": {
-    "agenda": "Agenda",
-    "month": "Monat",
-    "year": "Jahr",
-    "noUpcoming": "Keine anstehenden Buchungen",
-    "lead": "Leitung: {name}",
-    "previousMonth": "Vorheriger Monat",
-    "nextMonth": "Nächster Monat",
-    "today": "Heute",
-    "more": "+{n} weitere",
-    "yearlyView": "Jahresansicht"
-  },
-  "contacts": {
-    "empty": "Keine Kontakte"
-  },
-  "rooms": {
-    "empty": "Keine Zimmer",
-    "room": "Zimmer {number}",
-    "beds": {
-      "one": "{n} Bett",
-      "other": "{n} Betten"
+    "common": {
+        "loadFailed": "Laden fehlgeschlagen: {error}",
+        "retry": "Erneut versuchen",
+        "noEntries": "Keine Einträge"
+    },
+    "menu": {
+        "bookings": "Buchungen",
+        "contacts": "Kontakte",
+        "rooms": "Zimmer",
+        "settings": "Einstellungen"
+    },
+    "bookings": {
+        "newBooking": "Neue Buchung",
+        "agenda": "Agenda",
+        "month": "Monat",
+        "year": "Jahr",
+        "noUpcoming": "Keine anstehenden Buchungen",
+        "lead": "Leitung: {name}",
+        "previousMonth": "Vorheriger Monat",
+        "nextMonth": "Nächster Monat",
+        "today": "Heute",
+        "more": "+{n} weitere",
+        "yearlyView": "Jahresansicht"
+    },
+    "contacts": {
+        "empty": "Keine Kontakte"
+    },
+    "rooms": {
+        "empty": "Keine Zimmer",
+        "room": "Zimmer {number}",
+        "beds": {
+            "one": "{n} Bett",
+            "other": "{n} Betten"
+        }
+    },
+    "settings": {
+        "title": "Einstellungen",
+        "language": "Sprache",
+        "systemLanguage": "Systemstandard",
+        "startOfWeek": "Erster Wochentag",
+        "monday": "Montag",
+        "sunday": "Sonntag",
+        "accentColor": "Akzentfarbe"
     }
-  },
-  "settings": {
-    "title": "Einstellungen",
-    "language": "Sprache",
-    "systemLanguage": "Systemstandard",
-    "startOfWeek": "Erster Wochentag",
-    "monday": "Montag",
-    "sunday": "Sonntag",
-    "accentColor": "Akzentfarbe"
-  }
 }

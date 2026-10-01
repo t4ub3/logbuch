@@ -79,6 +79,7 @@ class _Translations$bookings$de extends Translations$bookings$en {
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
+	@override String get newBooking => 'Neue Buchung';
 	@override String get agenda => 'Agenda';
 	@override String get month => 'Monat';
 	@override String get year => 'Jahr';
@@ -147,6 +148,7 @@ extension on TranslationsDe {
 			'menu.contacts' => 'Kontakte',
 			'menu.rooms' => 'Zimmer',
 			'menu.settings' => 'Einstellungen',
+			'bookings.newBooking' => 'Neue Buchung',
 			'bookings.agenda' => 'Agenda',
 			'bookings.month' => 'Monat',
 			'bookings.year' => 'Jahr',

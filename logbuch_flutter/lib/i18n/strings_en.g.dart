@@ -96,6 +96,9 @@ class Translations$bookings$en {
 
 	// Translations
 
+	/// en: 'New booking'
+	String get newBooking => 'New booking';
+
 	/// en: 'Agenda'
 	String get agenda => 'Agenda';
 
@@ -205,6 +208,7 @@ extension on Translations {
 			'menu.contacts' => 'Contacts',
 			'menu.rooms' => 'Rooms',
 			'menu.settings' => 'Settings',
+			'bookings.newBooking' => 'New booking',
 			'bookings.agenda' => 'Agenda',
 			'bookings.month' => 'Month',
 			'bookings.year' => 'Year',

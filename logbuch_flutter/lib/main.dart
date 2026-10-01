@@ -42,6 +42,8 @@ class MyApp extends ConsumerWidget {
     return YaruTheme(
       data: YaruThemeData(variant: variant),
       builder: (context, yaru, child) => MaterialApp(
+        title: "Log|Buch",
+        debugShowCheckedModeBanner: false,
         theme: yaru.theme,
         darkTheme: yaru.darkTheme,
         locale: TranslationProvider.of(context).flutterLocale,

@@ -1,45 +1,46 @@
 {
-  "common": {
-    "loadFailed": "Failed to load: {error}",
-    "retry": "Retry",
-    "noEntries": "No entries"
-  },
-  "menu": {
-    "bookings": "Bookings",
-    "contacts": "Contacts",
-    "rooms": "Rooms",
-    "settings": "Settings"
-  },
-  "bookings": {
-    "agenda": "Agenda",
-    "month": "Month",
-    "year": "Year",
-    "noUpcoming": "No upcoming bookings",
-    "lead": "Lead: {name}",
-    "previousMonth": "Previous month",
-    "nextMonth": "Next month",
-    "today": "Today",
-    "more": "+{n} more",
-    "yearlyView": "Yearly view"
-  },
-  "contacts": {
-    "empty": "No contacts"
-  },
-  "rooms": {
-    "empty": "No rooms",
-    "room": "Room {number}",
-    "beds": {
-      "one": "{n} bed",
-      "other": "{n} beds"
+    "common": {
+        "loadFailed": "Failed to load: {error}",
+        "retry": "Retry",
+        "noEntries": "No entries"
+    },
+    "menu": {
+        "bookings": "Bookings",
+        "contacts": "Contacts",
+        "rooms": "Rooms",
+        "settings": "Settings"
+    },
+    "bookings": {
+        "newBooking": "New booking",
+        "agenda": "Agenda",
+        "month": "Month",
+        "year": "Year",
+        "noUpcoming": "No upcoming bookings",
+        "lead": "Lead: {name}",
+        "previousMonth": "Previous month",
+        "nextMonth": "Next month",
+        "today": "Today",
+        "more": "+{n} more",
+        "yearlyView": "Yearly view"
+    },
+    "contacts": {
+        "empty": "No contacts"
+    },
+    "rooms": {
+        "empty": "No rooms",
+        "room": "Room {number}",
+        "beds": {
+            "one": "{n} bed",
+            "other": "{n} beds"
+        }
+    },
+    "settings": {
+        "title": "Settings",
+        "language": "Language",
+        "systemLanguage": "System default",
+        "startOfWeek": "First day of the week",
+        "monday": "Monday",
+        "sunday": "Sunday",
+        "accentColor": "Accent color"
     }
-  },
-  "settings": {
-    "title": "Settings",
-    "language": "Language",
-    "systemLanguage": "System default",
-    "startOfWeek": "First day of the week",
-    "monday": "Monday",
-    "sunday": "Sunday",
-    "accentColor": "Accent color"
-  }
 }

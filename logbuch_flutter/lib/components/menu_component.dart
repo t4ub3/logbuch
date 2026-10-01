@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logbuch_flutter/components/inset_divider.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/bookings_panel.dart';
 import 'package:logbuch_flutter/panels/contacts_panel.dart';
@@ -75,7 +76,7 @@ class MenuComponent extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineMedium,
           ),
         ),
-        _divider(),
+        const InsetDivider(),
         Expanded(
           child: ListView(
             children: [
@@ -84,14 +85,11 @@ class MenuComponent extends StatelessWidget {
             ],
           ),
         ),
-        _divider(),
+        const InsetDivider(),
         _tile(context, MenuItem.settings),
       ],
     );
   }
-
-  /// A separator inset to line up with the menu items.
-  Widget _divider() => const Divider(height: 1, indent: 16, endIndent: 16);
 
   Widget _tile(BuildContext context, MenuItem item) {
     final isSelected = item == selected;
