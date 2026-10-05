@@ -38,6 +38,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final variant = ref.watch(settingsProvider.select((s) => s.variant));
+    final themeMode = ref.watch(settingsProvider.select((s) => s.themeMode));
 
     return YaruTheme(
       data: YaruThemeData(variant: variant),
@@ -46,6 +47,7 @@ class MyApp extends ConsumerWidget {
         debugShowCheckedModeBanner: false,
         theme: yaru.theme,
         darkTheme: yaru.darkTheme,
+        themeMode: themeMode,
         locale: TranslationProvider.of(context).flutterLocale,
         supportedLocales: AppLocaleUtils.supportedLocales,
         localizationsDelegates: GlobalMaterialLocalizations.delegates,

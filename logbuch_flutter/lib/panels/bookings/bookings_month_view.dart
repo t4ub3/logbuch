@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
@@ -260,36 +261,42 @@ class _BookingBar extends StatelessWidget {
     final isEnd = booking.endDay == day;
     const radius = Radius.circular(4);
 
-    return Tooltip(
-      message: [
-        booking.title,
-        booking.dateRangeLabel(context),
-        booking.leadLabel(context),
-      ].nonNulls.join('\n'),
-      child: Container(
-        // Bars run edge to edge between days so multi-day bookings read as
-        // one continuous bar; they are only rounded and inset at their ends.
-        margin: EdgeInsets.only(
-          top: 2,
-          left: isStart ? 4 : 0,
-          right: isEnd ? 4 : 0,
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-        decoration: BoxDecoration(
-          color: booking.color,
-          borderRadius: BorderRadius.horizontal(
-            left: isStart ? radius : Radius.zero,
-            right: isEnd ? radius : Radius.zero,
+    return GestureDetector(
+      onTap: () => openBookingTab(context, booking),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Tooltip(
+          message: [
+            booking.title,
+            booking.dateRangeLabel(context),
+            booking.leadLabel(context),
+          ].nonNulls.join('\n'),
+          child: Container(
+            // Bars run edge to edge between days so multi-day bookings read as
+            // one continuous bar; they are only rounded and inset at their ends.
+            margin: EdgeInsets.only(
+              top: 2,
+              left: isStart ? 4 : 0,
+              right: isEnd ? 4 : 0,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+            decoration: BoxDecoration(
+              color: booking.color,
+              borderRadius: BorderRadius.horizontal(
+                left: isStart ? radius : Radius.zero,
+                right: isEnd ? radius : Radius.zero,
+              ),
+            ),
+            child: Text(
+              // Label only where the bar starts and at the start of each week.
+              isStart || isRowStart ? booking.title : '',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(
+                context,
+              ).textTheme.labelSmall?.copyWith(color: Colors.white),
+            ),
           ),
-        ),
-        child: Text(
-          // Label only where the bar starts and at the start of each week.
-          isStart || isRowStart ? booking.title : '',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(
-            context,
-          ).textTheme.labelSmall?.copyWith(color: Colors.white),
         ),
       ),
     );

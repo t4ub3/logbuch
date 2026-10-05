@@ -4,8 +4,12 @@
         "retry": "Erneut versuchen",
         "noEntries": "Keine Einträge"
     },
+    "tabs": {
+        "home": "Start",
+        "close": "Tab schließen"
+    },
     "menu": {
-        "bookings": "Buchungen",
+        "calendar": "Kalender",
         "contacts": "Kontakte",
         "rooms": "Zimmer",
         "settings": "Einstellungen"
@@ -19,9 +23,31 @@
         "lead": "Leitung: {name}",
         "previousMonth": "Vorheriger Monat",
         "nextMonth": "Nächster Monat",
+        "previousYear": "Vorheriges Jahr",
+        "nextYear": "Nächstes Jahr",
         "today": "Heute",
         "more": "+{n} weitere",
-        "yearlyView": "Jahresansicht"
+        "yearlyView": "Jahresansicht",
+        "edit": "Bearbeiten",
+        "email": "E-Mail",
+        "phone": "Telefon",
+        "status": "Status",
+        "statuses": {
+            "requested": "Angefragt",
+            "booked": "Gebucht",
+            "billed": "Abgerechnet",
+            "paid": "Bezahlt"
+        },
+        "editBooking": "Buchung bearbeiten",
+        "titleField": "Titel",
+        "dates": "Zeitraum",
+        "noDates": "Kein Zeitraum",
+        "clearDates": "Zeitraum entfernen",
+        "leadField": "Leitung",
+        "required": "Pflichtfeld",
+        "cancel": "Abbrechen",
+        "save": "Speichern",
+        "saveFailed": "Speichern fehlgeschlagen: {error}"
     },
     "contacts": {
         "empty": "Keine Kontakte"
@@ -41,6 +67,10 @@
         "startOfWeek": "Erster Wochentag",
         "monday": "Montag",
         "sunday": "Sonntag",
+        "theme": "Design",
+        "systemTheme": "Systemstandard",
+        "light": "Hell",
+        "dark": "Dunkel",
         "accentColor": "Akzentfarbe"
     }
 }

@@ -4,8 +4,12 @@
         "retry": "Retry",
         "noEntries": "No entries"
     },
+    "tabs": {
+        "home": "Home",
+        "close": "Close tab"
+    },
     "menu": {
-        "bookings": "Bookings",
+        "calendar": "Calendar",
         "contacts": "Contacts",
         "rooms": "Rooms",
         "settings": "Settings"
@@ -19,9 +23,31 @@
         "lead": "Lead: {name}",
         "previousMonth": "Previous month",
         "nextMonth": "Next month",
+        "previousYear": "Previous year",
+        "nextYear": "Next year",
         "today": "Today",
         "more": "+{n} more",
-        "yearlyView": "Yearly view"
+        "yearlyView": "Yearly view",
+        "edit": "Edit",
+        "email": "Email",
+        "phone": "Phone",
+        "status": "Status",
+        "statuses": {
+            "requested": "Requested",
+            "booked": "Booked",
+            "billed": "Billed",
+            "paid": "Paid"
+        },
+        "editBooking": "Edit booking",
+        "titleField": "Title",
+        "dates": "Dates",
+        "noDates": "No dates",
+        "clearDates": "Clear dates",
+        "leadField": "Lead",
+        "required": "Required",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saveFailed": "Saving failed: {error}"
     },
     "contacts": {
         "empty": "No contacts"
@@ -41,6 +67,10 @@
         "startOfWeek": "First day of the week",
         "monday": "Monday",
         "sunday": "Sunday",
+        "theme": "Theme",
+        "systemTheme": "System default",
+        "light": "Light",
+        "dark": "Dark",
         "accentColor": "Accent color"
     }
 }

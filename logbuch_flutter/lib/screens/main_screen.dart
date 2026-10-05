@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/components/menu_component.dart';
 import 'package:logbuch_flutter/components/status_bar_component.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_details.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_editor.dart';
+import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:yaru/yaru.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  ConsumerState<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  MenuItem _selected = MenuItem.bookings;
+class _MainScreenState extends ConsumerState<MainScreen> {
+  MenuItem _selected = MenuItem.calendar;
 
   @override
   Widget build(BuildContext context) {
+    final open = ref.watch(tabsProvider);
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -23,9 +29,28 @@ class _MainScreenState extends State<MainScreen> {
             child: YaruPanedView(
               pane: MenuComponent(
                 selected: _selected,
-                onSelected: (item) => setState(() => _selected = item),
+                onSelected: (item) {
+                  setState(() => _selected = item);
+                  // The menu always leads back to the home tab.
+                  ref.read(tabsProvider.notifier).select(0);
+                },
               ),
-              page: _selected.panel,
+              // Keeps all tabs alive so their state (e.g. a half filled form)
+              // survives switching tabs.
+              page: IndexedStack(
+                index: open.selected,
+                children: [
+                  for (final tab in open.tabs)
+                    KeyedSubtree(
+                      key: tab.key,
+                      child: switch (tab) {
+                        HomeTab() => _selected.panel,
+                        BookingTab(editing: true) => BookingEditor(tab: tab),
+                        BookingTab() => BookingDetails(tab: tab),
+                      },
+                    ),
+                ],
+              ),
               layoutDelegate: const YaruResizablePaneDelegate(
                 initialPaneSize: 200,
                 minPaneSize: 25,
@@ -34,7 +59,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
           ),
-          StatusBarComponent(),
+          const StatusBarComponent(),
         ],
       ),
     );

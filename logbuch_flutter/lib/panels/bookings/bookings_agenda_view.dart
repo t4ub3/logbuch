@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
@@ -28,6 +29,7 @@ class BookingsAgendaView extends ConsumerWidget {
           booking.dateRangeLabel(context),
           booking.leadLabel(context),
         ].nonNulls.join(' · '),
+        onTap: () => openBookingTab(context, booking),
       ),
     );
   }

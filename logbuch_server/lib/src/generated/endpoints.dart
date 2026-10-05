@@ -326,6 +326,25 @@ class Endpoints extends _is.EndpointDispatch {
                     params['booking'],
                   ),
         ),
+        'update': _is.MethodConnector(
+          name: 'update',
+          params: {
+            'booking': _is.ParameterDescription(
+              name: 'booking',
+              type: _is.getType<_iz54m678.Booking>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['booking'] as _i7f5j1eo.BookingEndpoint).update(
+                    session,
+                    params['booking'],
+                  ),
+        ),
       },
     );
     connectors['contact'] = _is.EndpointConnector(

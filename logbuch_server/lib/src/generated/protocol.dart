@@ -22,10 +22,12 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
+import 'bookings/booking_status.dart' as _iqmkyysz;
 import 'bookings/bookings.dart' as _iikb94hp;
 import 'contacts/contact.dart' as _io9atw8a;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'rooms/room.dart' as _ix383f3m;
+export 'bookings/booking_status.dart';
 export 'bookings/bookings.dart';
 export 'contacts/contact.dart';
 export 'greetings/greeting.dart';
@@ -82,6 +84,13 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnType: _isp.ColumnType.json,
           isNullable: false,
           dartType: 'protocol:Contact',
+        ),
+        _isp.ColumnDefinition(
+          name: 'status',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'protocol:BookingStatus',
+          columnDefault: '\'requested\'',
         ),
       ],
       foreignKeys: [],
@@ -199,6 +208,9 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
 
+    if (t == _iqmkyysz.BookingStatus) {
+      return _iqmkyysz.BookingStatus.fromJson(data) as T;
+    }
     if (t == _iikb94hp.Booking) {
       return _iikb94hp.Booking.fromJson(data) as T;
     }
@@ -210,6 +222,10 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _ix383f3m.Room) {
       return _ix383f3m.Room.fromJson(data) as T;
+    }
+    if (t == _is.getType<_iqmkyysz.BookingStatus?>()) {
+      return (data != null ? _iqmkyysz.BookingStatus.fromJson(data) : null)
+          as T;
     }
     if (t == _is.getType<_iikb94hp.Booking?>()) {
       return (data != null ? _iikb94hp.Booking.fromJson(data) : null) as T;
@@ -253,6 +269,7 @@ class Protocol extends _is.DatabaseSerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _iqmkyysz.BookingStatus => 'BookingStatus',
       _iikb94hp.Booking => 'Booking',
       _io9atw8a.Contact => 'Contact',
       _izw8z7ou.Greeting => 'Greeting',
@@ -271,6 +288,8 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
 
     switch (data) {
+      case _iqmkyysz.BookingStatus():
+        return 'BookingStatus';
       case _iikb94hp.Booking():
         return 'Booking';
       case _io9atw8a.Contact():
@@ -304,6 +323,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     var dataClassName = data['className'];
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
+    }
+    if (dataClassName == 'BookingStatus') {
+      return deserialize<_iqmkyysz.BookingStatus>(data['data']);
     }
     if (dataClassName == 'Booking') {
       return deserialize<_iikb94hp.Booking>(data['data']);

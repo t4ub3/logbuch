@@ -42,6 +42,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 
 	// Translations
 	late final Translations$common$en common = Translations$common$en.internal(_root);
+	late final Translations$tabs$en tabs = Translations$tabs$en.internal(_root);
 	late final Translations$menu$en menu = Translations$menu$en.internal(_root);
 	late final Translations$bookings$en bookings = Translations$bookings$en.internal(_root);
 	late final Translations$contacts$en contacts = Translations$contacts$en.internal(_root);
@@ -67,6 +68,21 @@ class Translations$common$en {
 	String get noEntries => 'No entries';
 }
 
+// Path: tabs
+class Translations$tabs$en {
+	Translations$tabs$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Home'
+	String get home => 'Home';
+
+	/// en: 'Close tab'
+	String get close => 'Close tab';
+}
+
 // Path: menu
 class Translations$menu$en {
 	Translations$menu$en.internal(this._root);
@@ -75,8 +91,8 @@ class Translations$menu$en {
 
 	// Translations
 
-	/// en: 'Bookings'
-	String get bookings => 'Bookings';
+	/// en: 'Calendar'
+	String get calendar => 'Calendar';
 
 	/// en: 'Contacts'
 	String get contacts => 'Contacts';
@@ -120,6 +136,12 @@ class Translations$bookings$en {
 	/// en: 'Next month'
 	String get nextMonth => 'Next month';
 
+	/// en: 'Previous year'
+	String get previousYear => 'Previous year';
+
+	/// en: 'Next year'
+	String get nextYear => 'Next year';
+
 	/// en: 'Today'
 	String get today => 'Today';
 
@@ -128,6 +150,50 @@ class Translations$bookings$en {
 
 	/// en: 'Yearly view'
 	String get yearlyView => 'Yearly view';
+
+	/// en: 'Edit'
+	String get edit => 'Edit';
+
+	/// en: 'Email'
+	String get email => 'Email';
+
+	/// en: 'Phone'
+	String get phone => 'Phone';
+
+	/// en: 'Status'
+	String get status => 'Status';
+
+	late final Translations$bookings$statuses$en statuses = Translations$bookings$statuses$en.internal(_root);
+
+	/// en: 'Edit booking'
+	String get editBooking => 'Edit booking';
+
+	/// en: 'Title'
+	String get titleField => 'Title';
+
+	/// en: 'Dates'
+	String get dates => 'Dates';
+
+	/// en: 'No dates'
+	String get noDates => 'No dates';
+
+	/// en: 'Clear dates'
+	String get clearDates => 'Clear dates';
+
+	/// en: 'Lead'
+	String get leadField => 'Lead';
+
+	/// en: 'Required'
+	String get required => 'Required';
+
+	/// en: 'Cancel'
+	String get cancel => 'Cancel';
+
+	/// en: 'Save'
+	String get save => 'Save';
+
+	/// en: 'Saving failed: {error}'
+	String saveFailed({required Object error}) => 'Saving failed: ${error}';
 }
 
 // Path: contacts
@@ -189,8 +255,41 @@ class Translations$settings$en {
 	/// en: 'Sunday'
 	String get sunday => 'Sunday';
 
+	/// en: 'Theme'
+	String get theme => 'Theme';
+
+	/// en: 'System default'
+	String get systemTheme => 'System default';
+
+	/// en: 'Light'
+	String get light => 'Light';
+
+	/// en: 'Dark'
+	String get dark => 'Dark';
+
 	/// en: 'Accent color'
 	String get accentColor => 'Accent color';
+}
+
+// Path: bookings.statuses
+class Translations$bookings$statuses$en {
+	Translations$bookings$statuses$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Requested'
+	String get requested => 'Requested';
+
+	/// en: 'Booked'
+	String get booked => 'Booked';
+
+	/// en: 'Billed'
+	String get billed => 'Billed';
+
+	/// en: 'Paid'
+	String get paid => 'Paid';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -204,7 +303,9 @@ extension on Translations {
 			'common.loadFailed' => ({required Object error}) => 'Failed to load: ${error}',
 			'common.retry' => 'Retry',
 			'common.noEntries' => 'No entries',
-			'menu.bookings' => 'Bookings',
+			'tabs.home' => 'Home',
+			'tabs.close' => 'Close tab',
+			'menu.calendar' => 'Calendar',
 			'menu.contacts' => 'Contacts',
 			'menu.rooms' => 'Rooms',
 			'menu.settings' => 'Settings',
@@ -216,9 +317,29 @@ extension on Translations {
 			'bookings.lead' => ({required Object name}) => 'Lead: ${name}',
 			'bookings.previousMonth' => 'Previous month',
 			'bookings.nextMonth' => 'Next month',
+			'bookings.previousYear' => 'Previous year',
+			'bookings.nextYear' => 'Next year',
 			'bookings.today' => 'Today',
 			'bookings.more' => ({required Object n}) => '+${n} more',
 			'bookings.yearlyView' => 'Yearly view',
+			'bookings.edit' => 'Edit',
+			'bookings.email' => 'Email',
+			'bookings.phone' => 'Phone',
+			'bookings.status' => 'Status',
+			'bookings.statuses.requested' => 'Requested',
+			'bookings.statuses.booked' => 'Booked',
+			'bookings.statuses.billed' => 'Billed',
+			'bookings.statuses.paid' => 'Paid',
+			'bookings.editBooking' => 'Edit booking',
+			'bookings.titleField' => 'Title',
+			'bookings.dates' => 'Dates',
+			'bookings.noDates' => 'No dates',
+			'bookings.clearDates' => 'Clear dates',
+			'bookings.leadField' => 'Lead',
+			'bookings.required' => 'Required',
+			'bookings.cancel' => 'Cancel',
+			'bookings.save' => 'Save',
+			'bookings.saveFailed' => ({required Object error}) => 'Saving failed: ${error}',
 			'contacts.empty' => 'No contacts',
 			'rooms.empty' => 'No rooms',
 			'rooms.room' => ({required Object number}) => 'Room ${number}',
@@ -229,6 +350,10 @@ extension on Translations {
 			'settings.startOfWeek' => 'First day of the week',
 			'settings.monday' => 'Monday',
 			'settings.sunday' => 'Sunday',
+			'settings.theme' => 'Theme',
+			'settings.systemTheme' => 'System default',
+			'settings.light' => 'Light',
+			'settings.dark' => 'Dark',
 			'settings.accentColor' => 'Accent color',
 			_ => null,
 		};

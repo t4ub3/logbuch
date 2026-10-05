@@ -5,10 +5,11 @@ import 'package:logbuch_flutter/panels/bookings_panel.dart';
 import 'package:logbuch_flutter/panels/contacts_panel.dart';
 import 'package:logbuch_flutter/panels/rooms_panel.dart';
 import 'package:logbuch_flutter/panels/settings_panel.dart';
+import 'package:logbuch_flutter/theme/dimmed_accent.dart';
 import 'package:yaru/yaru.dart';
 
 enum MenuItem {
-  bookings(BookingsPanel()),
+  calendar(BookingsPanel()),
   contacts(ContactsPanel()),
   rooms(RoomsPanel()),
   settings(SettingsPanel());
@@ -18,14 +19,14 @@ enum MenuItem {
   final Widget panel;
 
   String title(Translations t) => switch (this) {
-    bookings => t.menu.bookings,
+    calendar => t.menu.calendar,
     contacts => t.menu.contacts,
     rooms => t.menu.rooms,
     settings => t.menu.settings,
   };
 
   IconData icon({required bool selected}) => switch (this) {
-    bookings => selected ? YaruIcons.calendar_filled : YaruIcons.calendar,
+    calendar => selected ? YaruIcons.calendar_filled : YaruIcons.calendar,
     contacts =>
       selected ? YaruIcons.address_book_filled : YaruIcons.address_book,
     rooms => selected ? YaruIcons.key_filled : YaruIcons.key,
@@ -49,7 +50,7 @@ class MenuComponent extends StatelessWidget {
 
     // YaruMasterTile takes its selected colors from the ListTileTheme.
     return ListTileTheme.merge(
-      selectedTileColor: colorScheme.primary.withValues(alpha: 0.4),
+      selectedTileColor: colorScheme.dimmedPrimary,
       selectedColor: colorScheme.onSurface,
       child: _buildMenu(context),
     );

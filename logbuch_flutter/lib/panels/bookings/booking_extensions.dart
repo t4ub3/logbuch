@@ -61,3 +61,15 @@ int compareByStart(Booking a, Booking b) {
   if (bStart == null) return -1;
   return aStart.compareTo(bStart);
 }
+
+extension BookingStatusX on BookingStatus {
+  String label(BuildContext context) {
+    final t = context.t.bookings.statuses;
+    return switch (this) {
+      BookingStatus.requested => t.requested,
+      BookingStatus.booked => t.booked,
+      BookingStatus.billed => t.billed,
+      BookingStatus.paid => t.paid,
+    };
+  }
+}

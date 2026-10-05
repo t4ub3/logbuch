@@ -84,6 +84,32 @@ class SettingsPanel extends ConsumerWidget {
                 ),
                 YaruListTile(
                   hasFocusBorder: false,
+                  title: Text(t.theme),
+                  trailing: DropdownMenu<ThemeMode>(
+                    key: ValueKey(('theme', currentLocale)),
+                    initialSelection: settings.themeMode,
+                    requestFocusOnTap: false,
+                    onSelected: (value) {
+                      if (value != null) notifier.setThemeMode(value);
+                    },
+                    dropdownMenuEntries: [
+                      DropdownMenuEntry(
+                        value: ThemeMode.system,
+                        label: t.systemTheme,
+                      ),
+                      DropdownMenuEntry(
+                        value: ThemeMode.light,
+                        label: t.light,
+                      ),
+                      DropdownMenuEntry(
+                        value: ThemeMode.dark,
+                        label: t.dark,
+                      ),
+                    ],
+                  ),
+                ),
+                YaruListTile(
+                  hasFocusBorder: false,
                   title: Text(t.accentColor),
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: 8),

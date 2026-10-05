@@ -12,6 +12,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:logbuch_server/src/generated/protocol.dart' as _iil9w69f;
 import 'package:serverpod/serverpod.dart' as _is;
+import '../bookings/booking_status.dart' as _ilk1qg37;
 import '../contacts/contact.dart' as _imbxrfja;
 
 abstract class Booking
@@ -23,7 +24,9 @@ abstract class Booking
     this.from,
     this.to,
     required this.lead,
-  }) : createdAt = createdAt ?? DateTime.now();
+    _ilk1qg37.BookingStatus? status,
+  }) : createdAt = createdAt ?? DateTime.now(),
+       status = status ?? _ilk1qg37.BookingStatus.requested;
 
   factory Booking({
     int? id,
@@ -32,6 +35,7 @@ abstract class Booking
     DateTime? from,
     DateTime? to,
     required _imbxrfja.Contact lead,
+    _ilk1qg37.BookingStatus? status,
   }) = _BookingImpl;
 
   factory Booking.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -50,6 +54,11 @@ abstract class Booking
       lead: _iil9w69f.Protocol().deserialize<_imbxrfja.Contact>(
         jsonSerialization['lead'],
       ),
+      status: jsonSerialization['status'] == null
+          ? null
+          : _ilk1qg37.BookingStatus.fromJson(
+              (jsonSerialization['status'] as String),
+            ),
     );
   }
 
@@ -70,6 +79,8 @@ abstract class Booking
 
   _imbxrfja.Contact lead;
 
+  _ilk1qg37.BookingStatus status;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -83,6 +94,7 @@ abstract class Booking
     DateTime? from,
     DateTime? to,
     _imbxrfja.Contact? lead,
+    _ilk1qg37.BookingStatus? status,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -94,6 +106,7 @@ abstract class Booking
       if (from != null) 'from': from?.toJson(),
       if (to != null) 'to': to?.toJson(),
       'lead': lead.toJson(),
+      'status': status.toJson(),
     };
   }
 
@@ -107,6 +120,7 @@ abstract class Booking
       if (from != null) 'from': from?.toJson(),
       if (to != null) 'to': to?.toJson(),
       'lead': lead.toJsonForProtocol(),
+      'status': status.toJson(),
     };
   }
 
@@ -148,6 +162,7 @@ class _BookingImpl extends Booking {
     DateTime? from,
     DateTime? to,
     required _imbxrfja.Contact lead,
+    _ilk1qg37.BookingStatus? status,
   }) : super._(
          id: id,
          createdAt: createdAt,
@@ -155,6 +170,7 @@ class _BookingImpl extends Booking {
          from: from,
          to: to,
          lead: lead,
+         status: status,
        );
 
   /// Returns a shallow copy of this [Booking]
@@ -168,6 +184,7 @@ class _BookingImpl extends Booking {
     Object? from = _Undefined,
     Object? to = _Undefined,
     _imbxrfja.Contact? lead,
+    _ilk1qg37.BookingStatus? status,
   }) {
     return Booking(
       id: id is int? ? id : this.id,
@@ -176,6 +193,7 @@ class _BookingImpl extends Booking {
       from: from is DateTime? ? from : this.from,
       to: to is DateTime? ? to : this.to,
       lead: lead ?? this.lead.copyWith(),
+      status: status ?? this.status,
     );
   }
 }
@@ -210,6 +228,13 @@ class BookingUpdateTable extends _is.UpdateTable<BookingTable> {
     table.lead,
     value,
   );
+
+  _is.ColumnValue<_ilk1qg37.BookingStatus, _ilk1qg37.BookingStatus> status(
+    _ilk1qg37.BookingStatus value,
+  ) => _is.ColumnValue(
+    table.status,
+    value,
+  );
 }
 
 class BookingTable extends _is.Table<int?> {
@@ -236,6 +261,12 @@ class BookingTable extends _is.Table<int?> {
       'lead',
       this,
     );
+    status = _is.ColumnEnum(
+      'status',
+      this,
+      _is.EnumSerialization.byName,
+      hasDefault: true,
+    );
   }
 
   late final BookingUpdateTable updateTable;
@@ -250,6 +281,8 @@ class BookingTable extends _is.Table<int?> {
 
   late final _is.ColumnSerializable<_imbxrfja.Contact> lead;
 
+  late final _is.ColumnEnum<_ilk1qg37.BookingStatus> status;
+
   @override
   List<_is.Column> get columns => [
     id,
@@ -258,6 +291,7 @@ class BookingTable extends _is.Table<int?> {
     from,
     to,
     lead,
+    status,
   ];
 }
 

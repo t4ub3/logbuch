@@ -277,6 +277,13 @@ class EndpointBooking extends _isc.EndpointRef {
         'add',
         {'booking': booking},
       );
+
+  _ida.Future<_iey0gn1f.Booking> update(_iey0gn1f.Booking booking) =>
+      caller.callServerEndpoint<_iey0gn1f.Booking>(
+        'booking',
+        'update',
+        {'booking': booking},
+      );
 }
 
 /// {@category Endpoint}

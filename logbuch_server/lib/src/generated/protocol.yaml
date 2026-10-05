@@ -13,6 +13,7 @@ booking:
   - getAll:
   - getById:
   - add:
+  - update:
 contact:
   - getAll:
   - getById:

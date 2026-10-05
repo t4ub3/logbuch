@@ -103,7 +103,7 @@ final class DisplayedMonthProvider
   }
 }
 
-String _$displayedMonthHash() => r'42ccddd10e3b8624400a817db1be498b3ae8206d';
+String _$displayedMonthHash() => r'ae90e3493115174c0d1f42e5610d4c93fd438d48';
 
 /// The month shown in the monthly calendar, as the first day of that month.
 
@@ -118,6 +118,64 @@ abstract class _$DisplayedMonth extends $Notifier<DateTime> {
             as $ClassProviderElement<
               AnyNotifier<DateTime, DateTime>,
               DateTime,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+/// The year shown in the yearly calendar.
+
+@ProviderFor(DisplayedYear)
+final displayedYearProvider = DisplayedYearProvider._();
+
+/// The year shown in the yearly calendar.
+final class DisplayedYearProvider
+    extends $NotifierProvider<DisplayedYear, int> {
+  /// The year shown in the yearly calendar.
+  DisplayedYearProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'displayedYearProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$displayedYearHash();
+
+  @$internal
+  @override
+  DisplayedYear create() => DisplayedYear();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int>(value),
+    );
+  }
+}
+
+String _$displayedYearHash() => r'6bcd2276ff81ccd6423b69930ac125203cf2b649';
+
+/// The year shown in the yearly calendar.
+
+abstract class _$DisplayedYear extends $Notifier<int> {
+  int build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<int, int>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<int, int>,
+              int,
               Object?,
               Object?
             >;

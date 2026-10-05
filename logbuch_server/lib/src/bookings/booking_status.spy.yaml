@@ -1,0 +1,8 @@
+enum: BookingStatus
+serialized: byName
+default: requested
+values:
+  - requested
+  - booked
+  - billed
+  - paid

@@ -13,4 +13,8 @@ class BookingEndpoint extends Endpoint {
   Future<Booking> add(Session session, Booking booking) async {
     return await Booking.db.insertRow(session, booking);
   }
+
+  Future<Booking> update(Session session, Booking booking) async {
+    return await Booking.db.updateRow(session, booking);
+  }
 }

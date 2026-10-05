@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:logbuch_flutter/components/inset_divider.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,7 +55,7 @@ class BookingsPanel extends ConsumerWidget {
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton.icon(
                 icon: Icon(YaruIcons.plus),
-                onPressed: () {},
+                onPressed: () => openBookingTab(context),
                 label: Text(context.t.bookings.newBooking),
               ),
             ),

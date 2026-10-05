@@ -25,6 +25,21 @@ class DisplayedMonth extends _$DisplayedMonth {
 
   void today() => state = _firstOfMonth(DateTime.now());
 
+  void show(DateTime month) => state = _firstOfMonth(month);
+
   static DateTime _firstOfMonth(DateTime date) =>
       DateTime(date.year, date.month);
+}
+
+/// The year shown in the yearly calendar.
+@Riverpod(keepAlive: true)
+class DisplayedYear extends _$DisplayedYear {
+  @override
+  int build() => DateTime.now().year;
+
+  void previous() => state--;
+
+  void next() => state++;
+
+  void today() => state = DateTime.now().year;
 }
