@@ -53,6 +53,30 @@ extension BookingX on Booking {
   }
 }
 
+/// Distributes the [bookings] that overlap the days [first] to [last] over
+/// lanes, so that bookings in the same lane never overlap and each one can
+/// be drawn as a straight bar. [bookings] must be sorted by [compareByStart].
+List<List<Booking>> assignLanes(
+  List<Booking> bookings,
+  DateTime first,
+  DateTime last,
+) {
+  final lanes = <List<Booking>>[];
+  for (final booking in bookings) {
+    final start = booking.startDay;
+    final end = booking.endDay;
+    if (start == null || end == null) continue;
+    if (start.isAfter(last) || end.isBefore(first)) continue;
+    final lane = lanes.where((l) => l.last.endDay!.isBefore(start));
+    if (lane.isEmpty) {
+      lanes.add([booking]);
+    } else {
+      lane.first.add(booking);
+    }
+  }
+  return lanes;
+}
+
 /// Orders bookings by start day; undated bookings come last.
 int compareByStart(Booking a, Booking b) {
   final aStart = a.startDay;

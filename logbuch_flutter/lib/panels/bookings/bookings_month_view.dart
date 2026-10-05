@@ -127,19 +127,27 @@ class _MonthGrid extends StatelessWidget {
         ),
         for (var w = 0; w < weeks; w++)
           Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (var d = 0; d < 7; d++)
-                  Expanded(
-                    child: _DayCell(
-                      day: dayAt(w, d),
-                      inMonth: dayAt(w, d).month == month.month,
-                      isRowStart: d == 0,
-                      bookings: bookings,
-                    ),
-                  ),
-              ],
+            child: _buildWeek(dayAt, w),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildWeek(DateTime Function(int, int) dayAt, int week) {
+    // Each booking keeps its lane for the whole week, so its bar stays on
+    // one line even when bookings above it end.
+    final lanes = assignLanes(bookings, dayAt(week, 0), dayAt(week, 6));
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var d = 0; d < 7; d++)
+          Expanded(
+            child: _DayCell(
+              day: dayAt(week, d),
+              inMonth: dayAt(week, d).month == month.month,
+              isRowStart: d == 0,
+              lanes: lanes,
             ),
           ),
       ],
@@ -152,7 +160,7 @@ class _DayCell extends StatelessWidget {
     required this.day,
     required this.inMonth,
     required this.isRowStart,
-    required this.bookings,
+    required this.lanes,
   });
 
   static const _maxBars = 3;
@@ -160,13 +168,18 @@ class _DayCell extends StatelessWidget {
   final DateTime day;
   final bool inMonth;
   final bool isRowStart;
-  final List<Booking> bookings;
+
+  /// The lanes of this week, see [assignLanes].
+  final List<List<Booking>> lanes;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isToday = DateUtils.isSameDay(day, DateTime.now());
-    final dayBookings = bookings.where((b) => b.coversDay(day)).toList();
+    final dayBookings = [
+      for (final lane in lanes) lane.where((b) => b.coversDay(day)).firstOrNull,
+    ];
+    final hidden = dayBookings.skip(_maxBars).nonNulls.length;
 
     return Container(
       decoration: BoxDecoration(
@@ -191,13 +204,20 @@ class _DayCell extends StatelessWidget {
                 ),
               ),
             ),
+            // Empty lanes keep their space so bars line up across the week.
             for (final booking in dayBookings.take(_maxBars))
-              _BookingBar(booking: booking, day: day, isRowStart: isRowStart),
-            if (dayBookings.length > _maxBars)
+              booking == null
+                  ? const SizedBox(height: _BookingBar.height)
+                  : _BookingBar(
+                      booking: booking,
+                      day: day,
+                      isRowStart: isRowStart,
+                    ),
+            if (hidden > 0)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
-                  context.t.bookings.more(n: dayBookings.length - _maxBars),
+                  context.t.bookings.more(n: hidden),
                   style: theme.textTheme.labelSmall,
                 ),
               ),
@@ -251,6 +271,9 @@ class _BookingBar extends StatelessWidget {
     required this.isRowStart,
   });
 
+  /// Height including the gap above the bar.
+  static const height = 18.0;
+
   final Booking booking;
   final DateTime day;
   final bool isRowStart;
@@ -272,6 +295,9 @@ class _BookingBar extends StatelessWidget {
             booking.leadLabel(context),
           ].nonNulls.join('\n'),
           child: Container(
+            // The top margin is part of [height].
+            height: height - 2,
+            alignment: Alignment.centerLeft,
             // Bars run edge to edge between days so multi-day bookings read as
             // one continuous bar; they are only rounded and inset at their ends.
             margin: EdgeInsets.only(
@@ -279,7 +305,7 @@ class _BookingBar extends StatelessWidget {
               left: isStart ? 4 : 0,
               right: isEnd ? 4 : 0,
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(
               color: booking.color,
               borderRadius: BorderRadius.horizontal(

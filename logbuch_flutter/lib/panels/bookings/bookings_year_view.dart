@@ -172,7 +172,11 @@ class _MonthRow extends ConsumerWidget {
     final locale = Localizations.localeOf(context).toLanguageTag();
     final leadingDays = (month.weekday % 7 - firstWeekday) % 7;
     final daysInMonth = DateUtils.getDaysInMonth(month.year, month.month);
-    final lanes = _assignLanes();
+    final lanes = assignLanes(
+      bookings,
+      month,
+      DateTime(month.year, month.month, daysInMonth),
+    );
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -211,26 +215,6 @@ class _MonthRow extends ConsumerWidget {
           ),
       ],
     );
-  }
-
-  /// Distributes the bookings of this month over lanes so that bookings in
-  /// the same lane never overlap and each one is drawn as a straight bar.
-  List<List<Booking>> _assignLanes() {
-    final monthEnd = DateTime(month.year, month.month + 1, 0);
-    final lanes = <List<Booking>>[];
-    for (final booking in bookings) {
-      final start = booking.startDay;
-      final end = booking.endDay;
-      if (start == null || end == null) continue;
-      if (start.isAfter(monthEnd) || end.isBefore(month)) continue;
-      final lane = lanes.where((l) => l.last.endDay!.isBefore(start));
-      if (lane.isEmpty) {
-        lanes.add([booking]);
-      } else {
-        lane.first.add(booking);
-      }
-    }
-    return lanes;
   }
 }
 

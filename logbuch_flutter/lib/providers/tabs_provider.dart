@@ -69,7 +69,7 @@ class Tabs extends _$Tabs {
 
   /// Replaces the tab with the same key as [tab].
   void update(AppTab tab) {
-    final index = _indexOf(tab);
+    final index = indexOf(tab);
     if (index == -1) return;
     state = OpenTabs(
       tabs: [...state.tabs]..[index] = tab,
@@ -80,7 +80,7 @@ class Tabs extends _$Tabs {
   /// Closes [tab] and selects its left neighbor if it was selected. The
   /// home tab cannot be closed.
   void close(AppTab tab) {
-    final index = _indexOf(tab);
+    final index = indexOf(tab);
     if (tab is HomeTab || index == -1) return;
     final selected = state.selected;
     state = OpenTabs(
@@ -89,7 +89,8 @@ class Tabs extends _$Tabs {
     );
   }
 
-  int _indexOf(AppTab tab) => state.tabs.indexWhere((t) => t.key == tab.key);
+  /// Index of the tab with the same key as [tab], or -1.
+  int indexOf(AppTab tab) => state.tabs.indexWhere((t) => t.key == tab.key);
 }
 
 /// Opens a booking tab from widgets without a [WidgetRef].

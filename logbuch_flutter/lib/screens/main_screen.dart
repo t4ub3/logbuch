@@ -31,7 +31,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 selected: _selected,
                 onSelected: (item) {
                   setState(() => _selected = item);
-                  // The menu always leads back to the home tab.
+                  // Menu items lead back to the home tab.
                   ref.read(tabsProvider.notifier).select(0);
                 },
               ),

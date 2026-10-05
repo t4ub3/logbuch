@@ -67,7 +67,6 @@ class _Translations$tabs$de extends Translations$tabs$en {
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
-	@override String get home => 'Start';
 	@override String get close => 'Tab schließen';
 }
 
@@ -190,7 +189,6 @@ extension on TranslationsDe {
 			'common.loadFailed' => ({required Object error}) => 'Laden fehlgeschlagen: ${error}',
 			'common.retry' => 'Erneut versuchen',
 			'common.noEntries' => 'Keine Einträge',
-			'tabs.home' => 'Start',
 			'tabs.close' => 'Tab schließen',
 			'menu.calendar' => 'Kalender',
 			'menu.contacts' => 'Kontakte',

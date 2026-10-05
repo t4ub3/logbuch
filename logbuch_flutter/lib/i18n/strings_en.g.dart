@@ -76,9 +76,6 @@ class Translations$tabs$en {
 
 	// Translations
 
-	/// en: 'Home'
-	String get home => 'Home';
-
 	/// en: 'Close tab'
 	String get close => 'Close tab';
 }
@@ -303,7 +300,6 @@ extension on Translations {
 			'common.loadFailed' => ({required Object error}) => 'Failed to load: ${error}',
 			'common.retry' => 'Retry',
 			'common.noEntries' => 'No entries',
-			'tabs.home' => 'Home',
 			'tabs.close' => 'Close tab',
 			'menu.calendar' => 'Calendar',
 			'menu.contacts' => 'Contacts',
