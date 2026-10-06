@@ -1,131 +1,56 @@
-/// Seeds the development database with dummy data.
+/// Fills the development database with demo data, see [DemoData].
 ///
-/// Requires the server to be running (`serverpod start`), which also runs the
-/// embedded development database. Run from `logbuch_server`:
+/// Run from `logbuch_server`, whether `serverpod start` is running or not:
 ///
 ///   serverpod run seed
 ///
-/// Does nothing if contacts, price categories, rooms or bookings already
-/// exist.
+/// What is in the database already is kept, and running this again adds
+/// nothing.
+///
+/// The data is created through the endpoints, so this is built like an
+/// integration test: `withServerpod` runs a server inside this process and
+/// lets the endpoints be called as an admin. Here it works on the
+/// development database instead of an empty one, and keeps what it wrote.
 library;
 
 import 'dart:io';
 
-import 'package:logbuch_server/src/generated/protocol.dart';
-import 'package:postgres/postgres.dart';
+import 'package:serverpod/serverpod.dart';
+import 'package:test/test.dart';
 
-// ignore_for_file: avoid_print
+import '../test/integration/roles.dart';
+import '../test/integration/test_tools/serverpod_test_tools.dart';
+import 'demo_data.dart';
 
-Future<void> main() async {
-  final dir = File.fromUri(
-    Platform.script.resolve('../.serverpod/development/'),
-  ).path;
-  final conn = await Connection.open(
-    Endpoint(
-      host: File('$dir/run/.s.PGSQL.5432').absolute.path,
-      isUnixSocket: true,
-      database: 'logbuch',
-      username: 'postgres',
-      password: File('$dir/postgres.password').readAsStringSync().trim(),
-    ),
-    settings: ConnectionSettings(sslMode: SslMode.disable),
+void main() {
+  withServerpod(
+    'The demo data',
+    (sessionBuilder, endpoints) {
+      test('is added to the development database', () async {
+        final now = DateTime.now();
+        await DemoData(
+          sessionBuilder.asAdmin,
+          endpoints,
+          today: DateTime.utc(now.year, now.month, now.day),
+        ).seed();
+      }, timeout: const Timeout(Duration(minutes: 10)));
+    },
+    ephemeralDatabase: false,
+    rollbackDatabase: RollbackDatabase.disabled,
+    // The development server keeps its database up to date itself.
+    applyMigrations: false,
+    configOverride: (config) =>
+        config.copyWith(database: _developmentDatabase()),
   );
+}
 
-  for (final t in ['contacts', 'price_categories', 'rooms', 'bookings']) {
-    final r = await conn.execute('SELECT count(*) FROM $t');
-    if ((r.first[0] as int) > 0) {
-      print('Table $t is not empty, skipping seed.');
-      await conn.close();
-      return;
-    }
-  }
-
-  await conn.runTx((tx) async {
-    final contacts = <Contact>[];
-    for (final c in [
-      ('Anna', 'Schmidt', 'anna.schmidt@example.com', '+49 151 1234567'),
-      ('Lukas', 'Müller', 'lukas.mueller@example.com', '+49 160 2345678'),
-      ('Marie', 'Weber', 'marie.weber@example.com', null),
-      ('Felix', 'Wagner', null, '+49 171 3456789'),
-      ('Sophie', 'Becker', 'sophie.becker@example.com', '+49 152 4567890'),
-    ]) {
-      final r = await tx.execute(
-        Sql.named(
-          'INSERT INTO contacts ("firstName", "lastName", mail, phone) '
-          'VALUES (@f, @l, @m, @p) RETURNING id, "createdAt"',
-        ),
-        parameters: {'f': c.$1, 'l': c.$2, 'm': c.$3, 'p': c.$4},
-      );
-      contacts.add(
-        Contact(
-          id: r.first[0] as int,
-          createdAt: r.first[1] as DateTime,
-          firstName: c.$1,
-          lastName: c.$2,
-          mail: c.$3,
-          phone: c.$4,
-        ),
-      );
-    }
-
-    final category = await tx.execute(
-      "INSERT INTO price_categories (name) VALUES ('Standard') RETURNING id",
-    );
-
-    for (var floor = 1; floor <= 3; floor++) {
-      for (var n = 1; n <= 5; n++) {
-        await tx.execute(
-          Sql.named(
-            'INSERT INTO rooms ("roomNumber", "bedAmount", "priceCategoryId") '
-            'VALUES (@r, @b, @c)',
-          ),
-          parameters: {
-            'r': '$floor${n.toString().padLeft(2, '0')}',
-            'b': n % 4 + 1,
-            'c': category.first[0],
-          },
-        );
-      }
-    }
-
-    for (final b in [
-      (
-        'Klassenfahrt 7b',
-        DateTime.utc(2026, 10, 12),
-        DateTime.utc(2026, 10, 16),
-        contacts[0],
-      ),
-      (
-        'Chorwochenende',
-        DateTime.utc(2026, 11, 6),
-        DateTime.utc(2026, 11, 8),
-        contacts[2],
-      ),
-      (
-        'Jugendfreizeit',
-        DateTime.utc(2027, 7, 20),
-        DateTime.utc(2027, 7, 31),
-        contacts[4],
-      ),
-    ]) {
-      await tx.execute(
-        Sql.named(
-          'INSERT INTO bookings (title, arrival, departure, "leadId") '
-          'VALUES (@t, @arrival, @departure, @lead)',
-        ),
-        parameters: {
-          't': b.$1,
-          'arrival': b.$2,
-          'departure': b.$3,
-          'lead': b.$4.id,
-        },
-      );
-    }
-  });
-
-  for (final t in ['contacts', 'rooms', 'bookings']) {
-    final r = await conn.execute('SELECT count(*) FROM $t');
-    print('$t: ${r.first[0]}');
-  }
-  await conn.close();
+/// The database of `config/development.yaml`. The rest of the configuration
+/// stays that of the tests, whose servers listen on ports of their own and
+/// so do not get in the way of a development server that is running.
+DatabaseConfig _developmentDatabase() {
+  // The database runs from the data directory that the configuration
+  // names, which holds its password as well, so none is given here.
+  return ServerpodConfig.load('development', null, {
+    'database': '',
+  }).database!.withResolvedLocalPath(Directory.current.path);
 }

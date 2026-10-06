@@ -39,10 +39,11 @@ serverpod:
         set -- web --base-href / --output ../logbuch_server/web/app
         flutter build "$@" || { flutter clean && flutter build "$@"; }
 
-    # Seed the development database with dummy data (server must be running).
+    # Add demo data to the development database. It is created through the
+    # endpoints, which is why this runs as a test. What is there is kept.
     seed:
-      windows: dart run tool/seed.dart
-      posix: dart run tool/seed.dart
+      windows: dart test tool/seed.dart --reporter expanded
+      posix: dart test tool/seed.dart --reporter expanded
 
   # Companion Flutter apps that `serverpod start` can launch (Ctrl+R), keyed
   # by a display alias. The default device is the web server, opening the
