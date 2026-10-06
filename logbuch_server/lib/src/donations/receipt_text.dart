@@ -4,6 +4,7 @@
 /// Geldzuwendungen", whose wording has to be kept.
 library;
 
+import 'package:logbuch_server/src/common/german_format.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
 
 const _small = [
@@ -79,20 +80,6 @@ String amountInWords(int cents) {
   final rest = cents % 100;
   return rest == 0 ? euros : '$euros und ${numberInWords(rest)} Cent';
 }
-
-/// An amount in figures the German way: 123456 cents are "1.234,56".
-String formatAmount(int cents) {
-  final euros = (cents ~/ 100).toString().replaceAllMapped(
-    RegExp(r'\B(?=(\d{3})+$)'),
-    (match) => '.',
-  );
-  return '$euros,${(cents % 100).toString().padLeft(2, '0')}';
-}
-
-/// A date the German way: 03.05.2027.
-String formatGermanDate(DateTime date) =>
-    '${date.day.toString().padLeft(2, '0')}.'
-    '${date.month.toString().padLeft(2, '0')}.${date.year}';
 
 /// Whether everything that a receipt states about the operator is there.
 bool isCompleteForReceipts(Operator operator) {

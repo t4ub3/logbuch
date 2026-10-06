@@ -1,0 +1,11 @@
+### The guests of one booking who are in the house on a day.
+class: MealBooking
+fields:
+  bookingId: int
+  title: String
+  ### The name of its meal plan, if it has one.
+  mealPlan: String?
+  guestCount: int
+  ### The age groups that have guests in this booking, youngest first.
+  ageGroups: List<AgeGroupCount>
+  unknownAge: int

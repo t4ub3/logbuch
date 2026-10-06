@@ -15,7 +15,10 @@
         "none": "Keine Angabe",
         "search": "Suchen",
         "signOut": "Abmelden",
-        "clear": "Entfernen"
+        "clear": "Entfernen",
+        "close": "Schließen",
+        "copy": "Kopieren",
+        "copied": "Kopiert"
     },
     "tabs": {
         "close": "Tab schließen"
@@ -25,7 +28,8 @@
         "contacts": "Kontakte",
         "admin": "Verwaltung",
         "settings": "Einstellungen",
-        "donations": "Spenden"
+        "donations": "Spenden",
+        "dashboard": "Übersicht"
     },
     "bookings": {
         "newBooking": "Neue Buchung",
@@ -41,7 +45,6 @@
         "today": "Heute",
         "more": "+{n} weitere",
         "yearlyView": "Jahresansicht",
-        "edit": "Bearbeiten",
         "email": "E-Mail",
         "phone": "Telefon",
         "status": "Status",
@@ -87,7 +90,6 @@
             "one": "{n} Gast erwartet",
             "other": "{n} Gäste erwartet"
         },
-        "roomsSaved": "Zimmer gespeichert",
         "guests": "Gäste",
         "assignment": "Verteilung",
         "price": "Preis",
@@ -116,7 +118,7 @@
         },
         "unassigned": "Ohne Zimmer",
         "everybodyAssigned": "Alle haben ein Zimmer.",
-        "noRoomsHeld": "Die Buchung hat noch keine Zimmer. Bitte unter Zimmer auswählen.",
+        "noRoomsHeld": "Die Buchung hat noch keine Zimmer.",
         "moveTo": "Verschieben nach",
         "bedsUsed": "{used} von {beds} Betten",
         "roomFull": "Voll",
@@ -181,7 +183,21 @@
         "quantity": "Anzahl",
         "unitPrice": "Einzelpreis",
         "isDiscount": "Das ist ein Rabatt",
-        "taxRate": "Steuersatz"
+        "taxRate": "Steuersatz",
+        "openInvoice": "Rechnung öffnen",
+        "openInvoiceFailed": "Die Rechnung konnte nicht geöffnet werden: {error}",
+        "renewInvoice": "Dokument erneuern",
+        "renewInvoiceHint": "Die Rechnung wird mit den aktuellen Angaben, etwa der Bankverbindung, neu erstellt und ersetzt das gespeicherte Dokument. Bitte nur, solange die Rechnung noch nicht verschickt wurde.",
+        "kitchen": "Küche",
+        "guestsByAge": "Gäste nach Altersgruppe",
+        "guestsInTotal": "Gäste insgesamt",
+        "noMealPlan": "Keine gewählt",
+        "noDietaryNeeds": "Für die Gäste sind keine Ernährungshinweise erfasst.",
+        "addHousehold": "Haushalt hinzufügen",
+        "noHouseholdsYet": "Es gibt noch keine Haushalte. Sie werden unter Kontakte, Haushalte angelegt.",
+        "confirmation": "Bestätigung",
+        "openConfirmationFailed": "Die Bestätigung konnte nicht geöffnet werden: {error}",
+        "bedsInRooms": "{beds} in {rooms}"
     },
     "contacts": {
         "empty": "Keine Kontakte",
@@ -207,7 +223,14 @@
         "noOrganizations": "Keine Organisationen",
         "addOrganization": "Neue Organisation",
         "editOrganization": "Organisation bearbeiten",
-        "deleteOrganizationHint": "Ihre Kontakte bleiben erhalten, ohne Organisation."
+        "deleteOrganizationHint": "Ihre Kontakte bleiben erhalten, ohne Organisation.",
+        "households": "Haushalte",
+        "noHouseholds": "Keine Haushalte",
+        "addHousehold": "Neuer Haushalt",
+        "editHousehold": "Haushalt bearbeiten",
+        "addMember": "Mitglied hinzufügen",
+        "noMembers": "Noch keine Mitglieder",
+        "deleteHouseholdHint": "Die Mitglieder bleiben als Kontakte erhalten."
     },
     "rooms": {
         "empty": "Keine Zimmer",
@@ -253,10 +276,12 @@
             "roomNotHeld": "Die Buchung hat dieses Zimmer nicht.",
             "alreadyInvoiced": "Das ist bereits in Rechnung gestellt und kann nicht mehr geändert werden.",
             "nothingToInvoice": "Es gibt nichts abzurechnen.",
-            "pricingIncomplete": "Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht unter Preis.",
+            "pricingIncomplete": "Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht beim Preis.",
             "notOverpaid": "Das ist mehr, als überzahlt wurde.",
             "alreadyReceipted": "Diese Spende steht auf einer Bestätigung und kann nicht mehr geändert werden.",
-            "operatorIncomplete": "Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen."
+            "operatorIncomplete": "Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen.",
+            "alreadyGuest": "Aus diesem Haushalt kann niemand hinzugefügt werden: Er hat keine Mitglieder, oder alle sind bereits Gäste der Buchung.",
+            "notConfirmed": "Eine Bestätigung gibt es nur für Buchungen, die eine Option oder bestätigt sind."
         },
         "rooms": {
             "add": "Neues Zimmer",
@@ -348,7 +373,7 @@
             "you": "Sie"
         },
         "operator": {
-            "hint": "Die Organisation, die das Haus betreibt. Diese Angaben stehen auf den Zuwendungsbestätigungen, die erst erstellt werden können, wenn alles ausgefüllt ist.",
+            "hint": "Die Organisation, die das Haus betreibt. Diese Angaben stehen auf Rechnungen und Zuwendungsbestätigungen. Bestätigungen können erst erstellt werden, wenn alle Angaben zum Finanzamt ausgefüllt sind.",
             "street": "Straße",
             "zip": "Postleitzahl",
             "city": "Ort",
@@ -365,7 +390,16 @@
             "purposesObjectHint": "Zum Beispiel: die Jugendhilfe",
             "place": "Ort der Unterschrift",
             "signatory": "Unterzeichnet von",
-            "saved": "Gespeichert"
+            "saved": "Gespeichert",
+            "bankHint": "Steht auf Rechnungen, damit klar ist, wohin und bis wann zu zahlen ist.",
+            "accountHolder": "Kontoinhaber",
+            "iban": "IBAN",
+            "bic": "BIC",
+            "bankName": "Bank",
+            "paymentTerms": "Zahlungsbedingungen",
+            "paymentTermsHint": "Zum Beispiel: Zahlbar innerhalb von 14 Tagen ohne Abzug.",
+            "confirmationNote": "Hinweis auf Buchungsbestätigungen",
+            "confirmationNoteHint": "Zum Beispiel, ab wann die Zimmer am Anreisetag bereitstehen."
         }
     },
     "auth": {
@@ -406,6 +440,33 @@
         },
         "openPdf": "PDF öffnen",
         "openFailed": "Die Bestätigung konnte nicht geöffnet werden: {error}"
+    },
+    "dashboard": {
+        "arrivals": "Anreisen in den nächsten 7 Tagen",
+        "noArrivals": "In den nächsten 7 Tagen reist niemand an.",
+        "departures": "Abreisen in den nächsten 7 Tagen",
+        "noDepartures": "In den nächsten 7 Tagen reist niemand ab.",
+        "tonight": "Heute Nacht",
+        "roomsOccupied": "{occupied} von {total} Zimmern belegt",
+        "guestsTonight": {
+            "zero": "Keine Gäste im Haus",
+            "one": "{n} Gast im Haus",
+            "other": "{n} Gäste im Haus"
+        },
+        "roomCount": {
+            "one": "{n} Zimmer",
+            "other": "{n} Zimmer"
+        },
+        "options": "Bald ablaufende Optionen",
+        "noOptions": "In den nächsten 14 Tagen läuft keine Option ab.",
+        "expires": "Läuft ab am {date}",
+        "expired": "Abgelaufen am {date}",
+        "balances": "Unbezahlte Rechnungen",
+        "noBalances": "Keine Rechnung wartet auf Zahlung.",
+        "catering": "Zu verpflegende Gäste",
+        "today": "Heute",
+        "tomorrow": "Morgen",
+        "noGuests": "Keine Gäste."
     },
     "settings": {
         "title": "Einstellungen",

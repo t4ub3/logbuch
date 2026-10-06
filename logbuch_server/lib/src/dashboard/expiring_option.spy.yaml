@@ -1,0 +1,7 @@
+### An option that expires soon or has expired.
+class: ExpiringOption
+fields:
+  bookingId: int
+  title: String
+  expiresAt: DateTime
+  arrival: DateTime?

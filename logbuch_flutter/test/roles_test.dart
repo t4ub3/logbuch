@@ -52,11 +52,9 @@ void main() {
       final tab = BookingTab(booking: client.booking.bookings.first);
       await pumpApp(tester, BookingDetails(tab: tab), client);
       expect(find.text('Class trip'), findsOneWidget);
-      expect(find.text('Edit'), findsNothing);
-      await tester.tap(find.text('Rooms'));
-      await tester.pumpAndSettle();
-      expect(find.text('Room 101'), findsOneWidget);
-      expect(find.text('Save'), findsNothing);
+      expect(inCard('Rooms', find.text('Room 101')), findsOneWidget);
+      // No card can be opened for editing.
+      expect(find.byTooltip('Edit'), findsNothing);
     });
   });
 

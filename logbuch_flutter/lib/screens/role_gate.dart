@@ -69,7 +69,7 @@ class _Notice extends ConsumerWidget {
                       child: Text(context.t.common.signOut),
                     ),
                     const SizedBox(width: 8),
-                    FilledButton(
+                    ElevatedButton(
                       onPressed: () => ref.invalidate(currentUserProvider),
                       child: Text(actionLabel),
                     ),

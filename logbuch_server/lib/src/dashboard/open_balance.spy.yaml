@@ -1,0 +1,9 @@
+### An invoice that is not paid in full.
+class: OpenBalance
+fields:
+  bookingId: int
+  bookingTitle: String
+  invoiceNumber: String
+  payerName: String
+  ### In cents.
+  owed: int

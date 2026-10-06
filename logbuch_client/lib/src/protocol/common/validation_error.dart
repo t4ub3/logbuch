@@ -27,8 +27,10 @@ enum ValidationError implements _isc.SerializableModel {
   inUse,
   notFound,
   datesRequired,
+  notConfirmed,
   roomUnavailable,
   roomNotHeld,
+  alreadyGuest,
   adminRequired,
   ownRole,
   alreadyInvoiced,
@@ -68,10 +70,14 @@ enum ValidationError implements _isc.SerializableModel {
         return ValidationError.notFound;
       case 'datesRequired':
         return ValidationError.datesRequired;
+      case 'notConfirmed':
+        return ValidationError.notConfirmed;
       case 'roomUnavailable':
         return ValidationError.roomUnavailable;
       case 'roomNotHeld':
         return ValidationError.roomNotHeld;
+      case 'alreadyGuest':
+        return ValidationError.alreadyGuest;
       case 'adminRequired':
         return ValidationError.adminRequired;
       case 'ownRole':

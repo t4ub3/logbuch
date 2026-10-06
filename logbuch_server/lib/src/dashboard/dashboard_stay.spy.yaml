@@ -1,0 +1,12 @@
+### A booking that arrives or departs on a day.
+class: DashboardStay
+fields:
+  bookingId: int
+  title: String
+  status: BookingStatus
+  ### The day of the arrival or the departure.
+  date: DateTime
+  leadName: String
+  ### The guests on the guest list, or the expected number without one.
+  guestCount: int?
+  roomCount: int

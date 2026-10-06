@@ -14,7 +14,7 @@ import 'package:serverpod/serverpod.dart' as _is;
 import '../donations/tax_notice_type.dart' as _i8bqfpik;
 
 /// The organisation that runs the house. Its details are printed on
-/// donation receipts.
+/// invoices and donation receipts.
 abstract class Operator
     implements _is.TableRow<int?>, _is.ProtocolSerialization {
   Operator._({
@@ -32,6 +32,12 @@ abstract class Operator
     this.purposesObject,
     required this.place,
     this.signatory,
+    this.accountHolder,
+    this.iban,
+    this.bic,
+    this.bankName,
+    this.paymentTerms,
+    this.confirmationNote,
   }) : noticeType = noticeType ?? _i8bqfpik.TaxNoticeType.statutoryCompliance;
 
   factory Operator({
@@ -49,6 +55,12 @@ abstract class Operator
     String? purposesObject,
     required String place,
     String? signatory,
+    String? accountHolder,
+    String? iban,
+    String? bic,
+    String? bankName,
+    String? paymentTerms,
+    String? confirmationNote,
   }) = _OperatorImpl;
 
   factory Operator.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -73,6 +85,12 @@ abstract class Operator
       purposesObject: jsonSerialization['purposesObject'] as String?,
       place: jsonSerialization['place'] as String,
       signatory: jsonSerialization['signatory'] as String?,
+      accountHolder: jsonSerialization['accountHolder'] as String?,
+      iban: jsonSerialization['iban'] as String?,
+      bic: jsonSerialization['bic'] as String?,
+      bankName: jsonSerialization['bankName'] as String?,
+      paymentTerms: jsonSerialization['paymentTerms'] as String?,
+      confirmationNote: jsonSerialization['confirmationNote'] as String?,
     );
   }
 
@@ -116,6 +134,21 @@ abstract class Operator
   /// Who signs the receipts.
   String? signatory;
 
+  /// Where invoices are to be paid to.
+  String? accountHolder;
+
+  String? iban;
+
+  String? bic;
+
+  String? bankName;
+
+  /// Printed on invoices, such as by when they are to be paid.
+  String? paymentTerms;
+
+  /// Printed on booking confirmations, such as when guests can arrive.
+  String? confirmationNote;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -137,6 +170,12 @@ abstract class Operator
     String? purposesObject,
     String? place,
     String? signatory,
+    String? accountHolder,
+    String? iban,
+    String? bic,
+    String? bankName,
+    String? paymentTerms,
+    String? confirmationNote,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -156,6 +195,12 @@ abstract class Operator
       if (purposesObject != null) 'purposesObject': purposesObject,
       'place': place,
       if (signatory != null) 'signatory': signatory,
+      if (accountHolder != null) 'accountHolder': accountHolder,
+      if (iban != null) 'iban': iban,
+      if (bic != null) 'bic': bic,
+      if (bankName != null) 'bankName': bankName,
+      if (paymentTerms != null) 'paymentTerms': paymentTerms,
+      if (confirmationNote != null) 'confirmationNote': confirmationNote,
     };
   }
 
@@ -177,6 +222,12 @@ abstract class Operator
       if (purposesObject != null) 'purposesObject': purposesObject,
       'place': place,
       if (signatory != null) 'signatory': signatory,
+      if (accountHolder != null) 'accountHolder': accountHolder,
+      if (iban != null) 'iban': iban,
+      if (bic != null) 'bic': bic,
+      if (bankName != null) 'bankName': bankName,
+      if (paymentTerms != null) 'paymentTerms': paymentTerms,
+      if (confirmationNote != null) 'confirmationNote': confirmationNote,
     };
   }
 
@@ -226,6 +277,12 @@ class _OperatorImpl extends Operator {
     String? purposesObject,
     required String place,
     String? signatory,
+    String? accountHolder,
+    String? iban,
+    String? bic,
+    String? bankName,
+    String? paymentTerms,
+    String? confirmationNote,
   }) : super._(
          id: id,
          name: name,
@@ -241,6 +298,12 @@ class _OperatorImpl extends Operator {
          purposesObject: purposesObject,
          place: place,
          signatory: signatory,
+         accountHolder: accountHolder,
+         iban: iban,
+         bic: bic,
+         bankName: bankName,
+         paymentTerms: paymentTerms,
+         confirmationNote: confirmationNote,
        );
 
   /// Returns a shallow copy of this [Operator]
@@ -262,6 +325,12 @@ class _OperatorImpl extends Operator {
     Object? purposesObject = _Undefined,
     String? place,
     Object? signatory = _Undefined,
+    Object? accountHolder = _Undefined,
+    Object? iban = _Undefined,
+    Object? bic = _Undefined,
+    Object? bankName = _Undefined,
+    Object? paymentTerms = _Undefined,
+    Object? confirmationNote = _Undefined,
   }) {
     return Operator(
       id: id is int? ? id : this.id,
@@ -282,6 +351,16 @@ class _OperatorImpl extends Operator {
           : this.purposesObject,
       place: place ?? this.place,
       signatory: signatory is String? ? signatory : this.signatory,
+      accountHolder: accountHolder is String?
+          ? accountHolder
+          : this.accountHolder,
+      iban: iban is String? ? iban : this.iban,
+      bic: bic is String? ? bic : this.bic,
+      bankName: bankName is String? ? bankName : this.bankName,
+      paymentTerms: paymentTerms is String? ? paymentTerms : this.paymentTerms,
+      confirmationNote: confirmationNote is String?
+          ? confirmationNote
+          : this.confirmationNote,
     );
   }
 }
@@ -358,6 +437,39 @@ class OperatorUpdateTable extends _is.UpdateTable<OperatorTable> {
     table.signatory,
     value,
   );
+
+  _is.ColumnValue<String, String> accountHolder(String? value) =>
+      _is.ColumnValue(
+        table.accountHolder,
+        value,
+      );
+
+  _is.ColumnValue<String, String> iban(String? value) => _is.ColumnValue(
+    table.iban,
+    value,
+  );
+
+  _is.ColumnValue<String, String> bic(String? value) => _is.ColumnValue(
+    table.bic,
+    value,
+  );
+
+  _is.ColumnValue<String, String> bankName(String? value) => _is.ColumnValue(
+    table.bankName,
+    value,
+  );
+
+  _is.ColumnValue<String, String> paymentTerms(String? value) =>
+      _is.ColumnValue(
+        table.paymentTerms,
+        value,
+      );
+
+  _is.ColumnValue<String, String> confirmationNote(String? value) =>
+      _is.ColumnValue(
+        table.confirmationNote,
+        value,
+      );
 }
 
 class OperatorTable extends _is.Table<int?> {
@@ -417,6 +529,30 @@ class OperatorTable extends _is.Table<int?> {
       'signatory',
       this,
     );
+    accountHolder = _is.ColumnString(
+      'accountHolder',
+      this,
+    );
+    iban = _is.ColumnString(
+      'iban',
+      this,
+    );
+    bic = _is.ColumnString(
+      'bic',
+      this,
+    );
+    bankName = _is.ColumnString(
+      'bankName',
+      this,
+    );
+    paymentTerms = _is.ColumnString(
+      'paymentTerms',
+      this,
+    );
+    confirmationNote = _is.ColumnString(
+      'confirmationNote',
+      this,
+    );
   }
 
   late final OperatorUpdateTable updateTable;
@@ -454,6 +590,21 @@ class OperatorTable extends _is.Table<int?> {
   /// Who signs the receipts.
   late final _is.ColumnString signatory;
 
+  /// Where invoices are to be paid to.
+  late final _is.ColumnString accountHolder;
+
+  late final _is.ColumnString iban;
+
+  late final _is.ColumnString bic;
+
+  late final _is.ColumnString bankName;
+
+  /// Printed on invoices, such as by when they are to be paid.
+  late final _is.ColumnString paymentTerms;
+
+  /// Printed on booking confirmations, such as when guests can arrive.
+  late final _is.ColumnString confirmationNote;
+
   @override
   List<_is.Column> get columns => [
     id,
@@ -470,6 +621,12 @@ class OperatorTable extends _is.Table<int?> {
     purposesObject,
     place,
     signatory,
+    accountHolder,
+    iban,
+    bic,
+    bankName,
+    paymentTerms,
+    confirmationNote,
   ];
 }
 

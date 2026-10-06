@@ -1,0 +1,5 @@
+### How many guests of a booking are in an age group.
+class: AgeGroupCount
+fields:
+  ageGroup: AgeGroup
+  count: int

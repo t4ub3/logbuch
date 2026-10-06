@@ -19,6 +19,8 @@ import 'package:logbuch_server/src/generated/bookings/bookings.dart'
     as _iz54m678;
 import 'package:logbuch_server/src/generated/contacts/contact.dart'
     as _i4e319y1;
+import 'package:logbuch_server/src/generated/contacts/household.dart'
+    as _inwmb5da;
 import 'package:logbuch_server/src/generated/contacts/organization.dart'
     as _i0zrc0jf;
 import 'package:logbuch_server/src/generated/donations/donation_receipt.dart'
@@ -53,6 +55,7 @@ import 'billing/donation.dart' as _i373k2rw;
 import 'billing/donation_source.dart' as _i6k4nn25;
 import 'billing/folio.dart' as _i94y90vb;
 import 'billing/folio_status.dart' as _ieyyblrs;
+import 'billing/invoice_document.dart' as _i46ek8jf;
 import 'billing/payment.dart' as _ifq0dbbu;
 import 'billing/payment_method.dart' as _irhicyww;
 import 'bookings/billing_mode.dart' as _iyrhfm9w;
@@ -62,14 +65,25 @@ import 'bookings/bookings.dart' as _iikb94hp;
 import 'common/validation_error.dart' as _ij920vmm;
 import 'common/validation_exception.dart' as _ifwcmx8g;
 import 'contacts/contact.dart' as _io9atw8a;
+import 'contacts/household.dart' as _itj5x341;
+import 'contacts/household_member.dart' as _i1si4u4r;
 import 'contacts/organization.dart' as _iycrigka;
+import 'dashboard/dashboard.dart' as _iggja872;
+import 'dashboard/dashboard_stay.dart' as _i9cu7oi7;
+import 'dashboard/expiring_option.dart' as _iklsr4n4;
+import 'dashboard/meal_booking.dart' as _igw13nlg;
+import 'dashboard/meal_day.dart' as _il8j3w9m;
+import 'dashboard/open_balance.dart' as _iwoe631f;
 import 'donations/donation_receipt.dart' as _igquyr3v;
 import 'donations/operator.dart' as _i80h05fc;
 import 'donations/receipt_preview.dart' as _i5pbbm36;
 import 'donations/tax_notice_type.dart' as _i3nhuzax;
 import 'greetings/greeting.dart' as _izw8z7ou;
+import 'guests/age_group_count.dart' as _i409y09h;
+import 'guests/dietary_need.dart' as _i7fy7mhe;
 import 'guests/guest.dart' as _inxh79pp;
 import 'guests/guest_group.dart' as _iar0olgw;
+import 'guests/kitchen_overview.dart' as _ijaatehs;
 import 'pricing/age_group.dart' as _igvrv9tv;
 import 'pricing/booking_price.dart' as _i53999gr;
 import 'pricing/charge_line.dart' as _idyrztp6;
@@ -91,6 +105,7 @@ export 'billing/donation.dart';
 export 'billing/donation_source.dart';
 export 'billing/folio.dart';
 export 'billing/folio_status.dart';
+export 'billing/invoice_document.dart';
 export 'billing/payment.dart';
 export 'billing/payment_method.dart';
 export 'bookings/billing_mode.dart';
@@ -100,14 +115,25 @@ export 'bookings/bookings.dart';
 export 'common/validation_error.dart';
 export 'common/validation_exception.dart';
 export 'contacts/contact.dart';
+export 'contacts/household.dart';
+export 'contacts/household_member.dart';
 export 'contacts/organization.dart';
+export 'dashboard/dashboard.dart';
+export 'dashboard/dashboard_stay.dart';
+export 'dashboard/expiring_option.dart';
+export 'dashboard/meal_booking.dart';
+export 'dashboard/meal_day.dart';
+export 'dashboard/open_balance.dart';
 export 'donations/donation_receipt.dart';
 export 'donations/operator.dart';
 export 'donations/receipt_preview.dart';
 export 'donations/tax_notice_type.dart';
 export 'greetings/greeting.dart';
+export 'guests/age_group_count.dart';
+export 'guests/dietary_need.dart';
 export 'guests/guest.dart';
 export 'guests/guest_group.dart';
+export 'guests/kitchen_overview.dart';
 export 'pricing/age_group.dart';
 export 'pricing/booking_price.dart';
 export 'pricing/charge_line.dart';
@@ -1072,6 +1098,154 @@ class Protocol extends _is.DatabaseSerializationManager {
       managed: true,
     ),
     _isp.TableDefinition(
+      name: 'household_members',
+      dartName: 'HouseholdMember',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'householdId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'contactId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'household_members_fk_0',
+          columns: ['householdId'],
+          referenceTable: 'households',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+        _isp.ForeignKeyDefinition(
+          constraintName: 'household_members_fk_1',
+          columns: ['contactId'],
+          referenceTable: 'contacts',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'household_members_unique_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'householdId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'contactId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'households',
+      dartName: 'Household',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'name',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'invoice_documents',
+      dartName: 'InvoiceDocument',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'folioId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'pdf',
+          columnType: _isp.ColumnType.bytea,
+          isNullable: false,
+          dartType: 'dart:typed_data:ByteData',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'invoice_documents_fk_0',
+          columns: ['folioId'],
+          referenceTable: 'folios',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'invoice_documents_folio_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'folioId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
       name: 'meal_plans',
       dartName: 'MealPlan',
       schema: 'public',
@@ -1278,6 +1452,42 @@ class Protocol extends _is.DatabaseSerializationManager {
         ),
         _isp.ColumnDefinition(
           name: 'signatory',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'accountHolder',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'iban',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'bic',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'bankName',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'paymentTerms',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'confirmationNote',
           columnType: _isp.ColumnType.text,
           isNullable: true,
           dartType: 'String?',
@@ -1704,6 +1914,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ieyyblrs.FolioStatus) {
       return _ieyyblrs.FolioStatus.fromJson(data) as T;
     }
+    if (t == _i46ek8jf.InvoiceDocument) {
+      return _i46ek8jf.InvoiceDocument.fromJson(data) as T;
+    }
     if (t == _ifq0dbbu.Payment) {
       return _ifq0dbbu.Payment.fromJson(data) as T;
     }
@@ -1731,8 +1944,32 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _io9atw8a.Contact) {
       return _io9atw8a.Contact.fromJson(data) as T;
     }
+    if (t == _itj5x341.Household) {
+      return _itj5x341.Household.fromJson(data) as T;
+    }
+    if (t == _i1si4u4r.HouseholdMember) {
+      return _i1si4u4r.HouseholdMember.fromJson(data) as T;
+    }
     if (t == _iycrigka.Organization) {
       return _iycrigka.Organization.fromJson(data) as T;
+    }
+    if (t == _iggja872.Dashboard) {
+      return _iggja872.Dashboard.fromJson(data) as T;
+    }
+    if (t == _i9cu7oi7.DashboardStay) {
+      return _i9cu7oi7.DashboardStay.fromJson(data) as T;
+    }
+    if (t == _iklsr4n4.ExpiringOption) {
+      return _iklsr4n4.ExpiringOption.fromJson(data) as T;
+    }
+    if (t == _igw13nlg.MealBooking) {
+      return _igw13nlg.MealBooking.fromJson(data) as T;
+    }
+    if (t == _il8j3w9m.MealDay) {
+      return _il8j3w9m.MealDay.fromJson(data) as T;
+    }
+    if (t == _iwoe631f.OpenBalance) {
+      return _iwoe631f.OpenBalance.fromJson(data) as T;
     }
     if (t == _igquyr3v.DonationReceipt) {
       return _igquyr3v.DonationReceipt.fromJson(data) as T;
@@ -1749,11 +1986,20 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
+    if (t == _i409y09h.AgeGroupCount) {
+      return _i409y09h.AgeGroupCount.fromJson(data) as T;
+    }
+    if (t == _i7fy7mhe.DietaryNeed) {
+      return _i7fy7mhe.DietaryNeed.fromJson(data) as T;
+    }
     if (t == _inxh79pp.Guest) {
       return _inxh79pp.Guest.fromJson(data) as T;
     }
     if (t == _iar0olgw.GuestGroup) {
       return _iar0olgw.GuestGroup.fromJson(data) as T;
+    }
+    if (t == _ijaatehs.KitchenOverview) {
+      return _ijaatehs.KitchenOverview.fromJson(data) as T;
     }
     if (t == _igvrv9tv.AgeGroup) {
       return _igvrv9tv.AgeGroup.fromJson(data) as T;
@@ -1819,6 +2065,10 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_ieyyblrs.FolioStatus?>()) {
       return (data != null ? _ieyyblrs.FolioStatus.fromJson(data) : null) as T;
     }
+    if (t == _is.getType<_i46ek8jf.InvoiceDocument?>()) {
+      return (data != null ? _i46ek8jf.InvoiceDocument.fromJson(data) : null)
+          as T;
+    }
     if (t == _is.getType<_ifq0dbbu.Payment?>()) {
       return (data != null ? _ifq0dbbu.Payment.fromJson(data) : null) as T;
     }
@@ -1852,8 +2102,35 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_io9atw8a.Contact?>()) {
       return (data != null ? _io9atw8a.Contact.fromJson(data) : null) as T;
     }
+    if (t == _is.getType<_itj5x341.Household?>()) {
+      return (data != null ? _itj5x341.Household.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i1si4u4r.HouseholdMember?>()) {
+      return (data != null ? _i1si4u4r.HouseholdMember.fromJson(data) : null)
+          as T;
+    }
     if (t == _is.getType<_iycrigka.Organization?>()) {
       return (data != null ? _iycrigka.Organization.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_iggja872.Dashboard?>()) {
+      return (data != null ? _iggja872.Dashboard.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i9cu7oi7.DashboardStay?>()) {
+      return (data != null ? _i9cu7oi7.DashboardStay.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_iklsr4n4.ExpiringOption?>()) {
+      return (data != null ? _iklsr4n4.ExpiringOption.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_igw13nlg.MealBooking?>()) {
+      return (data != null ? _igw13nlg.MealBooking.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_il8j3w9m.MealDay?>()) {
+      return (data != null ? _il8j3w9m.MealDay.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_iwoe631f.OpenBalance?>()) {
+      return (data != null ? _iwoe631f.OpenBalance.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_igquyr3v.DonationReceipt?>()) {
       return (data != null ? _igquyr3v.DonationReceipt.fromJson(data) : null)
@@ -1873,11 +2150,22 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
     }
+    if (t == _is.getType<_i409y09h.AgeGroupCount?>()) {
+      return (data != null ? _i409y09h.AgeGroupCount.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_i7fy7mhe.DietaryNeed?>()) {
+      return (data != null ? _i7fy7mhe.DietaryNeed.fromJson(data) : null) as T;
+    }
     if (t == _is.getType<_inxh79pp.Guest?>()) {
       return (data != null ? _inxh79pp.Guest.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_iar0olgw.GuestGroup?>()) {
       return (data != null ? _iar0olgw.GuestGroup.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ijaatehs.KitchenOverview?>()) {
+      return (data != null ? _ijaatehs.KitchenOverview.fromJson(data) : null)
+          as T;
     }
     if (t == _is.getType<_igvrv9tv.AgeGroup?>()) {
       return (data != null ? _igvrv9tv.AgeGroup.fromJson(data) : null) as T;
@@ -1982,6 +2270,56 @@ class Protocol extends _is.DatabaseSerializationManager {
               : null)
           as T;
     }
+    if (t == List<_i1si4u4r.HouseholdMember>) {
+      return (data as List)
+              .map((e) => deserialize<_i1si4u4r.HouseholdMember>(e))
+              .toList()
+          as T;
+    }
+    if (t == _is.getType<List<_i1si4u4r.HouseholdMember>?>()) {
+      return (data != null
+              ? (data as List)
+                    .map((e) => deserialize<_i1si4u4r.HouseholdMember>(e))
+                    .toList()
+              : null)
+          as T;
+    }
+    if (t == List<_i9cu7oi7.DashboardStay>) {
+      return (data as List)
+              .map((e) => deserialize<_i9cu7oi7.DashboardStay>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_iklsr4n4.ExpiringOption>) {
+      return (data as List)
+              .map((e) => deserialize<_iklsr4n4.ExpiringOption>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_iwoe631f.OpenBalance>) {
+      return (data as List)
+              .map((e) => deserialize<_iwoe631f.OpenBalance>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_il8j3w9m.MealDay>) {
+      return (data as List)
+              .map((e) => deserialize<_il8j3w9m.MealDay>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i409y09h.AgeGroupCount>) {
+      return (data as List)
+              .map((e) => deserialize<_i409y09h.AgeGroupCount>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_igw13nlg.MealBooking>) {
+      return (data as List)
+              .map((e) => deserialize<_igw13nlg.MealBooking>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_inxh79pp.Guest>) {
       return (data as List).map((e) => deserialize<_inxh79pp.Guest>(e)).toList()
           as T;
@@ -1992,6 +2330,12 @@ class Protocol extends _is.DatabaseSerializationManager {
                     .map((e) => deserialize<_inxh79pp.Guest>(e))
                     .toList()
               : null)
+          as T;
+    }
+    if (t == List<_i7fy7mhe.DietaryNeed>) {
+      return (data as List)
+              .map((e) => deserialize<_i7fy7mhe.DietaryNeed>(e))
+              .toList()
           as T;
     }
     if (t == List<_idyrztp6.ChargeLine>) {
@@ -2032,6 +2376,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == List<_i4e319y1.Contact>) {
       return (data as List)
               .map((e) => deserialize<_i4e319y1.Contact>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_inwmb5da.Household>) {
+      return (data as List)
+              .map((e) => deserialize<_inwmb5da.Household>(e))
               .toList()
           as T;
     }
@@ -2126,6 +2476,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _i6k4nn25.DonationSource => 'DonationSource',
       _i94y90vb.Folio => 'Folio',
       _ieyyblrs.FolioStatus => 'FolioStatus',
+      _i46ek8jf.InvoiceDocument => 'InvoiceDocument',
       _ifq0dbbu.Payment => 'Payment',
       _irhicyww.PaymentMethod => 'PaymentMethod',
       _iyrhfm9w.BillingMode => 'BillingMode',
@@ -2135,14 +2486,25 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ij920vmm.ValidationError => 'ValidationError',
       _ifwcmx8g.ValidationException => 'ValidationException',
       _io9atw8a.Contact => 'Contact',
+      _itj5x341.Household => 'Household',
+      _i1si4u4r.HouseholdMember => 'HouseholdMember',
       _iycrigka.Organization => 'Organization',
+      _iggja872.Dashboard => 'Dashboard',
+      _i9cu7oi7.DashboardStay => 'DashboardStay',
+      _iklsr4n4.ExpiringOption => 'ExpiringOption',
+      _igw13nlg.MealBooking => 'MealBooking',
+      _il8j3w9m.MealDay => 'MealDay',
+      _iwoe631f.OpenBalance => 'OpenBalance',
       _igquyr3v.DonationReceipt => 'DonationReceipt',
       _i80h05fc.Operator => 'Operator',
       _i5pbbm36.ReceiptPreview => 'ReceiptPreview',
       _i3nhuzax.TaxNoticeType => 'TaxNoticeType',
       _izw8z7ou.Greeting => 'Greeting',
+      _i409y09h.AgeGroupCount => 'AgeGroupCount',
+      _i7fy7mhe.DietaryNeed => 'DietaryNeed',
       _inxh79pp.Guest => 'Guest',
       _iar0olgw.GuestGroup => 'GuestGroup',
+      _ijaatehs.KitchenOverview => 'KitchenOverview',
       _igvrv9tv.AgeGroup => 'AgeGroup',
       _i53999gr.BookingPrice => 'BookingPrice',
       _idyrztp6.ChargeLine => 'ChargeLine',
@@ -2185,6 +2547,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'Folio';
       case _ieyyblrs.FolioStatus():
         return 'FolioStatus';
+      case _i46ek8jf.InvoiceDocument():
+        return 'InvoiceDocument';
       case _ifq0dbbu.Payment():
         return 'Payment';
       case _irhicyww.PaymentMethod():
@@ -2203,8 +2567,24 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'ValidationException';
       case _io9atw8a.Contact():
         return 'Contact';
+      case _itj5x341.Household():
+        return 'Household';
+      case _i1si4u4r.HouseholdMember():
+        return 'HouseholdMember';
       case _iycrigka.Organization():
         return 'Organization';
+      case _iggja872.Dashboard():
+        return 'Dashboard';
+      case _i9cu7oi7.DashboardStay():
+        return 'DashboardStay';
+      case _iklsr4n4.ExpiringOption():
+        return 'ExpiringOption';
+      case _igw13nlg.MealBooking():
+        return 'MealBooking';
+      case _il8j3w9m.MealDay():
+        return 'MealDay';
+      case _iwoe631f.OpenBalance():
+        return 'OpenBalance';
       case _igquyr3v.DonationReceipt():
         return 'DonationReceipt';
       case _i80h05fc.Operator():
@@ -2215,10 +2595,16 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'TaxNoticeType';
       case _izw8z7ou.Greeting():
         return 'Greeting';
+      case _i409y09h.AgeGroupCount():
+        return 'AgeGroupCount';
+      case _i7fy7mhe.DietaryNeed():
+        return 'DietaryNeed';
       case _inxh79pp.Guest():
         return 'Guest';
       case _iar0olgw.GuestGroup():
         return 'GuestGroup';
+      case _ijaatehs.KitchenOverview():
+        return 'KitchenOverview';
       case _igvrv9tv.AgeGroup():
         return 'AgeGroup';
       case _i53999gr.BookingPrice():
@@ -2294,6 +2680,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'FolioStatus') {
       return deserialize<_ieyyblrs.FolioStatus>(data['data']);
     }
+    if (dataClassName == 'InvoiceDocument') {
+      return deserialize<_i46ek8jf.InvoiceDocument>(data['data']);
+    }
     if (dataClassName == 'Payment') {
       return deserialize<_ifq0dbbu.Payment>(data['data']);
     }
@@ -2321,8 +2710,32 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'Contact') {
       return deserialize<_io9atw8a.Contact>(data['data']);
     }
+    if (dataClassName == 'Household') {
+      return deserialize<_itj5x341.Household>(data['data']);
+    }
+    if (dataClassName == 'HouseholdMember') {
+      return deserialize<_i1si4u4r.HouseholdMember>(data['data']);
+    }
     if (dataClassName == 'Organization') {
       return deserialize<_iycrigka.Organization>(data['data']);
+    }
+    if (dataClassName == 'Dashboard') {
+      return deserialize<_iggja872.Dashboard>(data['data']);
+    }
+    if (dataClassName == 'DashboardStay') {
+      return deserialize<_i9cu7oi7.DashboardStay>(data['data']);
+    }
+    if (dataClassName == 'ExpiringOption') {
+      return deserialize<_iklsr4n4.ExpiringOption>(data['data']);
+    }
+    if (dataClassName == 'MealBooking') {
+      return deserialize<_igw13nlg.MealBooking>(data['data']);
+    }
+    if (dataClassName == 'MealDay') {
+      return deserialize<_il8j3w9m.MealDay>(data['data']);
+    }
+    if (dataClassName == 'OpenBalance') {
+      return deserialize<_iwoe631f.OpenBalance>(data['data']);
     }
     if (dataClassName == 'DonationReceipt') {
       return deserialize<_igquyr3v.DonationReceipt>(data['data']);
@@ -2339,11 +2752,20 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
     }
+    if (dataClassName == 'AgeGroupCount') {
+      return deserialize<_i409y09h.AgeGroupCount>(data['data']);
+    }
+    if (dataClassName == 'DietaryNeed') {
+      return deserialize<_i7fy7mhe.DietaryNeed>(data['data']);
+    }
     if (dataClassName == 'Guest') {
       return deserialize<_inxh79pp.Guest>(data['data']);
     }
     if (dataClassName == 'GuestGroup') {
       return deserialize<_iar0olgw.GuestGroup>(data['data']);
+    }
+    if (dataClassName == 'KitchenOverview') {
+      return deserialize<_ijaatehs.KitchenOverview>(data['data']);
     }
     if (dataClassName == 'AgeGroup') {
       return deserialize<_igvrv9tv.AgeGroup>(data['data']);
@@ -2434,6 +2856,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _i373k2rw.Donation.t;
       case _i94y90vb.Folio:
         return _i94y90vb.Folio.t;
+      case _i46ek8jf.InvoiceDocument:
+        return _i46ek8jf.InvoiceDocument.t;
       case _ifq0dbbu.Payment:
         return _ifq0dbbu.Payment.t;
       case _icov2ydl.BookingRoom:
@@ -2442,6 +2866,10 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _iikb94hp.Booking.t;
       case _io9atw8a.Contact:
         return _io9atw8a.Contact.t;
+      case _itj5x341.Household:
+        return _itj5x341.Household.t;
+      case _i1si4u4r.HouseholdMember:
+        return _i1si4u4r.HouseholdMember.t;
       case _iycrigka.Organization:
         return _iycrigka.Organization.t;
       case _igquyr3v.DonationReceipt:

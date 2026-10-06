@@ -43,6 +43,14 @@ extension BookingX on Booking {
 
   String get leadName => lead?.fullName ?? '';
 
+  /// Whether the booking can be confirmed in writing: it has dates and is
+  /// an option or confirmed, as the server requires.
+  bool get canBeConfirmed =>
+      arrival != null &&
+      departure != null &&
+      status != BookingStatus.inquiry &&
+      status != BookingStatus.cancelled;
+
   String leadLabel(BuildContext context) =>
       context.t.bookings.lead(name: leadName);
 

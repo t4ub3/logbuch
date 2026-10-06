@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
+import 'package:logbuch_flutter/components/open_file.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
 import 'package:logbuch_flutter/panels/admin/admin_widgets.dart';
 import 'package:logbuch_flutter/panels/bookings/amount_row.dart';
-import 'package:logbuch_flutter/panels/bookings/booking_price_tab.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_price.dart';
 import 'package:logbuch_flutter/panels/contacts/contacts_section.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
@@ -46,49 +48,142 @@ enum _Overpayment { donation, refund, credit }
 
 /// The folios of a booking: one account per payer with the charges, the
 /// payments and what is still owed.
-class BookingBillingTab extends ConsumerWidget {
-  const BookingBillingTab({super.key, required this.bookingId});
+class BookingBillingCard extends ConsumerWidget {
+  const BookingBillingCard({super.key, required this.bookingId});
 
   final int bookingId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return switch (ref.watch(foliosProvider(bookingId))) {
-      AsyncError(:final error) => Center(
-        child: Text(context.t.common.loadFailed(error: error)),
-      ),
-      AsyncValue(value: final folios?) =>
-        folios.isEmpty
-            ? Center(
-                child: Text(
-                  context.t.bookings.noFolios,
-                  textAlign: TextAlign.center,
+    final t = context.t.bookings;
+    final theme = Theme.of(context);
+    final folios = ref.watch(foliosProvider(bookingId));
+
+    return BookingCard(
+      title: t.billing,
+      // Without a folio there is nothing to invoice or to pay.
+      onEdit: ref.watch(canEditProvider) && (folios.value?.isNotEmpty ?? false)
+          ? () => showBookingOverlay(
+              context,
+              ref,
+              bookingId: bookingId,
+              overlay: BookingBillingEditor(bookingId: bookingId),
+            )
+          : null,
+      child: switch (folios) {
+        AsyncError(:final error) => CardNote(
+          context.t.common.loadFailed(error: error),
+        ),
+        AsyncValue(value: final folios?) =>
+          folios.isEmpty
+              ? CardNote(t.noFolios)
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final (index, folio) in folios.indexed) ...[
+                      if (index > 0) const Divider(height: 24),
+                      DefaultTextStyle.merge(
+                        style: theme.textTheme.titleSmall,
+                        child: _FolioHeader(folio: folio),
+                      ),
+                      const SizedBox(height: 4),
+                      _FolioBody(folio: folio, readOnly: true),
+                    ],
+                  ],
                 ),
-              )
-            : ListView(
-                children: [
-                  for (final folio in folios)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _FolioCard(folio: folio),
-                    ),
-                ],
-              ),
-      _ => const Center(child: CircularProgressIndicator()),
-    };
+        _ => const CardLoading(),
+      },
+    );
   }
 }
 
-class _FolioCard extends ConsumerWidget {
-  const _FolioCard({required this.folio});
+/// The overlay in which the folios of a booking are invoiced and paid, and
+/// charges are added to them by hand. Every change is saved at once.
+class BookingBillingEditor extends ConsumerWidget {
+  const BookingBillingEditor({super.key, required this.bookingId});
+
+  final int bookingId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return BookingOverlay(
+      title: context.t.bookings.billing,
+      width: 720,
+      height: 720,
+      child: switch (ref.watch(foliosProvider(bookingId))) {
+        AsyncError(:final error) => Center(
+          child: Text(context.t.common.loadFailed(error: error)),
+        ),
+        AsyncValue(value: final folios?) =>
+          folios.isEmpty
+              ? Center(
+                  child: Text(
+                    context.t.bookings.noFolios,
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : ListView(
+                  children: [
+                    for (final folio in folios)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: YaruSection(
+                          headline: _FolioHeader(folio: folio),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: _FolioBody(folio: folio, readOnly: false),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+        _ => const CardLoading(),
+      },
+    );
+  }
+}
+
+/// Who pays a folio, and whether it was invoiced.
+class _FolioHeader extends StatelessWidget {
+  const _FolioHeader({required this.folio});
 
   final Folio folio;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t.bookings;
+
+    return Row(
+      children: [
+        Expanded(child: Text(folio.payer?.fullName ?? '')),
+        Text(
+          switch (folio.invoiceNumber) {
+            final number? => t.folioInvoiced(
+              number: number,
+              date: formatDate(context, folio.invoicedAt!),
+            ),
+            null => t.folioOpen,
+          },
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+}
+
+/// The charges and payments of a folio and what is still owed. Unless it is
+/// [readOnly], it has the buttons to change the folio as well.
+class _FolioBody extends ConsumerWidget {
+  const _FolioBody({required this.folio, required this.readOnly});
+
+  final Folio folio;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.t.bookings;
     final theme = Theme.of(context);
-    final canEdit = ref.watch(canEditProvider);
+    final canEdit = !readOnly;
     final billing = ref.read(serverpodClientProvider).billing;
     final overpaid = folio.overpaid;
     final total = theme.textTheme.titleSmall;
@@ -109,127 +204,124 @@ class _FolioCard extends ConsumerWidget {
       if (deleted) refresh();
     }
 
-    return YaruSection(
-      headline: Row(
-        children: [
-          Expanded(child: Text(folio.payer?.fullName ?? '')),
-          Text(
-            switch (folio.invoiceNumber) {
-              final number? => t.folioInvoiced(
-                number: number,
-                date: formatDate(context, folio.invoicedAt!),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final charge in folio.charges ?? <Charge>[])
+          AmountRow(
+            label: '${charge.type.label(context)} · ${charge.description}',
+            detail:
+                '${charge.quantity} × '
+                '${formatMoney(context, charge.unitPrice)}',
+            amount: charge.total,
+            onDelete: canEdit && !folio.isInvoiced && charge.isByHand
+                ? () => remove(
+                    charge.description,
+                    () => billing.deleteCharge(charge.id!),
+                  )
+                : null,
+          ),
+        const Divider(),
+        for (final payment in folio.payments ?? <Payment>[]) ...[
+          AmountRow(
+            label: [
+              payment.amount < 0 ? t.refund : t.payment,
+              formatDate(context, payment.date),
+              payment.method.label(context),
+              ?payment.reference,
+            ].join(' · '),
+            amount: payment.amount,
+            onDelete: canEdit
+                ? () => remove(
+                    formatMoney(context, payment.amount),
+                    () => billing.deletePayment(payment.id!),
+                    hint: t.removePaymentHint,
+                  )
+                : null,
+          ),
+          for (final donation in payment.donations ?? <Donation>[])
+            AmountRow(
+              label: t.donation,
+              amount: donation.amount,
+              onDelete: canEdit
+                  ? () => remove(
+                      t.donation,
+                      () => billing.deleteDonation(donation.id!),
+                      hint: t.removeDonationHint,
+                    )
+                  : null,
+            ),
+        ],
+        const SizedBox(height: 4),
+        if (overpaid < 0)
+          AmountRow(label: t.stillToPay, amount: -overpaid, style: total)
+        else if (overpaid == 0)
+          Text(t.paidInFull, style: total)
+        else
+          Row(
+            children: [
+              Expanded(
+                child: AmountRow(
+                  label: t.overpaid,
+                  amount: overpaid,
+                  style: total,
+                ),
               ),
-              null => t.folioOpen,
-            },
-            style: theme.textTheme.bodySmall,
+              if (canEdit) ...[
+                const SizedBox(width: 8),
+                OutlinedButton(
+                  onPressed: () => _settleOverpayment(context, ref, folio),
+                  child: Text(t.decide),
+                ),
+              ],
+            ],
+          ),
+        if (folio.isInvoiced)
+          Wrap(
+            alignment: WrapAlignment.end,
+            spacing: 8,
+            children: [
+              if (canEdit)
+                TextButton(
+                  onPressed: () => _renewInvoice(context, ref),
+                  child: Text(t.renewInvoice),
+                ),
+              TextButton.icon(
+                icon: const Icon(Icons.picture_as_pdf_outlined),
+                label: Text(t.openInvoice),
+                onPressed: () => _openInvoice(context, ref),
+              ),
+            ],
+          ),
+        if (canEdit) ...[
+          const SizedBox(height: 12),
+          Wrap(
+            alignment: WrapAlignment.end,
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              if (!folio.isInvoiced) ...[
+                TextButton(
+                  onPressed: () async {
+                    final dialog = _ChargeDialog(folio: folio);
+                    if (await showAdminDialog(context, dialog)) refresh();
+                  },
+                  child: Text(t.addCharge),
+                ),
+                OutlinedButton(
+                  onPressed: () => _invoice(context, ref),
+                  child: Text(t.createInvoice),
+                ),
+              ],
+              ElevatedButton(
+                onPressed: () => _recordPayment(context, ref),
+                child: Text(t.recordPayment),
+              ),
+            ],
           ),
         ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (final charge in folio.charges ?? <Charge>[])
-              AmountRow(
-                label: '${charge.type.label(context)} · ${charge.description}',
-                detail:
-                    '${charge.quantity} × '
-                    '${formatMoney(context, charge.unitPrice)}',
-                amount: charge.total,
-                onDelete: canEdit && !folio.isInvoiced && charge.isByHand
-                    ? () => remove(
-                        charge.description,
-                        () => billing.deleteCharge(charge.id!),
-                      )
-                    : null,
-              ),
-            const Divider(),
-            for (final payment in folio.payments ?? <Payment>[]) ...[
-              AmountRow(
-                label: [
-                  payment.amount < 0 ? t.refund : t.payment,
-                  formatDate(context, payment.date),
-                  payment.method.label(context),
-                  ?payment.reference,
-                ].join(' · '),
-                amount: payment.amount,
-                onDelete: canEdit
-                    ? () => remove(
-                        formatMoney(context, payment.amount),
-                        () => billing.deletePayment(payment.id!),
-                        hint: t.removePaymentHint,
-                      )
-                    : null,
-              ),
-              for (final donation in payment.donations ?? <Donation>[])
-                AmountRow(
-                  label: t.donation,
-                  amount: donation.amount,
-                  onDelete: canEdit
-                      ? () => remove(
-                          t.donation,
-                          () => billing.deleteDonation(donation.id!),
-                          hint: t.removeDonationHint,
-                        )
-                      : null,
-                ),
-            ],
-            const SizedBox(height: 4),
-            if (overpaid < 0)
-              AmountRow(label: t.stillToPay, amount: -overpaid, style: total)
-            else if (overpaid == 0)
-              Text(t.paidInFull, style: total)
-            else
-              Row(
-                children: [
-                  Expanded(
-                    child: AmountRow(
-                      label: t.overpaid,
-                      amount: overpaid,
-                      style: total,
-                    ),
-                  ),
-                  if (canEdit) ...[
-                    const SizedBox(width: 8),
-                    OutlinedButton(
-                      onPressed: () => _settleOverpayment(context, ref, folio),
-                      child: Text(t.decide),
-                    ),
-                  ],
-                ],
-              ),
-            if (canEdit) ...[
-              const SizedBox(height: 12),
-              Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  if (!folio.isInvoiced) ...[
-                    TextButton(
-                      onPressed: () async {
-                        final dialog = _ChargeDialog(folio: folio);
-                        if (await showAdminDialog(context, dialog)) refresh();
-                      },
-                      child: Text(t.addCharge),
-                    ),
-                    OutlinedButton(
-                      onPressed: () => _invoice(context, ref),
-                      child: Text(t.createInvoice),
-                    ),
-                  ],
-                  FilledButton(
-                    onPressed: () => _recordPayment(context, ref),
-                    child: Text(t.recordPayment),
-                  ),
-                ],
-              ),
-            ],
-            const SizedBox(height: 4),
-          ],
-        ),
-      ),
+        const SizedBox(height: 4),
+      ],
     );
   }
 
@@ -245,7 +337,7 @@ class _FolioCard extends ConsumerWidget {
             onPressed: () => Navigator.pop(context, false),
             child: Text(t.common.cancel),
           ),
-          FilledButton(
+          ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(t.bookings.createInvoice),
           ),
@@ -297,7 +389,7 @@ class _FolioCard extends ConsumerWidget {
             onPressed: () => Navigator.pop(context, _Overpayment.refund),
             child: Text(t.asRefund),
           ),
-          FilledButton(
+          ElevatedButton(
             onPressed: () => Navigator.pop(context, _Overpayment.donation),
             child: Text(t.asDonation),
           ),
@@ -326,6 +418,61 @@ class _FolioCard extends ConsumerWidget {
       case _Overpayment.credit || null:
         break;
     }
+  }
+
+  /// Opens the invoice as a PDF. The server produces it the first time and
+  /// keeps it as it is from then on.
+  Future<void> _openInvoice(
+    BuildContext context,
+    WidgetRef ref, {
+    bool renew = false,
+  }) async {
+    try {
+      final billing = ref.read(serverpodClientProvider).billing;
+      final pdf = renew
+          ? await billing.renewInvoicePdf(folio.id!)
+          : await billing.getInvoicePdf(folio.id!);
+      await ref.read(fileOpenerProvider)(
+        'Rechnung-${folio.invoiceNumber}.pdf',
+        // The bytes may be a part of a larger buffer.
+        pdf.buffer.asUint8List(pdf.offsetInBytes, pdf.lengthInBytes),
+      );
+    } catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            validationMessage(context, error) ??
+                context.t.bookings.openInvoiceFailed(error: error),
+          ),
+        ),
+      );
+    }
+  }
+
+  /// Replaces the stored invoice with one made from the current details,
+  /// after asking, and opens it.
+  Future<void> _renewInvoice(BuildContext context, WidgetRef ref) async {
+    final t = context.t;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.bookings.renewInvoice),
+        content: Text(t.bookings.renewInvoiceHint),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(t.common.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(t.bookings.renewInvoice),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    await _openInvoice(context, ref, renew: true);
   }
 
   /// Runs a change of the folio, shows why it failed if it did, and loads

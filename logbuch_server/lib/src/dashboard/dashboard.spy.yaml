@@ -1,0 +1,14 @@
+### What the start screen shows about today and the days ahead.
+class: Dashboard
+fields:
+  today: DateTime
+  arrivals: List<DashboardStay>
+  departures: List<DashboardStay>
+  ### Rooms that are held tonight, out of the active rooms.
+  roomsOccupied: int
+  roomsTotal: int
+  guestsTonight: int
+  expiringOptions: List<ExpiringOption>
+  openBalances: List<OpenBalance>
+  ### Today and tomorrow.
+  meals: List<MealDay>

@@ -19,6 +19,8 @@ import 'package:logbuch_server/src/generated/bookings/bookings.dart'
     as _iz54m678;
 import 'package:logbuch_server/src/generated/contacts/contact.dart'
     as _i4e319y1;
+import 'package:logbuch_server/src/generated/contacts/household.dart'
+    as _inwmb5da;
 import 'package:logbuch_server/src/generated/contacts/organization.dart'
     as _i0zrc0jf;
 import 'package:logbuch_server/src/generated/donations/operator.dart'
@@ -50,7 +52,9 @@ import '../auth/user_endpoint.dart' as _ilyd3rgd;
 import '../billing/billing_endpoint.dart' as _irc9lmoc;
 import '../bookings/booking_endpoint.dart' as _i7f5j1eo;
 import '../contacts/contact_endpoint.dart' as _i468fl3m;
+import '../contacts/household_endpoint.dart' as _i2lplksh;
 import '../contacts/organization_endpoint.dart' as _i05r4tmt;
+import '../dashboard/dashboard_endpoint.dart' as _izwoh05q;
 import '../donations/donation_endpoint.dart' as _ipeykwyx;
 import '../donations/operator_endpoint.dart' as _ihleekzx;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
@@ -105,10 +109,22 @@ class Endpoints extends _is.EndpointDispatch {
           'contact',
           null,
         ),
+      'household': _i2lplksh.HouseholdEndpoint()
+        ..initialize(
+          server,
+          'household',
+          null,
+        ),
       'organization': _i05r4tmt.OrganizationEndpoint()
         ..initialize(
           server,
           'organization',
+          null,
+        ),
+      'dashboard': _izwoh05q.DashboardEndpoint()
+        ..initialize(
+          server,
+          'dashboard',
           null,
         ),
       'donation': _ipeykwyx.DonationEndpoint()
@@ -526,6 +542,44 @@ class Endpoints extends _is.EndpointDispatch {
                     params['folioId'],
                   ),
         ),
+        'getInvoicePdf': _is.MethodConnector(
+          name: 'getInvoicePdf',
+          params: {
+            'folioId': _is.ParameterDescription(
+              name: 'folioId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['billing'] as _irc9lmoc.BillingEndpoint)
+                  .getInvoicePdf(
+                    session,
+                    params['folioId'],
+                  ),
+        ),
+        'renewInvoicePdf': _is.MethodConnector(
+          name: 'renewInvoicePdf',
+          params: {
+            'folioId': _is.ParameterDescription(
+              name: 'folioId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['billing'] as _irc9lmoc.BillingEndpoint)
+                  .renewInvoicePdf(
+                    session,
+                    params['folioId'],
+                  ),
+        ),
         'addPayment': _is.MethodConnector(
           name: 'addPayment',
           params: {
@@ -681,6 +735,25 @@ class Endpoints extends _is.EndpointDispatch {
                     params['booking'],
                   ),
         ),
+        'getConfirmationPdf': _is.MethodConnector(
+          name: 'getConfirmationPdf',
+          params: {
+            'bookingId': _is.ParameterDescription(
+              name: 'bookingId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['booking'] as _i7f5j1eo.BookingEndpoint)
+                  .getConfirmationPdf(
+                    session,
+                    params['bookingId'],
+                  ),
+        ),
         'availableRooms': _is.MethodConnector(
           name: 'availableRooms',
           params: {
@@ -831,6 +904,66 @@ class Endpoints extends _is.EndpointDispatch {
         ),
       },
     );
+    connectors['household'] = _is.EndpointConnector(
+      name: 'household',
+      endpoint: endpoints['household']!,
+      methodConnectors: {
+        'getAll': _is.MethodConnector(
+          name: 'getAll',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['household'] as _i2lplksh.HouseholdEndpoint)
+                  .getAll(session),
+        ),
+        'save': _is.MethodConnector(
+          name: 'save',
+          params: {
+            'household': _is.ParameterDescription(
+              name: 'household',
+              type: _is.getType<_inwmb5da.Household>(),
+              nullable: false,
+            ),
+            'memberIds': _is.ParameterDescription(
+              name: 'memberIds',
+              type: _is.getType<List<int>>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['household'] as _i2lplksh.HouseholdEndpoint).save(
+                    session,
+                    params['household'],
+                    params['memberIds'],
+                  ),
+        ),
+        'delete': _is.MethodConnector(
+          name: 'delete',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['household'] as _i2lplksh.HouseholdEndpoint)
+                  .delete(
+                    session,
+                    params['id'],
+                  ),
+        ),
+      },
+    );
     connectors['organization'] = _is.EndpointConnector(
       name: 'organization',
       endpoint: endpoints['organization']!,
@@ -905,6 +1038,22 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         params['id'],
                       ),
+        ),
+      },
+    );
+    connectors['dashboard'] = _is.EndpointConnector(
+      name: 'dashboard',
+      endpoint: endpoints['dashboard']!,
+      methodConnectors: {
+        'load': _is.MethodConnector(
+          name: 'load',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['dashboard'] as _izwoh05q.DashboardEndpoint)
+                  .load(session),
         ),
       },
     );
@@ -1128,6 +1277,50 @@ class Endpoints extends _is.EndpointDispatch {
                   (endpoints['guest'] as _i2qdn6vg.GuestEndpoint).getByBooking(
                     session,
                     params['bookingId'],
+                  ),
+        ),
+        'kitchenOverview': _is.MethodConnector(
+          name: 'kitchenOverview',
+          params: {
+            'bookingId': _is.ParameterDescription(
+              name: 'bookingId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['guest'] as _i2qdn6vg.GuestEndpoint)
+                  .kitchenOverview(
+                    session,
+                    params['bookingId'],
+                  ),
+        ),
+        'addHousehold': _is.MethodConnector(
+          name: 'addHousehold',
+          params: {
+            'bookingId': _is.ParameterDescription(
+              name: 'bookingId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'householdId': _is.ParameterDescription(
+              name: 'householdId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['guest'] as _i2qdn6vg.GuestEndpoint).addHousehold(
+                    session,
+                    params['bookingId'],
+                    params['householdId'],
                   ),
         ),
         'addGroup': _is.MethodConnector(

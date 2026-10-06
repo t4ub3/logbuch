@@ -15,7 +15,10 @@
         "none": "None",
         "search": "Search",
         "signOut": "Sign out",
-        "clear": "Clear"
+        "clear": "Clear",
+        "close": "Close",
+        "copy": "Copy",
+        "copied": "Copied"
     },
     "tabs": {
         "close": "Close tab"
@@ -25,7 +28,8 @@
         "contacts": "Contacts",
         "admin": "Admin",
         "settings": "Settings",
-        "donations": "Donations"
+        "donations": "Donations",
+        "dashboard": "Dashboard"
     },
     "bookings": {
         "newBooking": "New booking",
@@ -41,7 +45,6 @@
         "today": "Today",
         "more": "+{n} more",
         "yearlyView": "Yearly view",
-        "edit": "Edit",
         "email": "Email",
         "phone": "Phone",
         "status": "Status",
@@ -87,7 +90,6 @@
             "one": "{n} guest expected",
             "other": "{n} guests expected"
         },
-        "roomsSaved": "Rooms saved",
         "guests": "Guests",
         "assignment": "Assignment",
         "price": "Price",
@@ -116,7 +118,7 @@
         },
         "unassigned": "Without a room",
         "everybodyAssigned": "Everybody has a room.",
-        "noRoomsHeld": "The booking holds no rooms yet. Choose them under Rooms.",
+        "noRoomsHeld": "The booking holds no rooms yet.",
         "moveTo": "Move to",
         "bedsUsed": "{used} of {beds} beds",
         "roomFull": "Full",
@@ -181,7 +183,21 @@
         "quantity": "Quantity",
         "unitPrice": "Price each",
         "isDiscount": "This is a discount",
-        "taxRate": "Tax rate"
+        "taxRate": "Tax rate",
+        "openInvoice": "Open invoice",
+        "openInvoiceFailed": "The invoice could not be opened: {error}",
+        "renewInvoice": "Renew document",
+        "renewInvoiceHint": "The invoice is produced again with the details as they are now, such as the bank details, and replaces the stored document. Only do this while the invoice has not been sent.",
+        "kitchen": "Kitchen",
+        "guestsByAge": "Guests by age group",
+        "guestsInTotal": "Guests in total",
+        "noMealPlan": "None chosen",
+        "noDietaryNeeds": "No dietary needs were noted for the guests.",
+        "addHousehold": "Add household",
+        "noHouseholdsYet": "There are no households yet. Create them under Contacts, Households.",
+        "confirmation": "Confirmation",
+        "openConfirmationFailed": "The confirmation could not be opened: {error}",
+        "bedsInRooms": "{beds} in {rooms}"
     },
     "contacts": {
         "empty": "No contacts",
@@ -207,7 +223,14 @@
         "noOrganizations": "No organizations",
         "addOrganization": "New organization",
         "editOrganization": "Edit organization",
-        "deleteOrganizationHint": "Its contacts stay, without an organization."
+        "deleteOrganizationHint": "Its contacts stay, without an organization.",
+        "households": "Households",
+        "noHouseholds": "No households",
+        "addHousehold": "New household",
+        "editHousehold": "Edit household",
+        "addMember": "Add a member",
+        "noMembers": "No members yet",
+        "deleteHouseholdHint": "Its members stay as contacts."
     },
     "rooms": {
         "empty": "No rooms",
@@ -253,10 +276,12 @@
             "roomNotHeld": "The booking does not hold this room.",
             "alreadyInvoiced": "This is invoiced and can no longer be changed.",
             "nothingToInvoice": "There is nothing to invoice.",
-            "pricingIncomplete": "Parts of the booking cannot be priced yet. See the Price tab for what is missing.",
+            "pricingIncomplete": "Parts of the booking cannot be priced yet. Its price says what is missing.",
             "notOverpaid": "This is more than was overpaid.",
             "alreadyReceipted": "This donation is on a receipt and can no longer be changed.",
-            "operatorIncomplete": "The details of the operator are incomplete. Fill them in under Admin, Operator."
+            "operatorIncomplete": "The details of the operator are incomplete. Fill them in under Admin, Operator.",
+            "alreadyGuest": "Nobody in this household can be added: it has no members, or all of them are guests of the booking already.",
+            "notConfirmed": "A confirmation is only available for a booking that is an option or confirmed."
         },
         "rooms": {
             "add": "New room",
@@ -348,7 +373,7 @@
             "you": "you"
         },
         "operator": {
-            "hint": "The organisation that runs the house. These details are printed on donation receipts, which can only be issued once everything is filled in.",
+            "hint": "The organisation that runs the house. These details are printed on invoices and donation receipts. Receipts can only be issued once everything about the tax office is filled in.",
             "street": "Street",
             "zip": "Postal code",
             "city": "City",
@@ -365,7 +390,16 @@
             "purposesObjectHint": "In German, for example: die Jugendhilfe",
             "place": "Place where receipts are signed",
             "signatory": "Signed by",
-            "saved": "Saved"
+            "saved": "Saved",
+            "bankHint": "Printed on invoices, so that payers know where and by when to pay.",
+            "accountHolder": "Account holder",
+            "iban": "IBAN",
+            "bic": "BIC",
+            "bankName": "Bank",
+            "paymentTerms": "Payment terms",
+            "paymentTermsHint": "In German, for example: Zahlbar innerhalb von 14 Tagen ohne Abzug.",
+            "confirmationNote": "Note on booking confirmations",
+            "confirmationNoteHint": "In German, for example when rooms are ready on the day of arrival."
         }
     },
     "auth": {
@@ -406,6 +440,33 @@
         },
         "openPdf": "Open the PDF",
         "openFailed": "The receipt could not be opened: {error}"
+    },
+    "dashboard": {
+        "arrivals": "Arrivals in the next 7 days",
+        "noArrivals": "Nobody arrives in the next 7 days.",
+        "departures": "Departures in the next 7 days",
+        "noDepartures": "Nobody departs in the next 7 days.",
+        "tonight": "Tonight",
+        "roomsOccupied": "{occupied} of {total} rooms occupied",
+        "guestsTonight": {
+            "zero": "No guests in the house",
+            "one": "{n} guest in the house",
+            "other": "{n} guests in the house"
+        },
+        "roomCount": {
+            "one": "{n} room",
+            "other": "{n} rooms"
+        },
+        "options": "Options expiring soon",
+        "noOptions": "No option expires in the next 14 days.",
+        "expires": "Expires on {date}",
+        "expired": "Expired on {date}",
+        "balances": "Unpaid invoices",
+        "noBalances": "No invoice is waiting for payment.",
+        "catering": "Guests to cater for",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "noGuests": "No guests."
     },
     "settings": {
         "title": "Settings",

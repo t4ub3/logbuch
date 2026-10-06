@@ -25,8 +25,12 @@ import 'package:logbuch_server/src/generated/bookings/bookings.dart'
     as _iz54m678;
 import 'package:logbuch_server/src/generated/contacts/contact.dart'
     as _i4e319y1;
+import 'package:logbuch_server/src/generated/contacts/household.dart'
+    as _inwmb5da;
 import 'package:logbuch_server/src/generated/contacts/organization.dart'
     as _i0zrc0jf;
+import 'package:logbuch_server/src/generated/dashboard/dashboard.dart'
+    as _iybuevaf;
 import 'package:logbuch_server/src/generated/donations/donation_receipt.dart'
     as _iyoacxs7;
 import 'package:logbuch_server/src/generated/donations/operator.dart'
@@ -38,6 +42,8 @@ import 'package:logbuch_server/src/generated/greetings/greeting.dart'
 import 'package:logbuch_server/src/generated/guests/guest.dart' as _iju6pcvn;
 import 'package:logbuch_server/src/generated/guests/guest_group.dart'
     as _ikiew98c;
+import 'package:logbuch_server/src/generated/guests/kitchen_overview.dart'
+    as _iyt1890r;
 import 'package:logbuch_server/src/generated/pricing/age_group.dart'
     as _ifrl6grh;
 import 'package:logbuch_server/src/generated/pricing/booking_price.dart'
@@ -202,7 +208,11 @@ class TestEndpoints {
 
   late final _ContactEndpoint contact;
 
+  late final _HouseholdEndpoint household;
+
   late final _OrganizationEndpoint organization;
+
+  late final _DashboardEndpoint dashboard;
 
   late final _DonationEndpoint donation;
 
@@ -262,7 +272,15 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
+    household = _HouseholdEndpoint(
+      endpoints,
+      serializationManager,
+    );
     organization = _OrganizationEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    dashboard = _DashboardEndpoint(
       endpoints,
       serializationManager,
     );
@@ -879,6 +897,68 @@ class _BillingEndpoint {
     });
   }
 
+  _ida.Future<_idt.ByteData> getInvoicePdf(
+    _ist.TestSessionBuilder sessionBuilder,
+    int folioId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'billing',
+            method: 'getInvoicePdf',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'billing',
+          methodName: 'getInvoicePdf',
+          parameters: _ist.testObjectToJson({'folioId': folioId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_idt.ByteData>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_idt.ByteData> renewInvoicePdf(
+    _ist.TestSessionBuilder sessionBuilder,
+    int folioId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'billing',
+            method: 'renewInvoicePdf',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'billing',
+          methodName: 'renewInvoicePdf',
+          parameters: _ist.testObjectToJson({'folioId': folioId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_idt.ByteData>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _ida.Future<_ijoeqr7q.Payment> addPayment(
     _ist.TestSessionBuilder sessionBuilder,
     _ijoeqr7q.Payment payment,
@@ -1141,6 +1221,37 @@ class _BookingEndpoint {
     });
   }
 
+  _ida.Future<_idt.ByteData> getConfirmationPdf(
+    _ist.TestSessionBuilder sessionBuilder,
+    int bookingId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'booking',
+            method: 'getConfirmationPdf',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'booking',
+          methodName: 'getConfirmationPdf',
+          parameters: _ist.testObjectToJson({'bookingId': bookingId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_idt.ByteData>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _ida.Future<List<_iu0pobb2.Room>> availableRooms(
     _ist.TestSessionBuilder sessionBuilder,
     DateTime arrival,
@@ -1379,6 +1490,113 @@ class _ContactEndpoint {
   }
 }
 
+class _HouseholdEndpoint {
+  _HouseholdEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<List<_inwmb5da.Household>> getAll(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'household',
+            method: 'getAll',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'household',
+          methodName: 'getAll',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_inwmb5da.Household>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_inwmb5da.Household> save(
+    _ist.TestSessionBuilder sessionBuilder,
+    _inwmb5da.Household household,
+    List<int> memberIds,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'household',
+            method: 'save',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'household',
+          methodName: 'save',
+          parameters: _ist.testObjectToJson({
+            'household': household,
+            'memberIds': memberIds,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_inwmb5da.Household>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<void> delete(
+    _ist.TestSessionBuilder sessionBuilder,
+    int id,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'household',
+            method: 'delete',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'household',
+          methodName: 'delete',
+          parameters: _ist.testObjectToJson({'id': id}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _OrganizationEndpoint {
   _OrganizationEndpoint(
     this._endpointDispatch,
@@ -1505,6 +1723,47 @@ class _OrganizationEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _DashboardEndpoint {
+  _DashboardEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_iybuevaf.Dashboard> load(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dashboard',
+            method: 'load',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dashboard',
+          methodName: 'load',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iybuevaf.Dashboard>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1889,6 +2148,72 @@ class _GuestEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<List<_ikiew98c.GuestGroup>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_iyt1890r.KitchenOverview> kitchenOverview(
+    _ist.TestSessionBuilder sessionBuilder,
+    int bookingId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'guest',
+            method: 'kitchenOverview',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'guest',
+          methodName: 'kitchenOverview',
+          parameters: _ist.testObjectToJson({'bookingId': bookingId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iyt1890r.KitchenOverview>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_ikiew98c.GuestGroup> addHousehold(
+    _ist.TestSessionBuilder sessionBuilder,
+    int bookingId,
+    int householdId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'guest',
+            method: 'addHousehold',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'guest',
+          methodName: 'addHousehold',
+          parameters: _ist.testObjectToJson({
+            'bookingId': bookingId,
+            'householdId': householdId,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ikiew98c.GuestGroup>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

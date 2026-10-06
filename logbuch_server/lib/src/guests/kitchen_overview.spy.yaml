@@ -1,0 +1,9 @@
+### What the kitchen needs to know about a booking.
+class: KitchenOverview
+fields:
+  guestCount: int
+  ### Every age group, youngest first, with the number of its guests.
+  ageGroups: List<AgeGroupCount>
+  ### Guests with neither a birth date nor an age group.
+  unknownAge: int
+  dietaryNeeds: List<DietaryNeed>

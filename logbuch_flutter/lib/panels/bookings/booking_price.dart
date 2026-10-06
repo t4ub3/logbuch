@@ -4,7 +4,8 @@ import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
 import 'package:logbuch_flutter/panels/bookings/amount_row.dart';
-import 'package:logbuch_flutter/panels/bookings/booking_guests_tab.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_guests.dart';
 import 'package:logbuch_flutter/providers/booking_price_provider.dart';
 import 'package:logbuch_flutter/providers/guest_groups_provider.dart';
 import 'package:yaru/yaru.dart';
@@ -23,9 +24,10 @@ extension ChargeTypeX on ChargeType {
 }
 
 /// What the booking costs by the current rates, guest by guest, and what
-/// keeps parts of it from being priced.
-class BookingPriceTab extends ConsumerWidget {
-  const BookingPriceTab({super.key, required this.bookingId});
+/// keeps parts of it from being priced. The price is worked out from the
+/// booking, so there is nothing to edit.
+class BookingPriceCard extends ConsumerWidget {
+  const BookingPriceCard({super.key, required this.bookingId});
 
   final int bookingId;
 
@@ -37,13 +39,16 @@ class BookingPriceTab extends ConsumerWidget {
         for (final guest in group.guests ?? <Guest>[]) guest.id: guest.name,
     };
 
-    return switch (ref.watch(bookingPriceProvider(bookingId))) {
-      AsyncError(:final error) => Center(
-        child: Text(context.t.common.loadFailed(error: error)),
-      ),
-      AsyncValue(value: final price?) => _Price(price: price, names: names),
-      _ => const Center(child: CircularProgressIndicator()),
-    };
+    return BookingCard(
+      title: context.t.bookings.price,
+      child: switch (ref.watch(bookingPriceProvider(bookingId))) {
+        AsyncError(:final error) => CardNote(
+          context.t.common.loadFailed(error: error),
+        ),
+        AsyncValue(value: final price?) => _Price(price: price, names: names),
+        _ => const CardLoading(),
+      },
+    );
   }
 }
 
@@ -71,11 +76,12 @@ class _Price extends StatelessWidget {
     ];
     if (ofBooking.isNotEmpty) byGuest[null] = ofBooking;
 
-    return ListView(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (price.problems.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: 12),
             child: YaruInfoBox(
               yaruInfoType: YaruInfoType.warning,
               subtitle: Text(
@@ -86,54 +92,42 @@ class _Price extends StatelessWidget {
               ),
             ),
           ),
-        if (price.lines.isEmpty)
-          Padding(
-            padding: const EdgeInsets.all(kYaruPagePadding),
-            child: Text(t.nothingToPrice, textAlign: TextAlign.center),
-          ),
+        if (price.lines.isEmpty) CardNote(t.nothingToPrice),
         for (final MapEntry(key: guestId, value: lines) in byGuest.entries)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: YaruSection(
-              headline: AmountRow(
-                label: guestId == null ? t.wholeBooking : names[guestId] ?? '',
-                amount: lines.fold(0, (sum, line) => sum + line.total),
-              ),
-              child: Column(
-                children: [
-                  for (final line in lines)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      child: AmountRow(
-                        label:
-                            '${line.type.label(context)} · ${line.description}',
-                        detail:
-                            '${line.quantity} × '
-                            '${formatMoney(context, line.unitPrice)}',
-                        amount: line.total,
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                    ),
-                ],
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: 4,
+              children: [
+                AmountRow(
+                  label: guestId == null
+                      ? t.wholeBooking
+                      : names[guestId] ?? '',
+                  amount: lines.fold(0, (sum, line) => sum + line.total),
+                  style: theme.textTheme.titleSmall,
+                ),
+                for (final line in lines)
+                  AmountRow(
+                    label: '${line.type.label(context)} · ${line.description}',
+                    detail:
+                        '${line.quantity} × '
+                        '${formatMoney(context, line.unitPrice)}',
+                    amount: line.total,
+                    style: theme.textTheme.bodyMedium,
+                  ),
+              ],
             ),
           ),
         if (price.lines.isNotEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: AmountRow(
-              label: t.total,
-              amount: price.total,
-              style: theme.textTheme.titleMedium,
-            ),
+          const Divider(),
+          AmountRow(
+            label: t.total,
+            amount: price.total,
+            style: theme.textTheme.titleMedium,
           ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(t.inclTax, style: theme.textTheme.bodySmall),
-          ),
+          const SizedBox(height: 8),
+          CardNote(t.inclTax),
         ],
       ],
     );

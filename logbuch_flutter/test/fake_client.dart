@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/settings_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,6 +52,10 @@ class FakeClient extends Fake implements Client {
   final FakeDonations donation = FakeDonations();
   @override
   final FakeOperators operator = FakeOperators();
+  @override
+  final FakeHouseholds household = FakeHouseholds();
+  @override
+  final FakeDashboards dashboard = FakeDashboards();
 }
 
 class FakeUsers extends Fake implements EndpointUser {
@@ -182,6 +187,14 @@ class FakeContacts extends Fake implements EndpointContact {
   Future<List<Contact>> getAll() async => contacts;
 
   @override
+  Future<Contact> update(Contact contact) async {
+    contacts = [
+      for (final other in contacts) other.id == contact.id ? contact : other,
+    ];
+    return contact;
+  }
+
+  @override
   Future<Contact> add(Contact contact) async {
     final added = contact.copyWith(id: contacts.length + 1);
     contacts = [...contacts, added];
@@ -205,17 +218,38 @@ class FakeBookings extends Fake implements EndpointBooking {
   /// The rooms that count as free, whatever the dates.
   var available = <Room>[];
 
+  /// The bookings passed to [add].
+  final added = <Booking>[];
+
   /// The bookings passed to [update].
   final updated = <Booking>[];
 
   @override
+  Future<Booking> add(Booking booking) async {
+    added.add(booking);
+    final saved = booking.copyWith(id: 100 + added.length);
+    bookings = [...bookings, saved];
+    return saved;
+  }
+
+  @override
   Future<List<Booking>> getAll() async => bookings;
+
+  @override
+  Future<Booking?> getById(int id) async =>
+      bookings.where((booking) => booking.id == id).firstOrNull;
 
   @override
   Future<Booking> update(Booking booking) async {
     updated.add(booking);
     return booking;
   }
+
+  @override
+  Future<ByteData> getConfirmationPdf(int bookingId) async =>
+      ByteData.sublistView(
+        Uint8List.fromList('%PDF-confirmation'.codeUnits),
+      );
 
   @override
   Future<List<Room>> availableRooms(
@@ -293,6 +327,33 @@ class FakeGuests extends Fake implements EndpointGuest {
     ];
   }
 
+  /// The households that were added to a booking, by their id.
+  final addedHouseholds = <int>[];
+
+  @override
+  Future<GuestGroup> addHousehold(int bookingId, int householdId) async {
+    addedHouseholds.add(householdId);
+    final group = GuestGroup(
+      id: _nextId++,
+      bookingId: bookingId,
+      name: 'Household $householdId',
+      guests: [],
+    );
+    groups = [...groups, group];
+    return group;
+  }
+
+  /// What the kitchen is told, whatever the booking.
+  var kitchen = KitchenOverview(
+    guestCount: 0,
+    ageGroups: [],
+    unknownAge: 0,
+    dietaryNeeds: [],
+  );
+
+  @override
+  Future<KitchenOverview> kitchenOverview(int bookingId) async => kitchen;
+
   /// The guests of all groups.
   List<Guest> get guests => [for (final group in groups) ...?group.guests];
 }
@@ -332,6 +393,14 @@ class FakeBilling extends Fake implements EndpointBilling {
     _replace(folio.copyWith(charges: [...?folio.charges, added]));
     return added;
   }
+
+  @override
+  Future<ByteData> getInvoicePdf(int folioId) async =>
+      ByteData.sublistView(Uint8List.fromList('%PDF-invoice'.codeUnits));
+
+  @override
+  Future<ByteData> renewInvoicePdf(int folioId) async =>
+      ByteData.sublistView(Uint8List.fromList('%PDF-renewed'.codeUnits));
 
   @override
   Future<Folio> invoice(int folioId) async {
@@ -423,6 +492,66 @@ class FakeDonations extends Fake implements EndpointDonation {
   @override
   Future<ByteData> getReceiptPdf(int receiptId) async =>
       ByteData.sublistView(Uint8List.fromList('%PDF-fake'.codeUnits));
+}
+
+class FakeHouseholds extends Fake implements EndpointHousehold {
+  var households = <Household>[];
+
+  /// The contacts that members are made of when a household is saved.
+  var contacts = <Contact>[];
+
+  @override
+  Future<List<Household>> getAll() async => households;
+
+  @override
+  Future<Household> save(Household household, List<int> memberIds) async {
+    final id = household.id ?? 700 + households.length;
+    final saved = household.copyWith(
+      id: id,
+      members: [
+        for (final contact in contacts)
+          if (memberIds.contains(contact.id))
+            HouseholdMember(
+              householdId: id,
+              contactId: contact.id!,
+              contact: contact,
+            ),
+      ],
+    );
+    households = [
+      for (final other in households)
+        if (other.id != id) other,
+      saved,
+    ];
+    return saved;
+  }
+}
+
+class FakeDashboards extends Fake implements EndpointDashboard {
+  /// A day with nothing going on.
+  var shown = Dashboard(
+    today: DateTime.utc(2026, 10, 12),
+    arrivals: [],
+    departures: [],
+    roomsOccupied: 0,
+    roomsTotal: 0,
+    guestsTonight: 0,
+    expiringOptions: [],
+    openBalances: [],
+    meals: [
+      for (final day in [12, 13])
+        MealDay(
+          date: DateTime.utc(2026, 10, day),
+          bookings: [],
+          guestCount: 0,
+          ageGroups: [],
+          unknownAge: 0,
+        ),
+    ],
+  );
+
+  @override
+  Future<Dashboard> load() async => shown;
 }
 
 class FakeOperators extends Fake implements EndpointOperator {
@@ -601,6 +730,23 @@ FakeClient filledClient({UserRole? role = UserRole.admin}) {
       ],
     ),
   ];
+  client.guest.kitchen = KitchenOverview(
+    guestCount: 3,
+    ageGroups: [
+      AgeGroupCount(ageGroup: client.ageGroup.groups.first, count: 2),
+      AgeGroupCount(ageGroup: client.ageGroup.groups.last, count: 0),
+    ],
+    unknownAge: 1,
+    dietaryNeeds: [
+      DietaryNeed(
+        guestName: 'Jonas Weber',
+        groupName: 'Weber family',
+        ageGroupName: 'Child',
+        notes: 'No nuts',
+      ),
+    ],
+  );
+
   // The lead of the class trip is charged 140 euros and has not paid yet.
   client.billing.folios = [
     Folio(
@@ -634,6 +780,117 @@ FakeClient filledClient({UserRole? role = UserRole.admin}) {
       payments: [],
     ),
   ];
+  // The 12th of October 2026, the day the class trip arrives.
+  final child = client.ageGroup.groups.first;
+  final adult = client.ageGroup.groups.last;
+  client.dashboard.shown = Dashboard(
+    today: DateTime.utc(2026, 10, 12),
+    arrivals: [
+      DashboardStay(
+        bookingId: 1,
+        title: 'Class trip',
+        status: BookingStatus.confirmed,
+        date: DateTime.utc(2026, 10, 12),
+        leadName: 'Marie Weber',
+        guestCount: 3,
+        roomCount: 1,
+      ),
+      DashboardStay(
+        bookingId: 2,
+        title: 'Choir weekend',
+        status: BookingStatus.option,
+        date: DateTime.utc(2026, 10, 16),
+        leadName: 'Marie Weber',
+        roomCount: 0,
+      ),
+    ],
+    departures: [
+      DashboardStay(
+        bookingId: 1,
+        title: 'Class trip',
+        status: BookingStatus.confirmed,
+        date: DateTime.utc(2026, 10, 16),
+        leadName: 'Marie Weber',
+        guestCount: 3,
+        roomCount: 1,
+      ),
+    ],
+    roomsOccupied: 1,
+    roomsTotal: 4,
+    guestsTonight: 3,
+    expiringOptions: [
+      ExpiringOption(
+        bookingId: 2,
+        title: 'Choir weekend',
+        expiresAt: DateTime.utc(2026, 10, 10),
+      ),
+      ExpiringOption(
+        bookingId: 2,
+        title: 'Autumn retreat',
+        expiresAt: DateTime.utc(2026, 10, 20),
+      ),
+    ],
+    openBalances: [
+      OpenBalance(
+        bookingId: 1,
+        bookingTitle: 'Class trip',
+        invoiceNumber: '2026-0007',
+        payerName: 'Marie Weber',
+        owed: 14000,
+      ),
+    ],
+    meals: [
+      MealDay(
+        date: DateTime.utc(2026, 10, 12),
+        bookings: [
+          MealBooking(
+            bookingId: 1,
+            title: 'Class trip',
+            mealPlan: 'Full board',
+            guestCount: 3,
+            ageGroups: [
+              AgeGroupCount(ageGroup: child, count: 2),
+              AgeGroupCount(ageGroup: adult, count: 1),
+            ],
+            unknownAge: 0,
+          ),
+        ],
+        guestCount: 3,
+        ageGroups: [
+          AgeGroupCount(ageGroup: child, count: 2),
+          AgeGroupCount(ageGroup: adult, count: 1),
+        ],
+        unknownAge: 0,
+      ),
+      MealDay(
+        date: DateTime.utc(2026, 10, 13),
+        bookings: [],
+        guestCount: 0,
+        ageGroups: [
+          AgeGroupCount(ageGroup: child, count: 0),
+          AgeGroupCount(ageGroup: adult, count: 0),
+        ],
+        unknownAge: 0,
+      ),
+    ],
+  );
+
+  // Felix lives alone in a household of his own.
+  client.household.contacts = client.contact.contacts;
+  client.household.households = [
+    Household(
+      id: 1,
+      name: 'Wagner household',
+      members: [
+        HouseholdMember(
+          householdId: 1,
+          contactId: 2,
+          contact: client.contact.contacts.first,
+        ),
+      ],
+    ),
+  ];
+
   // This year one donation is on a receipt and one is waiting for its own.
   final year = DateTime.now().year;
   final felix = client.contact.contacts.first;
@@ -762,5 +1019,26 @@ Finder field(String label) => find.widgetWithText(TextFormField, label);
 Future<void> open(WidgetTester tester, String label) async {
   await tester.ensureVisible(find.text(label));
   await tester.tap(find.text(label));
+  await tester.pumpAndSettle();
+}
+
+/// The card of the page of a booking that has [title], such as "Rooms".
+Finder card(String title) =>
+    find.ancestor(of: find.text(title), matching: find.byType(BookingCard));
+
+/// What [finder] finds in the card that has [title].
+Finder inCard(String title, Finder finder) =>
+    find.descendant(of: card(title), matching: finder);
+
+/// What [finder] finds in the overlay that was opened from a card. The page
+/// stays below the overlay, so a text of a card may be there twice.
+Finder inOverlay(Finder finder) =>
+    find.descendant(of: find.byType(BookingOverlay), matching: finder);
+
+/// Opens the overlay that changes what the card with [title] shows.
+Future<void> editCard(WidgetTester tester, String title) async {
+  final button = inCard(title, find.byTooltip('Edit'));
+  await tester.ensureVisible(button);
+  await tester.tap(button);
   await tester.pumpAndSettle();
 }

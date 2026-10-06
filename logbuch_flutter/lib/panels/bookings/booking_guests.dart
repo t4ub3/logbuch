@@ -4,12 +4,15 @@ import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
 import 'package:logbuch_flutter/panels/admin/admin_widgets.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
 import 'package:logbuch_flutter/panels/contacts/contacts_section.dart';
+import 'package:logbuch_flutter/panels/contacts/households_section.dart';
 import 'package:logbuch_flutter/providers/age_groups_provider.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/contacts_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
 import 'package:logbuch_flutter/providers/guest_groups_provider.dart';
+import 'package:logbuch_flutter/providers/households_provider.dart';
 import 'package:yaru/yaru.dart';
 
 extension GuestX on Guest {
@@ -21,65 +24,236 @@ extension GuestX on Guest {
       ageGroupOverrideId == null && contact?.birthDate == null;
 }
 
+/// What is known about the age of [guest].
+String _age(BuildContext context, Guest guest, List<AgeGroup> ageGroups) {
+  final override = ageGroups
+      .where((group) => group.id == guest.ageGroupOverrideId)
+      .firstOrNull;
+  if (override != null) return override.name;
+  if (guest.contact?.birthDate case final birthDate?) {
+    return formatDate(context, birthDate);
+  }
+  return context.t.bookings.ageUnknown;
+}
+
+/// What is said about [guest] next to the name: the age, a crib, dietary
+/// needs, and the days of arrival and departure if they are not those of
+/// the booking.
+String _guestDetails(
+  BuildContext context,
+  Guest guest,
+  List<AgeGroup> ageGroups,
+) {
+  final t = context.t.bookings;
+  return [
+    _age(context, guest, ageGroups),
+    if (guest.needsCrib) t.crib,
+    ?guest.dietaryNotes,
+    if (guest.arrivalOverride case final arrival?)
+      '${t.arrivalOverride} ${formatDate(context, arrival)}',
+    if (guest.departureOverride case final departure?)
+      '${t.departureOverride} ${formatDate(context, departure)}',
+  ].join(' · ');
+}
+
 /// The guests of a booking in their groups, such as families.
-class BookingGuestsTab extends ConsumerWidget {
-  const BookingGuestsTab({super.key, required this.bookingId});
+class BookingGuestsCard extends ConsumerWidget {
+  const BookingGuestsCard({super.key, required this.bookingId});
 
   final int bookingId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.t.bookings;
-    final canEdit = ref.watch(canEditProvider);
+    final theme = Theme.of(context);
+    final ageGroups = ref.watch(ageGroupsProvider).value ?? [];
+
+    return BookingCard(
+      title: t.guests,
+      onEdit: ref.watch(canEditProvider)
+          ? () => showBookingOverlay(
+              context,
+              ref,
+              bookingId: bookingId,
+              overlay: BookingGuestsEditor(bookingId: bookingId),
+            )
+          : null,
+      child: switch (ref.watch(guestGroupsProvider(bookingId))) {
+        AsyncError(:final error) => CardNote(
+          context.t.common.loadFailed(error: error),
+        ),
+        AsyncValue(value: final groups?) =>
+          groups.isEmpty
+              ? CardNote(t.noGroups)
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final (index, group) in groups.indexed) ...[
+                      if (index > 0) const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text(
+                          '${group.name} · '
+                          '${t.guestCount(n: group.guests?.length ?? 0)}',
+                          style: theme.textTheme.titleSmall,
+                        ),
+                      ),
+                      for (final guest in group.guests ?? <Guest>[])
+                        CardRow(
+                          label: guest.name,
+                          detail: _guestDetails(context, guest, ageGroups),
+                          // Without an age the guest cannot be priced.
+                          warn: guest.ageUnknown,
+                        ),
+                    ],
+                  ],
+                ),
+        _ => const CardLoading(),
+      },
+    );
+  }
+}
+
+/// The overlay in which the guests of a booking and their groups are added,
+/// changed and removed. Every change is saved at once.
+class BookingGuestsEditor extends ConsumerWidget {
+  const BookingGuestsEditor({super.key, required this.bookingId});
+
+  final int bookingId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.t.bookings;
     final ageGroups = ref.watch(ageGroupsProvider).value ?? [];
 
     void refresh() => ref.invalidate(guestGroupsProvider(bookingId));
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (canEdit)
-          Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: ElevatedButton.icon(
-              icon: const Icon(YaruIcons.plus),
-              label: Text(t.addGroup),
-              onPressed: () async {
-                final dialog = _GroupDialog(bookingId: bookingId);
-                if (await showAdminDialog(context, dialog)) refresh();
-              },
-            ),
+    return BookingOverlay(
+      title: t.guests,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Wrap(
+            alignment: WrapAlignment.end,
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              OutlinedButton(
+                onPressed: () => _addHousehold(context, ref),
+                child: Text(t.addHousehold),
+              ),
+              ElevatedButton.icon(
+                icon: const Icon(YaruIcons.plus),
+                label: Text(t.addGroup),
+                onPressed: () async {
+                  final dialog = _GroupDialog(bookingId: bookingId);
+                  if (await showAdminDialog(context, dialog)) refresh();
+                },
+              ),
+            ],
           ),
-        const SizedBox(height: 8),
-        Expanded(
-          child: switch (ref.watch(guestGroupsProvider(bookingId))) {
-            AsyncError(:final error) => Center(
-              child: Text(context.t.common.loadFailed(error: error)),
-            ),
-            AsyncValue(value: final groups?) =>
-              groups.isEmpty
-                  ? Center(
-                      child: Text(t.noGroups, textAlign: TextAlign.center),
-                    )
-                  : ListView(
-                      children: [
-                        for (final group in groups)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: _GroupSection(
-                              group: group,
-                              ageGroups: ageGroups,
-                              onChanged: refresh,
+          const SizedBox(height: 8),
+          Expanded(
+            child: switch (ref.watch(guestGroupsProvider(bookingId))) {
+              AsyncError(:final error) => Center(
+                child: Text(context.t.common.loadFailed(error: error)),
+              ),
+              AsyncValue(value: final groups?) =>
+                groups.isEmpty
+                    ? Center(
+                        child: Text(t.noGroups, textAlign: TextAlign.center),
+                      )
+                    : ListView(
+                        children: [
+                          for (final group in groups)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: _GroupSection(
+                                group: group,
+                                ageGroups: ageGroups,
+                                onChanged: refresh,
+                              ),
                             ),
-                          ),
-                      ],
-                    ),
-            _ => const Center(child: CircularProgressIndicator()),
-          },
-        ),
-      ],
+                        ],
+                      ),
+              _ => const Center(child: CircularProgressIndicator()),
+            },
+          ),
+        ],
+      ),
     );
   }
+
+  /// Adds the members of a household the user picks as a new group.
+  Future<void> _addHousehold(BuildContext context, WidgetRef ref) async {
+    final household = await showDialog<Household>(
+      context: context,
+      builder: (context) => const _HouseholdChooser(),
+    );
+    if (household == null) return;
+    try {
+      await ref
+          .read(serverpodClientProvider)
+          .guest
+          .addHousehold(bookingId, household.id!);
+    } catch (error) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              validationMessage(context, error) ??
+                  context.t.common.saveFailed(error: error),
+            ),
+          ),
+        );
+      }
+    }
+    ref.invalidate(guestGroupsProvider(bookingId));
+  }
+}
+
+/// Lets the user pick one of the households to add to a booking.
+class _HouseholdChooser extends ConsumerWidget {
+  const _HouseholdChooser();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.t;
+
+    return SimpleDialog(
+      title: Text(t.bookings.addHousehold),
+      children: switch (ref.watch(householdsProvider)) {
+        AsyncError(:final error) => [
+          _padded(Text(t.common.loadFailed(error: error))),
+        ],
+        AsyncValue(value: final households?) when households.isEmpty => [
+          _padded(Text(t.bookings.noHouseholdsYet)),
+        ],
+        AsyncValue(value: final households?) => [
+          for (final household in households)
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, household),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(household.name),
+                  Text(
+                    household.memberNames ?? t.contacts.noMembers,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+        ],
+        _ => [const Center(child: CircularProgressIndicator())],
+      },
+    );
+  }
+
+  Widget _padded(Widget child) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+    child: child,
+  );
 }
 
 /// A group with its guests and the buttons to change both.
@@ -97,7 +271,6 @@ class _GroupSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.t.bookings;
-    final canEdit = ref.watch(canEditProvider);
     final guests = group.guests ?? [];
     final endpoint = ref.read(serverpodClientProvider).guest;
 
@@ -114,32 +287,30 @@ class _GroupSection extends ConsumerWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (canEdit) ...[
-            IconButton(
-              tooltip: t.addGuest,
-              icon: const Icon(YaruIcons.plus),
-              onPressed: () => edit(_GuestDialog(groupId: group.id!)),
-            ),
-            IconButton(
-              tooltip: t.editGroup,
-              icon: const Icon(YaruIcons.pen),
-              onPressed: () =>
-                  edit(_GroupDialog(bookingId: group.bookingId, group: group)),
-            ),
-            IconButton(
-              tooltip: context.t.common.delete,
-              icon: const Icon(YaruIcons.trash),
-              onPressed: () async {
-                final deleted = await confirmAndDelete(
-                  context,
-                  name: group.name,
-                  hint: t.deleteGroupHint,
-                  delete: () => endpoint.deleteGroup(group.id!),
-                );
-                if (deleted) onChanged();
-              },
-            ),
-          ],
+          IconButton(
+            tooltip: t.addGuest,
+            icon: const Icon(YaruIcons.plus),
+            onPressed: () => edit(_GuestDialog(groupId: group.id!)),
+          ),
+          IconButton(
+            tooltip: t.editGroup,
+            icon: const Icon(YaruIcons.pen),
+            onPressed: () =>
+                edit(_GroupDialog(bookingId: group.bookingId, group: group)),
+          ),
+          IconButton(
+            tooltip: context.t.common.delete,
+            icon: const Icon(YaruIcons.trash),
+            onPressed: () async {
+              final deleted = await confirmAndDelete(
+                context,
+                name: group.name,
+                hint: t.deleteGroupHint,
+                delete: () => endpoint.deleteGroup(group.id!),
+              );
+              if (deleted) onChanged();
+            },
+          ),
         ],
       ),
       child: Column(
@@ -148,15 +319,7 @@ class _GroupSection extends ConsumerWidget {
             AdminTile(
               icon: guest.needsCrib ? Icons.crib : YaruIcons.user,
               title: guest.name,
-              subtitle: [
-                _age(context, guest),
-                if (guest.needsCrib) t.crib,
-                ?guest.dietaryNotes,
-                if (guest.arrivalOverride case final arrival?)
-                  '${t.arrivalOverride} ${formatDate(context, arrival)}',
-                if (guest.departureOverride case final departure?)
-                  '${t.departureOverride} ${formatDate(context, departure)}',
-              ].join(' · '),
+              subtitle: _guestDetails(context, guest, ageGroups),
               onEdit: () =>
                   edit(_GuestDialog(groupId: group.id!, guest: guest)),
               onDelete: () async {
@@ -172,18 +335,6 @@ class _GroupSection extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  /// What is known about the age of the guest.
-  String _age(BuildContext context, Guest guest) {
-    final override = ageGroups
-        .where((group) => group.id == guest.ageGroupOverrideId)
-        .firstOrNull;
-    if (override != null) return override.name;
-    if (guest.contact?.birthDate case final birthDate?) {
-      return formatDate(context, birthDate);
-    }
-    return context.t.bookings.ageUnknown;
   }
 }
 

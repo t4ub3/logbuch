@@ -14,7 +14,7 @@ import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import '../donations/tax_notice_type.dart' as _i8bqfpik;
 
 /// The organisation that runs the house. Its details are printed on
-/// donation receipts.
+/// invoices and donation receipts.
 abstract class Operator
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
   Operator._({
@@ -32,6 +32,12 @@ abstract class Operator
     this.purposesObject,
     required this.place,
     this.signatory,
+    this.accountHolder,
+    this.iban,
+    this.bic,
+    this.bankName,
+    this.paymentTerms,
+    this.confirmationNote,
   }) : noticeType = noticeType ?? _i8bqfpik.TaxNoticeType.statutoryCompliance;
 
   factory Operator({
@@ -49,6 +55,12 @@ abstract class Operator
     String? purposesObject,
     required String place,
     String? signatory,
+    String? accountHolder,
+    String? iban,
+    String? bic,
+    String? bankName,
+    String? paymentTerms,
+    String? confirmationNote,
   }) = _OperatorImpl;
 
   factory Operator.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -75,6 +87,12 @@ abstract class Operator
       purposesObject: jsonSerialization['purposesObject'] as String?,
       place: jsonSerialization['place'] as String,
       signatory: jsonSerialization['signatory'] as String?,
+      accountHolder: jsonSerialization['accountHolder'] as String?,
+      iban: jsonSerialization['iban'] as String?,
+      bic: jsonSerialization['bic'] as String?,
+      bankName: jsonSerialization['bankName'] as String?,
+      paymentTerms: jsonSerialization['paymentTerms'] as String?,
+      confirmationNote: jsonSerialization['confirmationNote'] as String?,
     );
   }
 
@@ -116,6 +134,21 @@ abstract class Operator
   /// Who signs the receipts.
   String? signatory;
 
+  /// Where invoices are to be paid to.
+  String? accountHolder;
+
+  String? iban;
+
+  String? bic;
+
+  String? bankName;
+
+  /// Printed on invoices, such as by when they are to be paid.
+  String? paymentTerms;
+
+  /// Printed on booking confirmations, such as when guests can arrive.
+  String? confirmationNote;
+
   /// Returns a shallow copy of this [Operator]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -134,6 +167,12 @@ abstract class Operator
     String? purposesObject,
     String? place,
     String? signatory,
+    String? accountHolder,
+    String? iban,
+    String? bic,
+    String? bankName,
+    String? paymentTerms,
+    String? confirmationNote,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -153,6 +192,12 @@ abstract class Operator
       if (purposesObject != null) 'purposesObject': purposesObject,
       'place': place,
       if (signatory != null) 'signatory': signatory,
+      if (accountHolder != null) 'accountHolder': accountHolder,
+      if (iban != null) 'iban': iban,
+      if (bic != null) 'bic': bic,
+      if (bankName != null) 'bankName': bankName,
+      if (paymentTerms != null) 'paymentTerms': paymentTerms,
+      if (confirmationNote != null) 'confirmationNote': confirmationNote,
     };
   }
 
@@ -174,6 +219,12 @@ abstract class Operator
       if (purposesObject != null) 'purposesObject': purposesObject,
       'place': place,
       if (signatory != null) 'signatory': signatory,
+      if (accountHolder != null) 'accountHolder': accountHolder,
+      if (iban != null) 'iban': iban,
+      if (bic != null) 'bic': bic,
+      if (bankName != null) 'bankName': bankName,
+      if (paymentTerms != null) 'paymentTerms': paymentTerms,
+      if (confirmationNote != null) 'confirmationNote': confirmationNote,
     };
   }
 
@@ -201,6 +252,12 @@ class _OperatorImpl extends Operator {
     String? purposesObject,
     required String place,
     String? signatory,
+    String? accountHolder,
+    String? iban,
+    String? bic,
+    String? bankName,
+    String? paymentTerms,
+    String? confirmationNote,
   }) : super._(
          id: id,
          name: name,
@@ -216,6 +273,12 @@ class _OperatorImpl extends Operator {
          purposesObject: purposesObject,
          place: place,
          signatory: signatory,
+         accountHolder: accountHolder,
+         iban: iban,
+         bic: bic,
+         bankName: bankName,
+         paymentTerms: paymentTerms,
+         confirmationNote: confirmationNote,
        );
 
   /// Returns a shallow copy of this [Operator]
@@ -237,6 +300,12 @@ class _OperatorImpl extends Operator {
     Object? purposesObject = _Undefined,
     String? place,
     Object? signatory = _Undefined,
+    Object? accountHolder = _Undefined,
+    Object? iban = _Undefined,
+    Object? bic = _Undefined,
+    Object? bankName = _Undefined,
+    Object? paymentTerms = _Undefined,
+    Object? confirmationNote = _Undefined,
   }) {
     return Operator(
       id: id is int? ? id : this.id,
@@ -257,6 +326,16 @@ class _OperatorImpl extends Operator {
           : this.purposesObject,
       place: place ?? this.place,
       signatory: signatory is String? ? signatory : this.signatory,
+      accountHolder: accountHolder is String?
+          ? accountHolder
+          : this.accountHolder,
+      iban: iban is String? ? iban : this.iban,
+      bic: bic is String? ? bic : this.bic,
+      bankName: bankName is String? ? bankName : this.bankName,
+      paymentTerms: paymentTerms is String? ? paymentTerms : this.paymentTerms,
+      confirmationNote: confirmationNote is String?
+          ? confirmationNote
+          : this.confirmationNote,
     );
   }
 }

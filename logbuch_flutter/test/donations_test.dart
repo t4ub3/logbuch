@@ -58,7 +58,7 @@ void main() {
     expect(find.text('1 donation'), findsOneWidget);
     expect(find.text('€10.00'), findsNWidgets(2));
 
-    await tester.tap(find.widgetWithText(FilledButton, 'Create receipts'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Create receipts'));
     await tester.pumpAndSettle();
 
     expect(find.text('1 receipt created'), findsOneWidget);
@@ -85,8 +85,8 @@ void main() {
       find.text('No receipt: the address is incomplete'),
       findsOneWidget,
     );
-    final create = tester.widget<FilledButton>(
-      find.widgetWithText(FilledButton, 'Create receipts'),
+    final create = tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, 'Create receipts'),
     );
     expect(create.onPressed, isNull);
   });
@@ -120,7 +120,7 @@ void main() {
     await tester.tap(find.text('New donation'));
     await tester.pumpAndSettle();
     // Without a donor and an amount nothing is saved.
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
     await tester.pumpAndSettle();
     expect(find.text('Required'), findsNWidgets(2));
 
@@ -129,7 +129,7 @@ void main() {
     await tester.tap(find.text('Marie Weber').last);
     await tester.pumpAndSettle();
     await tester.enterText(field('Amount'), '25');
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
     await tester.pumpAndSettle();
 
     final donation = client.donation.donations.last;
@@ -174,14 +174,29 @@ void main() {
     await tester.enterText(field('Name'), 'Haus am See e. V.');
     await tester.enterText(field('Tax office'), 'Kassel');
     await tester.enterText(field('Place where receipts are signed'), 'Kassel');
-    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Save'));
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.ensureVisible(field('IBAN'));
+    await tester.enterText(field('IBAN'), ' DE02 5205 0353 0000 1234 56 ');
+    await tester.enterText(
+      field('Payment terms'),
+      'Zahlbar innerhalb von 14 Tagen ohne Abzug.',
+    );
+    await tester.ensureVisible(field('Note on booking confirmations'));
+    await tester.enterText(
+      field('Note on booking confirmations'),
+      'Anreise ab 15 Uhr.',
+    );
+    await tester.ensureVisible(find.widgetWithText(ElevatedButton, 'Save'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
     await tester.pumpAndSettle();
 
     final saved = client.operator.operator!;
     expect(saved.name, 'Haus am See e. V.');
     expect(saved.taxOffice, 'Kassel');
     expect(saved.place, 'Kassel');
+    expect(saved.iban, 'DE02 5205 0353 0000 1234 56');
+    expect(saved.paymentTerms, 'Zahlbar innerhalb von 14 Tagen ohne Abzug.');
+    expect(saved.bic, isNull);
+    expect(saved.confirmationNote, 'Anreise ab 15 Uhr.');
     expect(saved.noticeType, TaxNoticeType.statutoryCompliance);
     expect(saved.noticeDate, isNull);
     expect(find.text('Saved'), findsOneWidget);

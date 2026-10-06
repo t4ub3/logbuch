@@ -48,6 +48,7 @@ class TranslationsDe extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$admin$de admin = _Translations$admin$de._(_root);
 	@override late final _Translations$auth$de auth = _Translations$auth$de._(_root);
 	@override late final _Translations$donations$de donations = _Translations$donations$de._(_root);
+	@override late final _Translations$dashboard$de dashboard = _Translations$dashboard$de._(_root);
 	@override late final _Translations$settings$de settings = _Translations$settings$de._(_root);
 }
 
@@ -74,6 +75,9 @@ class _Translations$common$de extends Translations$common$en {
 	@override String get search => 'Suchen';
 	@override String get signOut => 'Abmelden';
 	@override String get clear => 'Entfernen';
+	@override String get close => 'Schließen';
+	@override String get copy => 'Kopieren';
+	@override String get copied => 'Kopiert';
 }
 
 // Path: tabs
@@ -98,6 +102,7 @@ class _Translations$menu$de extends Translations$menu$en {
 	@override String get admin => 'Verwaltung';
 	@override String get settings => 'Einstellungen';
 	@override String get donations => 'Spenden';
+	@override String get dashboard => 'Übersicht';
 }
 
 // Path: bookings
@@ -120,7 +125,6 @@ class _Translations$bookings$de extends Translations$bookings$en {
 	@override String get today => 'Heute';
 	@override String more({required Object n}) => '+${n} weitere';
 	@override String get yearlyView => 'Jahresansicht';
-	@override String get edit => 'Bearbeiten';
 	@override String get email => 'E-Mail';
 	@override String get phone => 'Telefon';
 	@override String get status => 'Status';
@@ -155,7 +159,6 @@ class _Translations$bookings$de extends Translations$bookings$en {
 		one: '${n} Gast erwartet',
 		other: '${n} Gäste erwartet',
 	);
-	@override String get roomsSaved => 'Zimmer gespeichert';
 	@override String get guests => 'Gäste';
 	@override String get assignment => 'Verteilung';
 	@override String get price => 'Preis';
@@ -184,7 +187,7 @@ class _Translations$bookings$de extends Translations$bookings$en {
 	);
 	@override String get unassigned => 'Ohne Zimmer';
 	@override String get everybodyAssigned => 'Alle haben ein Zimmer.';
-	@override String get noRoomsHeld => 'Die Buchung hat noch keine Zimmer. Bitte unter Zimmer auswählen.';
+	@override String get noRoomsHeld => 'Die Buchung hat noch keine Zimmer.';
 	@override String get moveTo => 'Verschieben nach';
 	@override String bedsUsed({required Object used, required Object beds}) => '${used} von ${beds} Betten';
 	@override String get roomFull => 'Voll';
@@ -232,6 +235,20 @@ class _Translations$bookings$de extends Translations$bookings$en {
 	@override String get unitPrice => 'Einzelpreis';
 	@override String get isDiscount => 'Das ist ein Rabatt';
 	@override String get taxRate => 'Steuersatz';
+	@override String get openInvoice => 'Rechnung öffnen';
+	@override String openInvoiceFailed({required Object error}) => 'Die Rechnung konnte nicht geöffnet werden: ${error}';
+	@override String get renewInvoice => 'Dokument erneuern';
+	@override String get renewInvoiceHint => 'Die Rechnung wird mit den aktuellen Angaben, etwa der Bankverbindung, neu erstellt und ersetzt das gespeicherte Dokument. Bitte nur, solange die Rechnung noch nicht verschickt wurde.';
+	@override String get kitchen => 'Küche';
+	@override String get guestsByAge => 'Gäste nach Altersgruppe';
+	@override String get guestsInTotal => 'Gäste insgesamt';
+	@override String get noMealPlan => 'Keine gewählt';
+	@override String get noDietaryNeeds => 'Für die Gäste sind keine Ernährungshinweise erfasst.';
+	@override String get addHousehold => 'Haushalt hinzufügen';
+	@override String get noHouseholdsYet => 'Es gibt noch keine Haushalte. Sie werden unter Kontakte, Haushalte angelegt.';
+	@override String get confirmation => 'Bestätigung';
+	@override String openConfirmationFailed({required Object error}) => 'Die Bestätigung konnte nicht geöffnet werden: ${error}';
+	@override String bedsInRooms({required Object beds, required Object rooms}) => '${beds} in ${rooms}';
 }
 
 // Path: contacts
@@ -265,6 +282,13 @@ class _Translations$contacts$de extends Translations$contacts$en {
 	@override String get addOrganization => 'Neue Organisation';
 	@override String get editOrganization => 'Organisation bearbeiten';
 	@override String get deleteOrganizationHint => 'Ihre Kontakte bleiben erhalten, ohne Organisation.';
+	@override String get households => 'Haushalte';
+	@override String get noHouseholds => 'Keine Haushalte';
+	@override String get addHousehold => 'Neuer Haushalt';
+	@override String get editHousehold => 'Haushalt bearbeiten';
+	@override String get addMember => 'Mitglied hinzufügen';
+	@override String get noMembers => 'Noch keine Mitglieder';
+	@override String get deleteHouseholdHint => 'Die Mitglieder bleiben als Kontakte erhalten.';
 }
 
 // Path: rooms
@@ -352,6 +376,40 @@ class _Translations$donations$de extends Translations$donations$en {
 	);
 	@override String get openPdf => 'PDF öffnen';
 	@override String openFailed({required Object error}) => 'Die Bestätigung konnte nicht geöffnet werden: ${error}';
+}
+
+// Path: dashboard
+class _Translations$dashboard$de extends Translations$dashboard$en {
+	_Translations$dashboard$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get arrivals => 'Anreisen in den nächsten 7 Tagen';
+	@override String get noArrivals => 'In den nächsten 7 Tagen reist niemand an.';
+	@override String get departures => 'Abreisen in den nächsten 7 Tagen';
+	@override String get noDepartures => 'In den nächsten 7 Tagen reist niemand ab.';
+	@override String get tonight => 'Heute Nacht';
+	@override String roomsOccupied({required Object occupied, required Object total}) => '${occupied} von ${total} Zimmern belegt';
+	@override String guestsTonight({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n,
+		zero: 'Keine Gäste im Haus',
+		one: '${n} Gast im Haus',
+		other: '${n} Gäste im Haus',
+	);
+	@override String roomCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n,
+		one: '${n} Zimmer',
+		other: '${n} Zimmer',
+	);
+	@override String get options => 'Bald ablaufende Optionen';
+	@override String get noOptions => 'In den nächsten 14 Tagen läuft keine Option ab.';
+	@override String expires({required Object date}) => 'Läuft ab am ${date}';
+	@override String expired({required Object date}) => 'Abgelaufen am ${date}';
+	@override String get balances => 'Unbezahlte Rechnungen';
+	@override String get noBalances => 'Keine Rechnung wartet auf Zahlung.';
+	@override String get catering => 'Zu verpflegende Gäste';
+	@override String get today => 'Heute';
+	@override String get tomorrow => 'Morgen';
+	@override String get noGuests => 'Keine Gäste.';
 }
 
 // Path: settings
@@ -488,10 +546,12 @@ class _Translations$admin$errors$de extends Translations$admin$errors$en {
 	@override String get roomNotHeld => 'Die Buchung hat dieses Zimmer nicht.';
 	@override String get alreadyInvoiced => 'Das ist bereits in Rechnung gestellt und kann nicht mehr geändert werden.';
 	@override String get nothingToInvoice => 'Es gibt nichts abzurechnen.';
-	@override String get pricingIncomplete => 'Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht unter Preis.';
+	@override String get pricingIncomplete => 'Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht beim Preis.';
 	@override String get notOverpaid => 'Das ist mehr, als überzahlt wurde.';
 	@override String get alreadyReceipted => 'Diese Spende steht auf einer Bestätigung und kann nicht mehr geändert werden.';
 	@override String get operatorIncomplete => 'Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen.';
+	@override String get alreadyGuest => 'Aus diesem Haushalt kann niemand hinzugefügt werden: Er hat keine Mitglieder, oder alle sind bereits Gäste der Buchung.';
+	@override String get notConfirmed => 'Eine Bestätigung gibt es nur für Buchungen, die eine Option oder bestätigt sind.';
 }
 
 // Path: admin.rooms
@@ -640,7 +700,7 @@ class _Translations$admin$operator$de extends Translations$admin$operator$en {
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
-	@override String get hint => 'Die Organisation, die das Haus betreibt. Diese Angaben stehen auf den Zuwendungsbestätigungen, die erst erstellt werden können, wenn alles ausgefüllt ist.';
+	@override String get hint => 'Die Organisation, die das Haus betreibt. Diese Angaben stehen auf Rechnungen und Zuwendungsbestätigungen. Bestätigungen können erst erstellt werden, wenn alle Angaben zum Finanzamt ausgefüllt sind.';
 	@override String get street => 'Straße';
 	@override String get zip => 'Postleitzahl';
 	@override String get city => 'Ort';
@@ -658,6 +718,15 @@ class _Translations$admin$operator$de extends Translations$admin$operator$en {
 	@override String get place => 'Ort der Unterschrift';
 	@override String get signatory => 'Unterzeichnet von';
 	@override String get saved => 'Gespeichert';
+	@override String get bankHint => 'Steht auf Rechnungen, damit klar ist, wohin und bis wann zu zahlen ist.';
+	@override String get accountHolder => 'Kontoinhaber';
+	@override String get iban => 'IBAN';
+	@override String get bic => 'BIC';
+	@override String get bankName => 'Bank';
+	@override String get paymentTerms => 'Zahlungsbedingungen';
+	@override String get paymentTermsHint => 'Zum Beispiel: Zahlbar innerhalb von 14 Tagen ohne Abzug.';
+	@override String get confirmationNote => 'Hinweis auf Buchungsbestätigungen';
+	@override String get confirmationNoteHint => 'Zum Beispiel, ab wann die Zimmer am Anreisetag bereitstehen.';
 }
 
 // Path: auth.roles
@@ -710,12 +779,16 @@ extension on TranslationsDe {
 			'common.search' => 'Suchen',
 			'common.signOut' => 'Abmelden',
 			'common.clear' => 'Entfernen',
+			'common.close' => 'Schließen',
+			'common.copy' => 'Kopieren',
+			'common.copied' => 'Kopiert',
 			'tabs.close' => 'Tab schließen',
 			'menu.calendar' => 'Kalender',
 			'menu.contacts' => 'Kontakte',
 			'menu.admin' => 'Verwaltung',
 			'menu.settings' => 'Einstellungen',
 			'menu.donations' => 'Spenden',
+			'menu.dashboard' => 'Übersicht',
 			'bookings.newBooking' => 'Neue Buchung',
 			'bookings.agenda' => 'Agenda',
 			'bookings.month' => 'Monat',
@@ -729,7 +802,6 @@ extension on TranslationsDe {
 			'bookings.today' => 'Heute',
 			'bookings.more' => ({required Object n}) => '+${n} weitere',
 			'bookings.yearlyView' => 'Jahresansicht',
-			'bookings.edit' => 'Bearbeiten',
 			'bookings.email' => 'E-Mail',
 			'bookings.phone' => 'Telefon',
 			'bookings.status' => 'Status',
@@ -765,7 +837,6 @@ extension on TranslationsDe {
 			'bookings.noFreeRooms' => 'In diesem Zeitraum sind keine Zimmer frei.',
 			'bookings.selectedBeds' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, one: '${n} Bett ausgewählt', other: '${n} Betten ausgewählt', ), 
 			'bookings.guestsExpected' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, one: '${n} Gast erwartet', other: '${n} Gäste erwartet', ), 
-			'bookings.roomsSaved' => 'Zimmer gespeichert',
 			'bookings.guests' => 'Gäste',
 			'bookings.assignment' => 'Verteilung',
 			'bookings.price' => 'Preis',
@@ -791,7 +862,7 @@ extension on TranslationsDe {
 			'bookings.guestCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, one: '${n} Gast', other: '${n} Gäste', ), 
 			'bookings.unassigned' => 'Ohne Zimmer',
 			'bookings.everybodyAssigned' => 'Alle haben ein Zimmer.',
-			'bookings.noRoomsHeld' => 'Die Buchung hat noch keine Zimmer. Bitte unter Zimmer auswählen.',
+			'bookings.noRoomsHeld' => 'Die Buchung hat noch keine Zimmer.',
 			'bookings.moveTo' => 'Verschieben nach',
 			'bookings.bedsUsed' => ({required Object used, required Object beds}) => '${used} von ${beds} Betten',
 			'bookings.roomFull' => 'Voll',
@@ -848,6 +919,20 @@ extension on TranslationsDe {
 			'bookings.unitPrice' => 'Einzelpreis',
 			'bookings.isDiscount' => 'Das ist ein Rabatt',
 			'bookings.taxRate' => 'Steuersatz',
+			'bookings.openInvoice' => 'Rechnung öffnen',
+			'bookings.openInvoiceFailed' => ({required Object error}) => 'Die Rechnung konnte nicht geöffnet werden: ${error}',
+			'bookings.renewInvoice' => 'Dokument erneuern',
+			'bookings.renewInvoiceHint' => 'Die Rechnung wird mit den aktuellen Angaben, etwa der Bankverbindung, neu erstellt und ersetzt das gespeicherte Dokument. Bitte nur, solange die Rechnung noch nicht verschickt wurde.',
+			'bookings.kitchen' => 'Küche',
+			'bookings.guestsByAge' => 'Gäste nach Altersgruppe',
+			'bookings.guestsInTotal' => 'Gäste insgesamt',
+			'bookings.noMealPlan' => 'Keine gewählt',
+			'bookings.noDietaryNeeds' => 'Für die Gäste sind keine Ernährungshinweise erfasst.',
+			'bookings.addHousehold' => 'Haushalt hinzufügen',
+			'bookings.noHouseholdsYet' => 'Es gibt noch keine Haushalte. Sie werden unter Kontakte, Haushalte angelegt.',
+			'bookings.confirmation' => 'Bestätigung',
+			'bookings.openConfirmationFailed' => ({required Object error}) => 'Die Bestätigung konnte nicht geöffnet werden: ${error}',
+			'bookings.bedsInRooms' => ({required Object beds, required Object rooms}) => '${beds} in ${rooms}',
 			'contacts.empty' => 'Keine Kontakte',
 			'contacts.people' => 'Personen',
 			'contacts.organizations' => 'Organisationen',
@@ -872,6 +957,13 @@ extension on TranslationsDe {
 			'contacts.addOrganization' => 'Neue Organisation',
 			'contacts.editOrganization' => 'Organisation bearbeiten',
 			'contacts.deleteOrganizationHint' => 'Ihre Kontakte bleiben erhalten, ohne Organisation.',
+			'contacts.households' => 'Haushalte',
+			'contacts.noHouseholds' => 'Keine Haushalte',
+			'contacts.addHousehold' => 'Neuer Haushalt',
+			'contacts.editHousehold' => 'Haushalt bearbeiten',
+			'contacts.addMember' => 'Mitglied hinzufügen',
+			'contacts.noMembers' => 'Noch keine Mitglieder',
+			'contacts.deleteHouseholdHint' => 'Die Mitglieder bleiben als Kontakte erhalten.',
 			'rooms.empty' => 'Keine Zimmer',
 			'rooms.room' => ({required Object number}) => 'Zimmer ${number}',
 			'rooms.beds' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, one: '${n} Bett', other: '${n} Betten', ), 
@@ -907,10 +999,12 @@ extension on TranslationsDe {
 			'admin.errors.roomNotHeld' => 'Die Buchung hat dieses Zimmer nicht.',
 			'admin.errors.alreadyInvoiced' => 'Das ist bereits in Rechnung gestellt und kann nicht mehr geändert werden.',
 			'admin.errors.nothingToInvoice' => 'Es gibt nichts abzurechnen.',
-			'admin.errors.pricingIncomplete' => 'Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht unter Preis.',
+			'admin.errors.pricingIncomplete' => 'Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht beim Preis.',
 			'admin.errors.notOverpaid' => 'Das ist mehr, als überzahlt wurde.',
 			'admin.errors.alreadyReceipted' => 'Diese Spende steht auf einer Bestätigung und kann nicht mehr geändert werden.',
 			'admin.errors.operatorIncomplete' => 'Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen.',
+			'admin.errors.alreadyGuest' => 'Aus diesem Haushalt kann niemand hinzugefügt werden: Er hat keine Mitglieder, oder alle sind bereits Gäste der Buchung.',
+			'admin.errors.notConfirmed' => 'Eine Bestätigung gibt es nur für Buchungen, die eine Option oder bestätigt sind.',
 			'admin.rooms.add' => 'Neues Zimmer',
 			'admin.rooms.edit' => 'Zimmer bearbeiten',
 			'admin.rooms.number' => 'Zimmernummer',
@@ -979,7 +1073,7 @@ extension on TranslationsDe {
 			'admin.users.empty' => 'Keine Benutzer',
 			'admin.users.unknownEmail' => 'Keine E-Mail-Adresse',
 			'admin.users.you' => 'Sie',
-			'admin.operator.hint' => 'Die Organisation, die das Haus betreibt. Diese Angaben stehen auf den Zuwendungsbestätigungen, die erst erstellt werden können, wenn alles ausgefüllt ist.',
+			'admin.operator.hint' => 'Die Organisation, die das Haus betreibt. Diese Angaben stehen auf Rechnungen und Zuwendungsbestätigungen. Bestätigungen können erst erstellt werden, wenn alle Angaben zum Finanzamt ausgefüllt sind.',
 			'admin.operator.street' => 'Straße',
 			'admin.operator.zip' => 'Postleitzahl',
 			'admin.operator.city' => 'Ort',
@@ -997,6 +1091,15 @@ extension on TranslationsDe {
 			'admin.operator.place' => 'Ort der Unterschrift',
 			'admin.operator.signatory' => 'Unterzeichnet von',
 			'admin.operator.saved' => 'Gespeichert',
+			'admin.operator.bankHint' => 'Steht auf Rechnungen, damit klar ist, wohin und bis wann zu zahlen ist.',
+			'admin.operator.accountHolder' => 'Kontoinhaber',
+			'admin.operator.iban' => 'IBAN',
+			'admin.operator.bic' => 'BIC',
+			'admin.operator.bankName' => 'Bank',
+			'admin.operator.paymentTerms' => 'Zahlungsbedingungen',
+			'admin.operator.paymentTermsHint' => 'Zum Beispiel: Zahlbar innerhalb von 14 Tagen ohne Abzug.',
+			'admin.operator.confirmationNote' => 'Hinweis auf Buchungsbestätigungen',
+			'admin.operator.confirmationNoteHint' => 'Zum Beispiel, ab wann die Zimmer am Anreisetag bereitstehen.',
 			'auth.waitingTitle' => 'Warten auf Freigabe',
 			'auth.waitingText' => ({required Object email}) => 'Ihr Konto ${email} hat noch keine Rolle. Ein Admin muss den Zugriff freigeben.',
 			'auth.checkAgain' => 'Erneut prüfen',
@@ -1023,6 +1126,24 @@ extension on TranslationsDe {
 			'donations.created' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, zero: 'Keine Bestätigungen erstellt', one: '${n} Bestätigung erstellt', other: '${n} Bestätigungen erstellt', ), 
 			'donations.openPdf' => 'PDF öffnen',
 			'donations.openFailed' => ({required Object error}) => 'Die Bestätigung konnte nicht geöffnet werden: ${error}',
+			'dashboard.arrivals' => 'Anreisen in den nächsten 7 Tagen',
+			'dashboard.noArrivals' => 'In den nächsten 7 Tagen reist niemand an.',
+			'dashboard.departures' => 'Abreisen in den nächsten 7 Tagen',
+			'dashboard.noDepartures' => 'In den nächsten 7 Tagen reist niemand ab.',
+			'dashboard.tonight' => 'Heute Nacht',
+			'dashboard.roomsOccupied' => ({required Object occupied, required Object total}) => '${occupied} von ${total} Zimmern belegt',
+			'dashboard.guestsTonight' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, zero: 'Keine Gäste im Haus', one: '${n} Gast im Haus', other: '${n} Gäste im Haus', ), 
+			'dashboard.roomCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, one: '${n} Zimmer', other: '${n} Zimmer', ), 
+			'dashboard.options' => 'Bald ablaufende Optionen',
+			'dashboard.noOptions' => 'In den nächsten 14 Tagen läuft keine Option ab.',
+			'dashboard.expires' => ({required Object date}) => 'Läuft ab am ${date}',
+			'dashboard.expired' => ({required Object date}) => 'Abgelaufen am ${date}',
+			'dashboard.balances' => 'Unbezahlte Rechnungen',
+			'dashboard.noBalances' => 'Keine Rechnung wartet auf Zahlung.',
+			'dashboard.catering' => 'Zu verpflegende Gäste',
+			'dashboard.today' => 'Heute',
+			'dashboard.tomorrow' => 'Morgen',
+			'dashboard.noGuests' => 'Keine Gäste.',
 			'settings.title' => 'Einstellungen',
 			'settings.language' => 'Sprache',
 			'settings.systemLanguage' => 'Systemstandard',

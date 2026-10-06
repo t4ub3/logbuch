@@ -311,7 +311,7 @@ class _ReceiptsDialog extends ConsumerWidget {
           onPressed: () => Navigator.pop(context, false),
           child: Text(t.common.cancel),
         ),
-        FilledButton(
+        ElevatedButton(
           onPressed: ready.isEmpty ? null : () => Navigator.pop(context, true),
           child: Text(t.donations.createReceipts),
         ),

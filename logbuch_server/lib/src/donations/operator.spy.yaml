@@ -1,5 +1,5 @@
 ### The organisation that runs the house. Its details are printed on
-### donation receipts.
+### invoices and donation receipts.
 class: Operator
 table: operator
 fields:
@@ -23,3 +23,12 @@ fields:
   place: String
   ### Who signs the receipts.
   signatory: String?
+  ### Where invoices are to be paid to.
+  accountHolder: String?
+  iban: String?
+  bic: String?
+  bankName: String?
+  ### Printed on invoices, such as by when they are to be paid.
+  paymentTerms: String?
+  ### Printed on booking confirmations, such as when guests can arrive.
+  confirmationNote: String?

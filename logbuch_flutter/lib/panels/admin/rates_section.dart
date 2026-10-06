@@ -462,7 +462,7 @@ class _RateMatrixState extends State<_RateMatrix> {
                   child: Text(context.t.common.discard),
                 ),
                 const SizedBox(width: 8),
-                FilledButton.icon(
+                ElevatedButton.icon(
                   icon: const Icon(YaruIcons.save),
                   label: Text(context.t.common.save),
                   onPressed: _dirty && !_saving && entered != null

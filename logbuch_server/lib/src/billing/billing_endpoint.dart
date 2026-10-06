@@ -1,5 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:logbuch_server/src/auth/roles.dart';
 import 'package:logbuch_server/src/billing/folio_distribution.dart';
+import 'package:logbuch_server/src/billing/invoice_pdf.dart';
 import 'package:logbuch_server/src/common/today.dart';
 import 'package:logbuch_server/src/common/validation.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
@@ -133,6 +136,89 @@ class BillingEndpoint extends AppEndpoint {
       );
       return _updateStatus(session, folioId, transaction);
     });
+  }
+
+  /// The invoice of an invoiced folio as a PDF.
+  ///
+  /// It is produced when it is first asked for and kept as it is from then
+  /// on, so that an invoice that was sent out does not change when the
+  /// details of the operator or the address of the payer do.
+  Future<ByteData> getInvoicePdf(Session session, int folioId) async {
+    return session.db.transaction((transaction) async {
+      // Only one call at a time produces the document.
+      await Folio.db.lockRows(
+        session,
+        where: (t) => t.id.equals(folioId),
+        lockMode: LockMode.forUpdate,
+        transaction: transaction,
+      );
+      final stored = await InvoiceDocument.db.findFirstRow(
+        session,
+        where: (t) => t.folioId.equals(folioId),
+        transaction: transaction,
+      );
+      if (stored != null) return stored.pdf;
+
+      final folio = await Folio.db.findById(
+        session,
+        folioId,
+        include: Folio.include(
+          payer: Contact.include(),
+          booking: Booking.include(),
+          charges: Charge.includeList(orderBy: (t) => t.id),
+        ),
+        transaction: transaction,
+      );
+      if (folio == null || folio.invoiceNumber == null) {
+        throw ValidationException(reason: ValidationError.notFound);
+      }
+      final operator = await Operator.db.findFirstRow(
+        session,
+        transaction: transaction,
+      );
+      if (operator == null || !isCompleteForInvoices(operator)) {
+        throw ValidationException(reason: ValidationError.operatorIncomplete);
+      }
+      final guests = await Guest.db.find(
+        session,
+        where: (t) => t.group.bookingId.equals(folio.bookingId),
+        include: Guest.include(contact: Contact.include()),
+        transaction: transaction,
+      );
+
+      final pdf = ByteData.sublistView(
+        await buildInvoicePdf(
+          operator: operator,
+          folio: folio,
+          guestNames: {
+            for (final guest in guests)
+              guest.id!:
+                  '${guest.contact!.firstName} ${guest.contact!.lastName}'
+                      .trim(),
+          },
+        ),
+      );
+      await InvoiceDocument.db.insertRow(
+        session,
+        InvoiceDocument(folioId: folioId, pdf: pdf),
+        transaction: transaction,
+      );
+      return pdf;
+    });
+  }
+
+  /// Produces the invoice anew from the details as they are now and keeps
+  /// that in place of the stored document.
+  ///
+  /// Meant for an invoice that was not sent out yet, for example because the
+  /// bank details were only entered after it was first opened.
+  Future<ByteData> renewInvoicePdf(Session session, int folioId) async {
+    requireAdmin(session);
+    await InvoiceDocument.db.deleteWhere(
+      session,
+      where: (t) => t.folioId.equals(folioId),
+    );
+    return getInvoicePdf(session, folioId);
   }
 
   /// Records money received for a folio. A negative amount is a refund.

@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
-import 'package:logbuch_flutter/panels/bookings/booking_guests_tab.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_guests.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
 import 'package:logbuch_flutter/providers/guest_groups_provider.dart';
@@ -36,38 +37,97 @@ RoomFit roomFit(Room room, Iterable<Guest> guests) {
   return inBeds == room.bedAmount ? RoomFit.full : RoomFit.freeBeds;
 }
 
-/// Puts the guests of a booking into the rooms it holds. Guests are dragged
-/// onto a room one by one or as a whole group, or moved with the menu that
-/// opens when one of them is tapped.
-class BookingAssignmentTab extends ConsumerWidget {
-  const BookingAssignmentTab({super.key, required this.booking});
+/// The rooms [booking] holds, by their number.
+List<BookingRoom> _holds(Booking booking) => [...?booking.rooms]
+  ..sort(
+    (a, b) => (a.room?.roomNumber ?? '').compareTo(b.room?.roomNumber ?? ''),
+  );
+
+/// Which guests of a booking sleep in which of its rooms, and who has no
+/// room yet.
+class BookingAssignmentCard extends ConsumerWidget {
+  const BookingAssignmentCard({super.key, required this.booking});
 
   final Booking booking;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.t.bookings;
-    final holds = [...?booking.rooms]
-      ..sort(
-        (a, b) =>
-            (a.room?.roomNumber ?? '').compareTo(b.room?.roomNumber ?? ''),
-      );
-    if (holds.isEmpty) {
-      return Center(child: Text(t.noRoomsHeld, textAlign: TextAlign.center));
-    }
+    final holds = _holds(booking);
 
-    return switch (ref.watch(guestGroupsProvider(booking.id!))) {
-      AsyncError(:final error) => Center(
-        child: Text(context.t.common.loadFailed(error: error)),
-      ),
-      AsyncValue(value: final groups?) => _Board(
-        holds: holds,
-        groups: groups,
-        canEdit: ref.watch(canEditProvider),
-        onMove: (guestIds, hold) => _move(context, ref, guestIds, hold),
-      ),
-      _ => const Center(child: CircularProgressIndicator()),
-    };
+    Widget chip(Guest guest) =>
+        _GuestChip(guest: guest, holds: holds, onMove: null);
+
+    return BookingCard(
+      title: t.assignment,
+      // Without rooms there is nothing to put the guests into.
+      onEdit: holds.isNotEmpty && ref.watch(canEditProvider)
+          ? () => showBookingOverlay(
+              context,
+              ref,
+              bookingId: booking.id!,
+              overlay: BookingAssignmentEditor(booking: booking),
+            )
+          : null,
+      child: holds.isEmpty
+          ? CardNote(t.noRoomsHeld)
+          : switch (ref.watch(guestGroupsProvider(booking.id!))) {
+              AsyncError(:final error) => CardNote(
+                context.t.common.loadFailed(error: error),
+              ),
+              AsyncValue(value: final groups?) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: 12,
+                children: [
+                  _Unassigned(groups: groups, canEdit: false, chip: chip),
+                  for (final hold in holds)
+                    _RoomCard(
+                      room: hold.room!,
+                      guests: _guestsIn(hold, groups),
+                      chip: chip,
+                    ),
+                ],
+              ),
+              _ => const CardLoading(),
+            },
+    );
+  }
+}
+
+/// The guests of [groups] who sleep in the room of [hold].
+List<Guest> _guestsIn(BookingRoom hold, List<GuestGroup> groups) => [
+  for (final group in groups)
+    for (final guest in group.guests ?? <Guest>[])
+      if (guest.bookingRoomId == hold.id) guest,
+];
+
+/// The overlay that puts the guests of a booking into the rooms it holds.
+/// Guests are dragged onto a room one by one or as a whole group, or moved
+/// with the menu that opens when one of them is tapped. Every move is saved
+/// at once.
+class BookingAssignmentEditor extends ConsumerWidget {
+  const BookingAssignmentEditor({super.key, required this.booking});
+
+  final Booking booking;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return BookingOverlay(
+      title: context.t.bookings.assignment,
+      width: 960,
+      height: 720,
+      child: switch (ref.watch(guestGroupsProvider(booking.id!))) {
+        AsyncError(:final error) => Center(
+          child: Text(context.t.common.loadFailed(error: error)),
+        ),
+        AsyncValue(value: final groups?) => _Board(
+          holds: _holds(booking),
+          groups: groups,
+          onMove: (guestIds, hold) => _move(context, ref, guestIds, hold),
+        ),
+        _ => const Center(child: CircularProgressIndicator()),
+      },
+    );
   }
 
   Future<void> _move(
@@ -101,24 +161,17 @@ class _Board extends StatelessWidget {
   const _Board({
     required this.holds,
     required this.groups,
-    required this.canEdit,
     required this.onMove,
   });
 
   final List<BookingRoom> holds;
   final List<GuestGroup> groups;
-  final bool canEdit;
   final _Move onMove;
 
   @override
   Widget build(BuildContext context) {
-    final guests = [for (final group in groups) ...?group.guests];
-
-    Widget chip(Guest guest) => _GuestChip(
-      guest: guest,
-      holds: holds,
-      onMove: canEdit ? onMove : null,
-    );
+    Widget chip(Guest guest) =>
+        _GuestChip(guest: guest, holds: holds, onMove: onMove);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -126,8 +179,10 @@ class _Board extends StatelessWidget {
         SizedBox(
           width: 250,
           child: _DropZone(
-            onDrop: canEdit ? (guestIds) => onMove(guestIds, null) : null,
-            child: _Unassigned(groups: groups, canEdit: canEdit, chip: chip),
+            onDrop: (guestIds) => onMove(guestIds, null),
+            child: SingleChildScrollView(
+              child: _Unassigned(groups: groups, canEdit: true, chip: chip),
+            ),
           ),
         ),
         const SizedBox(width: 16),
@@ -138,15 +193,10 @@ class _Board extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: _DropZone(
-                    onDrop: canEdit
-                        ? (guestIds) => onMove(guestIds, hold)
-                        : null,
+                    onDrop: (guestIds) => onMove(guestIds, hold),
                     child: _RoomCard(
                       room: hold.room!,
-                      guests: [
-                        for (final guest in guests)
-                          if (guest.bookingRoomId == hold.id) guest,
-                      ],
+                      guests: _guestsIn(hold, groups),
                       chip: chip,
                     ),
                   ),
@@ -164,15 +214,11 @@ class _Board extends StatelessWidget {
 class _DropZone extends StatelessWidget {
   const _DropZone({required this.onDrop, required this.child});
 
-  /// Null if the user may not move guests.
-  final ValueChanged<List<int>>? onDrop;
+  final ValueChanged<List<int>> onDrop;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final onDrop = this.onDrop;
-    if (onDrop == null) return child;
-
     return DragTarget<List<int>>(
       onAcceptWithDetails: (details) => onDrop(details.data),
       builder: (context, candidates, rejected) => DecoratedBox(
@@ -188,7 +234,8 @@ class _DropZone extends StatelessWidget {
   }
 }
 
-/// The guests without a room, by group. A group is dragged by its name.
+/// The guests without a room, by group. A group is dragged by its name
+/// if the guests can be moved.
 class _Unassigned extends StatelessWidget {
   const _Unassigned({
     required this.groups,
@@ -212,7 +259,8 @@ class _Unassigned extends StatelessWidget {
         ],
     }..removeWhere((group, guests) => guests.isEmpty);
 
-    return ListView(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 8),
@@ -327,8 +375,9 @@ class _RoomCard extends StatelessWidget {
   }
 }
 
-/// A guest who can be dragged to a room. Tapping opens a menu with the same
-/// choices for those who cannot or do not want to drag.
+/// A guest. If guests can be moved, this one can be dragged to a room, and
+/// tapping opens a menu with the same choices for those who cannot or do
+/// not want to drag.
 class _GuestChip extends StatelessWidget {
   const _GuestChip({
     required this.guest,
@@ -342,7 +391,7 @@ class _GuestChip extends StatelessWidget {
   final Guest guest;
   final List<BookingRoom> holds;
 
-  /// Null if the user may not move guests.
+  /// Null if the guests are only shown.
   final _Move? onMove;
 
   @override
@@ -389,7 +438,7 @@ class _Dragged extends StatelessWidget {
     required this.child,
   });
 
-  /// Null if the user may not move guests.
+  /// Null if the guests are only shown.
   final List<int>? guestIds;
   final String label;
   final Widget child;

@@ -18,6 +18,8 @@ billing:
   - addCharge:
   - deleteCharge:
   - invoice:
+  - getInvoicePdf:
+  - renewInvoicePdf:
   - addPayment:
   - deletePayment:
   - donate:
@@ -27,6 +29,7 @@ booking:
   - getById:
   - add:
   - update:
+  - getConfirmationPdf:
   - availableRooms:
   - setRooms:
 contact:
@@ -35,11 +38,17 @@ contact:
   - add:
   - update:
   - delete:
+household:
+  - getAll:
+  - save:
+  - delete:
 organization:
   - getAll:
   - add:
   - update:
   - delete:
+dashboard:
+  - load:
 donation:
   - getByYear:
   - addDirect:
@@ -55,6 +64,8 @@ greeting:
   - hello:
 guest:
   - getByBooking:
+  - kitchenOverview:
+  - addHousehold:
   - addGroup:
   - updateGroup:
   - deleteGroup:

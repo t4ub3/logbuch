@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/components/menu_component.dart';
 import 'package:logbuch_flutter/components/status_bar_component.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_details.dart';
-import 'package:logbuch_flutter/panels/bookings/booking_editor.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_form.dart';
 import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:yaru/yaru.dart';
 
@@ -15,7 +15,7 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
-  MenuItem _selected = MenuItem.calendar;
+  MenuItem _selected = MenuItem.dashboard;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                       key: tab.key,
                       child: switch (tab) {
                         HomeTab() => _selected.panel,
-                        BookingTab(editing: true) => BookingEditor(tab: tab),
+                        BookingTab(booking: null) => NewBookingForm(tab: tab),
                         BookingTab() => BookingDetails(tab: tab),
                       },
                     ),

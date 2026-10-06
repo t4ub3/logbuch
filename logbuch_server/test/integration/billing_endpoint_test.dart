@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:test/test.dart';
 
@@ -363,6 +366,98 @@ void main() {
         expect(next.invoiceNumber, matches(RegExp(r'^\d{4}-0002$')));
       });
 
+      group('and its invoice is asked for', () {
+        Future<Operator> saveOperator(String name) => endpoints.operator.save(
+          sessionBuilder,
+          Operator(
+            name: name,
+            street: 'Seeweg 1',
+            zip: '34117',
+            city: 'Kassel',
+            taxOffice: '',
+            taxNumber: '026 250 12345',
+            purposes: '',
+            place: '',
+          ),
+        );
+
+        test('then it needs the details of the operator', () async {
+          await expectLater(
+            endpoints.billing.getInvoicePdf(sessionBuilder, invoiced.id!),
+            throwsValidation(ValidationError.operatorIncomplete),
+          );
+        });
+
+        test('then it is a PDF that stays as it was first produced', () async {
+          await saveOperator('Haus am See e. V.');
+          final first = await endpoints.billing.getInvoicePdf(
+            sessionBuilder,
+            invoiced.id!,
+          );
+          final start = first.buffer.asUint8List(first.offsetInBytes, 5);
+          expect(ascii.decode(start), '%PDF-');
+
+          await saveOperator('Haus am Berg e. V.');
+          final again = await endpoints.billing.getInvoicePdf(
+            sessionBuilder.asViewer,
+            invoiced.id!,
+          );
+
+          expect(
+            again.buffer.asUint8List(again.offsetInBytes, again.lengthInBytes),
+            first.buffer.asUint8List(first.offsetInBytes, first.lengthInBytes),
+          );
+        });
+      });
+
+      test(
+        'then an admin can renew its invoice with changed details',
+        () async {
+          Future<Operator> saveOperator(String name) => endpoints.operator.save(
+            sessionBuilder,
+            Operator(
+              name: name,
+              street: 'Seeweg 1',
+              zip: '34117',
+              city: 'Kassel',
+              taxOffice: '',
+              taxNumber: '026 250 12345',
+              purposes: '',
+              place: '',
+            ),
+          );
+          List<int> bytes(ByteData pdf) =>
+              pdf.buffer.asUint8List(pdf.offsetInBytes, pdf.lengthInBytes);
+
+          await saveOperator('Haus am See e. V.');
+          final first = await endpoints.billing.getInvoicePdf(
+            sessionBuilder,
+            invoiced.id!,
+          );
+          await saveOperator('Haus am Berg und am See e. V.');
+
+          await expectLater(
+            endpoints.billing.renewInvoicePdf(
+              sessionBuilder.asViewer,
+              invoiced.id!,
+            ),
+            throwsValidation(ValidationError.adminRequired),
+          );
+          final renewed = await endpoints.billing.renewInvoicePdf(
+            sessionBuilder,
+            invoiced.id!,
+          );
+          expect(bytes(renewed).length, isNot(bytes(first).length));
+
+          // The renewed document is the one that is kept.
+          final again = await endpoints.billing.getInvoicePdf(
+            sessionBuilder,
+            invoiced.id!,
+          );
+          expect(bytes(again), bytes(renewed));
+        },
+      );
+
       test('then paying what is owed settles it', () async {
         await pay(invoiced, 10000);
         expect((await folio()).status, FolioStatus.invoiced);
@@ -432,6 +527,14 @@ void main() {
         expect(after.payments!.map((p) => p.amount), [16000, -1000]);
         expect(after.status, FolioStatus.settled);
       });
+    });
+
+    test('when asking for the invoice of a folio that is not invoiced '
+        'then there is none', () async {
+      await expectLater(
+        endpoints.billing.getInvoicePdf(sessionBuilder, (await folio()).id!),
+        throwsValidation(ValidationError.notFound),
+      );
     });
 
     test('when a guest cannot be priced '

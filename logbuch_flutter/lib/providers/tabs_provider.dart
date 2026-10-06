@@ -16,22 +16,14 @@ sealed class AppTab {
 /// The always open tab with the menu and its panels.
 class HomeTab extends AppTab {}
 
-/// Shows [booking], or creates a new one if null.
+/// Shows [booking], or the form that creates a new one if null.
 class BookingTab extends AppTab {
-  BookingTab({this.booking, bool? editing, super.key})
-    : editing = editing ?? booking == null;
+  BookingTab({this.booking, super.key});
 
   final Booking? booking;
 
-  /// Whether the booking form is shown instead of the details. New bookings
-  /// always start in the form.
-  final bool editing;
-
-  BookingTab copyWith({Booking? booking, bool? editing}) => BookingTab(
-    booking: booking ?? this.booking,
-    editing: editing ?? this.editing,
-    key: key,
-  );
+  BookingTab copyWith({Booking? booking}) =>
+      BookingTab(booking: booking ?? this.booking, key: key);
 }
 
 class OpenTabs {
@@ -49,7 +41,7 @@ class Tabs extends _$Tabs {
 
   void select(int index) => state = OpenTabs(tabs: state.tabs, selected: index);
 
-  /// Opens a tab to create a new booking, or to edit [booking]. A booking
+  /// Opens a tab to create a new booking, or to show [booking]. A booking
   /// that is already open in a tab is not opened twice.
   void openBooking([Booking? booking]) {
     if (booking?.id case final id?) {

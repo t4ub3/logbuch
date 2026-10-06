@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,7 +76,7 @@ class AdminListSection<T> extends ConsumerWidget {
 }
 
 /// A record of an [AdminListSection]. Tapping it edits the record, if the
-/// user may change data.
+/// user may change data, or opens it with [onOpen] for everybody.
 class AdminTile extends ConsumerWidget {
   const AdminTile({
     super.key,
@@ -83,6 +85,7 @@ class AdminTile extends ConsumerWidget {
     this.subtitle,
     required this.onEdit,
     required this.onDelete,
+    this.onOpen,
   });
 
   final IconData icon;
@@ -90,6 +93,10 @@ class AdminTile extends ConsumerWidget {
   final String? subtitle;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+
+  /// Shows the record without editing it. It is what tapping the tile
+  /// does if given, also for users who may not change data.
+  final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -100,7 +107,7 @@ class AdminTile extends ConsumerWidget {
       leading: Icon(icon),
       titleText: title,
       subtitleText: subtitle,
-      onTap: canEdit ? onEdit : null,
+      onTap: onOpen ?? (canEdit ? onEdit : null),
       trailing: !canEdit
           ? null
           : Row(
@@ -150,7 +157,7 @@ Future<bool> confirmAndDelete(
           onPressed: () => Navigator.pop(context, false),
           child: Text(context.t.common.cancel),
         ),
-        FilledButton(
+        ElevatedButton(
           onPressed: () => Navigator.pop(context, true),
           child: Text(context.t.common.delete),
         ),
@@ -179,26 +186,52 @@ Future<bool> confirmAndDelete(
 /// A dialog with a form made of [children]. Once the form is valid it is
 /// saved with [onSave] and the dialog closes with true; if saving fails the
 /// error is shown below the fields.
+///
+/// With [readOnly] the dialog only shows the form, whose fields the caller
+/// has to make read-only, and can only be closed, or switched to editing
+/// with [onEdit]. The cancel button closes the dialog, unless [onCancel]
+/// does something else, such as returning to the read-only form.
 class AdminFormDialog extends StatefulWidget {
   const AdminFormDialog({
     super.key,
     required this.title,
     required this.children,
     required this.onSave,
+    this.readOnly = false,
+    this.onEdit,
+    this.onCancel,
   });
 
   final String title;
   final List<Widget> children;
   final Future<void> Function() onSave;
+  final bool readOnly;
+
+  /// Adds a button to a read-only dialog that starts editing.
+  final VoidCallback? onEdit;
+
+  /// Called by the cancel button instead of closing the dialog.
+  final VoidCallback? onCancel;
 
   @override
   State<AdminFormDialog> createState() => _AdminFormDialogState();
 }
 
 class _AdminFormDialogState extends State<AdminFormDialog> {
-  final _formKey = GlobalKey<FormState>();
+  var _formKey = GlobalKey<FormState>();
   bool _saving = false;
   Object? _error;
+
+  @override
+  void didUpdateWidget(AdminFormDialog oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Editing was given up. A new form drops what the old one complained
+    // about, as that was about values that are gone.
+    if (widget.readOnly && !oldWidget.readOnly) {
+      _formKey = GlobalKey<FormState>();
+      _error = null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -235,16 +268,31 @@ class _AdminFormDialogState extends State<AdminFormDialog> {
           ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: _saving ? null : () => Navigator.pop(context, false),
-          child: Text(t.cancel),
-        ),
-        FilledButton(
-          onPressed: _saving ? null : _save,
-          child: Text(t.save),
-        ),
-      ],
+      actions: widget.readOnly
+          ? [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(t.close),
+              ),
+              if (widget.onEdit case final onEdit?)
+                ElevatedButton.icon(
+                  icon: const Icon(YaruIcons.pen),
+                  label: Text(t.edit),
+                  onPressed: onEdit,
+                ),
+            ]
+          : [
+              TextButton(
+                onPressed: _saving
+                    ? null
+                    : widget.onCancel ?? () => Navigator.pop(context, false),
+                child: Text(t.cancel),
+              ),
+              ElevatedButton(
+                onPressed: _saving ? null : _save,
+                child: Text(t.save),
+              ),
+            ],
     );
   }
 
@@ -360,7 +408,7 @@ class AmountField extends StatelessWidget {
 }
 
 /// A field that picks a single day, kept as a local date. It can be cleared
-/// again.
+/// again, unless it is [readOnly] and only shows the day.
 class DateField extends StatelessWidget {
   const DateField({
     super.key,
@@ -368,6 +416,7 @@ class DateField extends StatelessWidget {
     required this.date,
     required this.onChanged,
     this.firstDate,
+    this.readOnly = false,
   });
 
   final String label;
@@ -376,18 +425,19 @@ class DateField extends StatelessWidget {
 
   /// The earliest day that can be picked; ten years ago if not given.
   final DateTime? firstDate;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
     final date = this.date;
 
     return InkWell(
-      onTap: () => _pick(context),
+      onTap: readOnly ? null : () => _pick(context),
       child: InputDecorator(
         isEmpty: date == null,
         decoration: InputDecoration(
           labelText: label,
-          suffixIcon: date == null
+          suffixIcon: date == null || readOnly
               ? const Icon(Icons.event)
               : IconButton(
                   tooltip: context.t.common.clear,
@@ -411,5 +461,53 @@ class DateField extends StatelessWidget {
       lastDate: DateTime(now.year + 10),
     );
     if (picked != null) onChanged(picked);
+  }
+}
+
+/// A button for the end of a text field that copies what the field says.
+/// It shows a check mark for a moment once it has.
+class CopyButton extends StatefulWidget {
+  const CopyButton({super.key, required this.controller});
+
+  final TextEditingController controller;
+
+  @override
+  State<CopyButton> createState() => _CopyButtonState();
+}
+
+class _CopyButtonState extends State<CopyButton> {
+  Timer? _copied;
+
+  @override
+  void dispose() {
+    _copied?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _copy() async {
+    await Clipboard.setData(ClipboardData(text: widget.controller.text.trim()));
+    if (!mounted) return;
+    _copied?.cancel();
+    setState(() {
+      _copied = Timer(const Duration(seconds: 2), () {
+        if (mounted) setState(() => _copied = null);
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t.common;
+    final copied = _copied != null;
+
+    // Nothing to copy from an empty field.
+    return ListenableBuilder(
+      listenable: widget.controller,
+      builder: (context, child) => IconButton(
+        tooltip: copied ? t.copied : t.copy,
+        icon: Icon(copied ? YaruIcons.checkmark : Icons.copy, size: 18),
+        onPressed: widget.controller.text.trim().isEmpty ? null : _copy,
+      ),
+    );
   }
 }

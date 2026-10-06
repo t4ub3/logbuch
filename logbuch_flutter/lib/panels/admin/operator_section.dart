@@ -10,7 +10,7 @@ import 'package:logbuch_flutter/providers/operator_provider.dart';
 import 'package:yaru/yaru.dart';
 
 /// The details of the organisation that runs the house, as they are printed
-/// on donation receipts.
+/// on invoices and donation receipts.
 class OperatorSection extends ConsumerWidget {
   const OperatorSection({super.key});
 
@@ -54,6 +54,18 @@ class _OperatorFormState extends ConsumerState<_OperatorForm> {
   );
   late final _place = TextEditingController(text: _operator?.place);
   late final _signatory = TextEditingController(text: _operator?.signatory);
+  late final _accountHolder = TextEditingController(
+    text: _operator?.accountHolder,
+  );
+  late final _iban = TextEditingController(text: _operator?.iban);
+  late final _bic = TextEditingController(text: _operator?.bic);
+  late final _bankName = TextEditingController(text: _operator?.bankName);
+  late final _paymentTerms = TextEditingController(
+    text: _operator?.paymentTerms,
+  );
+  late final _confirmationNote = TextEditingController(
+    text: _operator?.confirmationNote,
+  );
   late TaxNoticeType _noticeType =
       _operator?.noticeType ?? TaxNoticeType.statutoryCompliance;
   late DateTime? _noticeDate = switch (_operator?.noticeDate) {
@@ -77,6 +89,12 @@ class _OperatorFormState extends ConsumerState<_OperatorForm> {
       _purposesObject,
       _place,
       _signatory,
+      _accountHolder,
+      _iban,
+      _bic,
+      _bankName,
+      _paymentTerms,
+      _confirmationNote,
     ]) {
       controller.dispose();
     }
@@ -97,6 +115,8 @@ class _OperatorFormState extends ConsumerState<_OperatorForm> {
       return TextFormField(
         controller: controller,
         readOnly: !canEdit,
+        canRequestFocus: canEdit,
+        mouseCursor: canEdit ? null : SystemMouseCursors.basic,
         decoration: InputDecoration(labelText: label, helperText: hint),
       );
     }
@@ -138,14 +158,12 @@ class _OperatorFormState extends ConsumerState<_OperatorForm> {
             ? (type) => setState(() => _noticeType = type ?? _noticeType)
             : null,
       ),
-      IgnorePointer(
-        ignoring: !canEdit,
-        child: DateField(
-          label: t.noticeDate,
-          date: _noticeDate,
-          firstDate: DateTime(2000),
-          onChanged: (date) => setState(() => _noticeDate = date),
-        ),
+      DateField(
+        label: t.noticeDate,
+        date: _noticeDate,
+        firstDate: DateTime(2000),
+        readOnly: !canEdit,
+        onChanged: (date) => setState(() => _noticeDate = date),
       ),
       // Each kind of notice is cited with something the other does not need.
       if (_noticeType == TaxNoticeType.exemptionNotice)
@@ -155,6 +173,44 @@ class _OperatorFormState extends ConsumerState<_OperatorForm> {
         text(_purposesObject, t.purposesObject, hint: t.purposesObjectHint),
       text(_place, t.place),
       text(_signatory, t.signatory),
+      Padding(
+        padding: const EdgeInsets.only(top: 16),
+        child: Text(t.bankHint, style: theme.textTheme.bodySmall),
+      ),
+      text(_accountHolder, t.accountHolder),
+      text(_iban, t.iban),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: 180, child: text(_bic, t.bic)),
+          const SizedBox(width: 16),
+          Expanded(child: text(_bankName, t.bankName)),
+        ],
+      ),
+      TextFormField(
+        controller: _paymentTerms,
+        readOnly: !canEdit,
+        canRequestFocus: canEdit,
+        mouseCursor: canEdit ? null : SystemMouseCursors.basic,
+        minLines: 2,
+        maxLines: 5,
+        decoration: InputDecoration(
+          labelText: t.paymentTerms,
+          helperText: t.paymentTermsHint,
+        ),
+      ),
+      TextFormField(
+        controller: _confirmationNote,
+        readOnly: !canEdit,
+        canRequestFocus: canEdit,
+        mouseCursor: canEdit ? null : SystemMouseCursors.basic,
+        minLines: 2,
+        maxLines: 8,
+        decoration: InputDecoration(
+          labelText: t.confirmationNote,
+          helperText: t.confirmationNoteHint,
+        ),
+      ),
     ];
 
     return SingleChildScrollView(
@@ -182,7 +238,7 @@ class _OperatorFormState extends ConsumerState<_OperatorForm> {
                 const SizedBox(height: 24),
                 Align(
                   alignment: AlignmentDirectional.centerEnd,
-                  child: FilledButton.icon(
+                  child: ElevatedButton.icon(
                     icon: const Icon(YaruIcons.save),
                     label: Text(context.t.common.save),
                     onPressed: _saving ? null : _save,
@@ -212,6 +268,12 @@ class _OperatorFormState extends ConsumerState<_OperatorForm> {
       purposesObject: nullIfBlank(_purposesObject.text),
       place: _place.text.trim(),
       signatory: nullIfBlank(_signatory.text),
+      accountHolder: nullIfBlank(_accountHolder.text),
+      iban: nullIfBlank(_iban.text),
+      bic: nullIfBlank(_bic.text),
+      bankName: nullIfBlank(_bankName.text),
+      paymentTerms: nullIfBlank(_paymentTerms.text),
+      confirmationNote: nullIfBlank(_confirmationNote.text),
     );
 
     setState(() {

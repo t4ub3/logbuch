@@ -15,8 +15,10 @@ values:
   - inUse
   - notFound
   - datesRequired
+  - notConfirmed
   - roomUnavailable
   - roomNotHeld
+  - alreadyGuest
   - adminRequired
   - ownRole
   - alreadyInvoiced

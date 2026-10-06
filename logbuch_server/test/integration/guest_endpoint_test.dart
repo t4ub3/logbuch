@@ -89,6 +89,52 @@ void main() {
       },
     );
 
+    test(
+      'when asking for the kitchen overview '
+      'then guests are counted by age group and dietary needs are listed',
+      () async {
+        await endpoints.ageGroup.add(
+          sessionBuilder,
+          AgeGroup(name: 'Adult', minAge: 18),
+        );
+        await endpoints.ageGroup.add(
+          sessionBuilder,
+          AgeGroup(name: 'Child', minAge: 0, maxAge: 17),
+        );
+        await endpoints.guest.addGuest(
+          sessionBuilder,
+          Guest(groupId: family.id!, contactId: lead.id!),
+        );
+        await endpoints.guest.addNewGuest(
+          sessionBuilder,
+          Guest(groupId: family.id!, contactId: 0, dietaryNotes: 'No nuts'),
+          Contact(
+            firstName: 'Jonas',
+            lastName: 'Weber',
+            birthDate: DateTime.utc(2019, 3, 3),
+          ),
+        );
+
+        // The kitchen can be given a view-only account.
+        final overview = await endpoints.guest.kitchenOverview(
+          sessionBuilder.asViewer,
+          booking.id!,
+        );
+
+        expect(overview.guestCount, 2);
+        expect(
+          overview.ageGroups.map((entry) => (entry.ageGroup.name, entry.count)),
+          [('Child', 1), ('Adult', 1)],
+        );
+        expect(overview.unknownAge, 0);
+        final need = overview.dietaryNeeds.single;
+        expect(need.guestName, 'Jonas Weber');
+        expect(need.groupName, 'Weber family');
+        expect(need.ageGroupName, 'Child');
+        expect(need.notes, 'No nuts');
+      },
+    );
+
     test('when adding a new guest without a name '
         'then neither guest nor contact is stored', () async {
       await expectLater(

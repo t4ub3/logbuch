@@ -1,0 +1,9 @@
+### Everybody who is in the house on a day and is to be catered for.
+class: MealDay
+fields:
+  date: DateTime
+  bookings: List<MealBooking>
+  guestCount: int
+  ### Every age group, youngest first, with the number of its guests.
+  ageGroups: List<AgeGroupCount>
+  unknownAge: int

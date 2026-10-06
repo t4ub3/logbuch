@@ -1,0 +1,8 @@
+### What a guest of a booking cannot or does not eat.
+class: DietaryNeed
+fields:
+  guestName: String
+  groupName: String
+  ### Null if the age of the guest is not known.
+  ageGroupName: String?
+  notes: String

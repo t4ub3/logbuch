@@ -6,6 +6,7 @@ import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
 import 'package:logbuch_flutter/panels/admin/admin_widgets.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/contacts_provider.dart';
+import 'package:logbuch_flutter/providers/current_user_provider.dart';
 import 'package:logbuch_flutter/providers/organizations_provider.dart';
 import 'package:yaru/yaru.dart';
 
@@ -53,7 +54,7 @@ class _ContactsSectionState extends ConsumerState<ContactsSection> {
       onRetry: () => ref.refresh(contactsProvider.future),
       emptyText: query.isEmpty ? t.empty : t.noMatches,
       addLabel: t.add,
-      onAdd: () => _edit(context),
+      onAdd: () => _show(context),
       toolbar: Align(
         alignment: AlignmentDirectional.centerStart,
         child: SizedBox(
@@ -77,7 +78,8 @@ class _ContactsSectionState extends ConsumerState<ContactsSection> {
           ?contact.phone,
           ?contact.city,
         ].join(' · '),
-        onEdit: () => _edit(context, contact),
+        onOpen: () => _show(context, contact: contact),
+        onEdit: () => _show(context, contact: contact, editing: true),
         onDelete: () async {
           final deleted = await confirmAndDelete(
             context,
@@ -91,18 +93,30 @@ class _ContactsSectionState extends ConsumerState<ContactsSection> {
     );
   }
 
-  Future<void> _edit(BuildContext context, [Contact? contact]) async {
-    if (await showAdminDialog(context, _ContactDialog(contact: contact))) {
+  /// Shows the details of the contact, ready to be edited if [editing], or
+  /// the empty form for a new contact.
+  Future<void> _show(
+    BuildContext context, {
+    Contact? contact,
+    bool editing = false,
+  }) async {
+    final dialog = _ContactDialog(contact: contact, editing: editing);
+    if (await showAdminDialog(context, dialog)) {
       ref.invalidate(contactsProvider);
     }
   }
 }
 
+/// The details of a contact. They are only shown at first; those who may
+/// change data can switch to editing them. A new contact starts out editable.
 class _ContactDialog extends ConsumerStatefulWidget {
-  const _ContactDialog({this.contact});
+  const _ContactDialog({this.contact, this.editing = false});
 
-  /// The contact to edit, or null to create one.
+  /// The contact to show, or null to create one.
   final Contact? contact;
+
+  /// Whether the fields can be edited right away.
+  final bool editing;
 
   @override
   ConsumerState<_ContactDialog> createState() => _ContactDialogState();
@@ -111,6 +125,7 @@ class _ContactDialog extends ConsumerStatefulWidget {
 class _ContactDialogState extends ConsumerState<_ContactDialog> {
   Contact? get _contact => widget.contact;
 
+  late bool _editing = widget.editing || _contact == null;
   late final _firstName = TextEditingController(text: _contact?.firstName);
   late final _lastName = TextEditingController(text: _contact?.lastName);
   late final _mail = TextEditingController(text: _contact?.mail);
@@ -145,10 +160,44 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
     super.dispose();
   }
 
-  Widget _text(TextEditingController controller, String label) {
+  /// Returns to the details of [contact] as they are stored, dropping
+  /// what was entered.
+  void _stopEditing(Contact contact) {
+    setState(() {
+      _editing = false;
+      _firstName.text = contact.firstName;
+      _lastName.text = contact.lastName;
+      _mail.text = contact.mail ?? '';
+      _phone.text = contact.phone ?? '';
+      _street.text = contact.street ?? '';
+      _zip.text = contact.zip ?? '';
+      _city.text = contact.city ?? '';
+      _country.text = contact.country ?? '';
+      _notes.text = contact.notes ?? '';
+      _birthDate = switch (contact.birthDate) {
+        final birthDate? => toLocalDate(birthDate),
+        null => null,
+      };
+      _organizationId = contact.organizationId;
+      _privacyConsentAt = contact.privacyConsentAt;
+    });
+  }
+
+  /// A text field; [copyable] gives it a button that copies its value.
+  Widget _text(
+    TextEditingController controller,
+    String label, {
+    bool copyable = false,
+  }) {
     return TextFormField(
       controller: controller,
-      decoration: InputDecoration(labelText: label),
+      readOnly: !_editing,
+      canRequestFocus: _editing,
+      mouseCursor: _editing ? null : SystemMouseCursors.basic,
+      decoration: InputDecoration(
+        labelText: label,
+        suffixIcon: copyable ? CopyButton(controller: controller) : null,
+      ),
     );
   }
 
@@ -156,9 +205,20 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
   Widget build(BuildContext context) {
     final t = context.t.contacts;
     final organizations = ref.watch(organizationsProvider).value ?? [];
+    final contact = _contact;
 
     return AdminFormDialog(
-      title: _contact == null ? t.add : t.edit,
+      title: contact == null
+          ? t.add
+          : _editing
+          ? t.edit
+          : contact.fullName,
+      readOnly: !_editing,
+      onEdit: ref.watch(canEditProvider)
+          ? () => setState(() => _editing = true)
+          : null,
+      // A new contact has no details to return to.
+      onCancel: contact == null ? null : () => _stopEditing(contact),
       onSave: _save,
       children: [
         Row(
@@ -167,7 +227,10 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
             Expanded(
               child: TextFormField(
                 controller: _firstName,
-                autofocus: true,
+                readOnly: !_editing,
+                canRequestFocus: _editing,
+                mouseCursor: _editing ? null : SystemMouseCursors.basic,
+                autofocus: _editing,
                 decoration: InputDecoration(labelText: t.firstName),
               ),
             ),
@@ -175,6 +238,9 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
             Expanded(
               child: TextFormField(
                 controller: _lastName,
+                readOnly: !_editing,
+                canRequestFocus: _editing,
+                mouseCursor: _editing ? null : SystemMouseCursors.basic,
                 decoration: InputDecoration(labelText: t.lastName),
                 // Guests of large groups are often only known by one name.
                 validator: (_) =>
@@ -190,10 +256,11 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
           label: t.birthDate,
           date: _birthDate,
           firstDate: DateTime(1900),
+          readOnly: !_editing,
           onChanged: (date) => setState(() => _birthDate = date),
         ),
-        _text(_mail, t.email),
-        _text(_phone, t.phone),
+        _text(_mail, t.email, copyable: true),
+        _text(_phone, t.phone, copyable: true),
         _text(_street, t.street),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,10 +286,15 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
                 child: Text(organization.name),
               ),
           ],
-          onChanged: (id) => setState(() => _organizationId = id),
+          onChanged: _editing
+              ? (id) => setState(() => _organizationId = id)
+              : null,
         ),
         TextFormField(
           controller: _notes,
+          readOnly: !_editing,
+          canRequestFocus: _editing,
+          mouseCursor: _editing ? null : SystemMouseCursors.basic,
           minLines: 2,
           maxLines: 4,
           decoration: InputDecoration(labelText: t.notes),
@@ -231,11 +303,13 @@ class _ContactDialogState extends ConsumerState<_ContactDialog> {
           title: Text(t.privacyConsent),
           value: _privacyConsentAt != null,
           // Keeps the time of a consent that was given before.
-          onChanged: (given) => setState(
-            () => _privacyConsentAt = given
-                ? _contact?.privacyConsentAt ?? DateTime.now()
-                : null,
-          ),
+          onChanged: _editing
+              ? (given) => setState(
+                  () => _privacyConsentAt = given
+                      ? _contact?.privacyConsentAt ?? DateTime.now()
+                      : null,
+                )
+              : null,
         ),
       ],
     );

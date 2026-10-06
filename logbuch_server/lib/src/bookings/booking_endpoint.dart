@@ -1,7 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:logbuch_server/src/auth/roles.dart';
+import 'package:logbuch_server/src/bookings/confirmation_pdf.dart';
+import 'package:logbuch_server/src/common/today.dart';
 import 'package:logbuch_server/src/common/validation.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:logbuch_server/src/generated/serverpod.dart';
+import 'package:logbuch_server/src/pricing/pricing_data.dart';
 
 class BookingEndpoint extends AppEndpoint {
   Future<List<Booking>> getAll(Session session) async {
@@ -56,6 +61,45 @@ class BookingEndpoint extends AppEndpoint {
       await Booking.db.updateRow(session, validated, transaction: transaction);
     });
     return (await getById(session, booking.id!))!;
+  }
+
+  /// The confirmation of the booking for its lead, as a PDF.
+  ///
+  /// It is made anew every time from the booking as it is now, with the
+  /// date of today, and is not kept. The price is only on it while all of
+  /// the booking can be priced.
+  Future<ByteData> getConfirmationPdf(Session session, int bookingId) async {
+    final data = await PricingData.load(session, bookingId);
+    if (data == null) {
+      throw ValidationException(reason: ValidationError.notFound);
+    }
+    final booking = (await getById(session, bookingId))!;
+    if (booking.arrival == null || booking.departure == null) {
+      throw ValidationException(reason: ValidationError.datesRequired);
+    }
+    if (!isConfirmable(booking.status)) {
+      throw ValidationException(reason: ValidationError.notConfirmed);
+    }
+    final operator = await Operator.db.findFirstRow(session);
+    if (operator == null || !isCompleteForConfirmations(operator)) {
+      throw ValidationException(reason: ValidationError.operatorIncomplete);
+    }
+
+    final guests = data.groups.fold(
+      0,
+      (count, group) => count + (group.guests?.length ?? 0),
+    );
+    final price = data.price;
+    return ByteData.sublistView(
+      await buildConfirmationPdf(
+        operator: operator,
+        booking: booking,
+        // Until there is a guest list, the number the booking expects.
+        guestCount: guests > 0 ? guests : booking.expectedGuestCount,
+        price: price.problems.isEmpty && price.lines.isNotEmpty ? price : null,
+        today: await todayInGermany(session),
+      ),
+    );
   }
 
   /// The active rooms that no booking holds during the nights from [arrival]

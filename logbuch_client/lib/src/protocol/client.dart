@@ -22,8 +22,12 @@ import 'package:logbuch_client/src/protocol/billing/payment.dart' as _iwxc7te6;
 import 'package:logbuch_client/src/protocol/bookings/bookings.dart'
     as _iey0gn1f;
 import 'package:logbuch_client/src/protocol/contacts/contact.dart' as _izv2jndr;
+import 'package:logbuch_client/src/protocol/contacts/household.dart'
+    as _if2jdwd3;
 import 'package:logbuch_client/src/protocol/contacts/organization.dart'
     as _igjrrozn;
+import 'package:logbuch_client/src/protocol/dashboard/dashboard.dart'
+    as _ixsk8ltj;
 import 'package:logbuch_client/src/protocol/donations/donation_receipt.dart'
     as _i8cfzthc;
 import 'package:logbuch_client/src/protocol/donations/operator.dart'
@@ -35,6 +39,8 @@ import 'package:logbuch_client/src/protocol/greetings/greeting.dart'
 import 'package:logbuch_client/src/protocol/guests/guest.dart' as _i44zmmsa;
 import 'package:logbuch_client/src/protocol/guests/guest_group.dart'
     as _ihpk2u4j;
+import 'package:logbuch_client/src/protocol/guests/kitchen_overview.dart'
+    as _igu8r4n7;
 import 'package:logbuch_client/src/protocol/pricing/age_group.dart'
     as _iw3hbj1z;
 import 'package:logbuch_client/src/protocol/pricing/booking_price.dart'
@@ -380,6 +386,30 @@ class EndpointBilling extends EndpointApp {
         {'folioId': folioId},
       );
 
+  /// The invoice of an invoiced folio as a PDF.
+  ///
+  /// It is produced when it is first asked for and kept as it is from then
+  /// on, so that an invoice that was sent out does not change when the
+  /// details of the operator or the address of the payer do.
+  _ida.Future<_idt.ByteData> getInvoicePdf(int folioId) =>
+      caller.callServerEndpoint<_idt.ByteData>(
+        'billing',
+        'getInvoicePdf',
+        {'folioId': folioId},
+      );
+
+  /// Produces the invoice anew from the details as they are now and keeps
+  /// that in place of the stored document.
+  ///
+  /// Meant for an invoice that was not sent out yet, for example because the
+  /// bank details were only entered after it was first opened.
+  _ida.Future<_idt.ByteData> renewInvoicePdf(int folioId) =>
+      caller.callServerEndpoint<_idt.ByteData>(
+        'billing',
+        'renewInvoicePdf',
+        {'folioId': folioId},
+      );
+
   /// Records money received for a folio. A negative amount is a refund.
   _ida.Future<_iwxc7te6.Payment> addPayment(_iwxc7te6.Payment payment) =>
       caller.callServerEndpoint<_iwxc7te6.Payment>(
@@ -414,7 +444,8 @@ class EndpointBilling extends EndpointApp {
     },
   );
 
-  /// Takes back a donation; the money counts as overpaid again.
+  /// Takes back a donation; the money counts as overpaid again. A
+  /// donation that is on a receipt stays.
   _ida.Future<void> deleteDonation(int id) => caller.callServerEndpoint<void>(
     'billing',
     'deleteDonation',
@@ -459,6 +490,18 @@ class EndpointBooking extends EndpointApp {
         'booking',
         'update',
         {'booking': booking},
+      );
+
+  /// The confirmation of the booking for its lead, as a PDF.
+  ///
+  /// It is made anew every time from the booking as it is now, with the
+  /// date of today, and is not kept. The price is only on it while all of
+  /// the booking can be priced.
+  _ida.Future<_idt.ByteData> getConfirmationPdf(int bookingId) =>
+      caller.callServerEndpoint<_idt.ByteData>(
+        'booking',
+        'getConfirmationPdf',
+        {'bookingId': bookingId},
       );
 
   /// The active rooms that no booking holds during the nights from [arrival]
@@ -537,6 +580,44 @@ class EndpointContact extends EndpointApp {
   );
 }
 
+/// Households: contacts who usually travel together, such as a family.
+/// {@category Endpoint}
+class EndpointHousehold extends EndpointApp {
+  EndpointHousehold(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'household';
+
+  /// All households with their members and the contacts of those.
+  _ida.Future<List<_if2jdwd3.Household>> getAll() =>
+      caller.callServerEndpoint<List<_if2jdwd3.Household>>(
+        'household',
+        'getAll',
+        {},
+      );
+
+  /// Stores the household, new or changed, with the contacts in [memberIds]
+  /// as its members. Contacts that are left out are no longer members.
+  _ida.Future<_if2jdwd3.Household> save(
+    _if2jdwd3.Household household,
+    List<int> memberIds,
+  ) => caller.callServerEndpoint<_if2jdwd3.Household>(
+    'household',
+    'save',
+    {
+      'household': household,
+      'memberIds': memberIds,
+    },
+  );
+
+  /// Removes the household. Its members stay as contacts.
+  _ida.Future<void> delete(int id) => caller.callServerEndpoint<void>(
+    'household',
+    'delete',
+    {'id': id},
+  );
+}
+
 /// {@category Endpoint}
 class EndpointOrganization extends EndpointApp {
   EndpointOrganization(_isc.EndpointCaller caller) : super(caller);
@@ -574,6 +655,23 @@ class EndpointOrganization extends EndpointApp {
     'delete',
     {'id': id},
   );
+}
+
+/// {@category Endpoint}
+class EndpointDashboard extends EndpointApp {
+  EndpointDashboard(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'dashboard';
+
+  /// What the start screen shows about today and the days ahead, see
+  /// [buildDashboard].
+  _ida.Future<_ixsk8ltj.Dashboard> load() =>
+      caller.callServerEndpoint<_ixsk8ltj.Dashboard>(
+        'dashboard',
+        'load',
+        {},
+      );
 }
 
 /// Donations and the yearly receipts for them.
@@ -705,6 +803,30 @@ class EndpointGuest extends EndpointApp {
         'getByBooking',
         {'bookingId': bookingId},
       );
+
+  /// The guests of the booking summed up for the kitchen: how many there
+  /// are in every age group, and their dietary needs.
+  _ida.Future<_igu8r4n7.KitchenOverview> kitchenOverview(int bookingId) =>
+      caller.callServerEndpoint<_igu8r4n7.KitchenOverview>(
+        'guest',
+        'kitchenOverview',
+        {'bookingId': bookingId},
+      );
+
+  /// Adds the members of a household to the booking, as a new group named
+  /// after the household. Members who are guests of the booking already are
+  /// left out, so that nobody is there twice.
+  _ida.Future<_ihpk2u4j.GuestGroup> addHousehold(
+    int bookingId,
+    int householdId,
+  ) => caller.callServerEndpoint<_ihpk2u4j.GuestGroup>(
+    'guest',
+    'addHousehold',
+    {
+      'bookingId': bookingId,
+      'householdId': householdId,
+    },
+  );
 
   _ida.Future<_ihpk2u4j.GuestGroup> addGroup(_ihpk2u4j.GuestGroup group) =>
       caller.callServerEndpoint<_ihpk2u4j.GuestGroup>(
@@ -1129,7 +1251,9 @@ class Client extends _isc.ServerpodClientShared {
     billing = EndpointBilling(this);
     booking = EndpointBooking(this);
     contact = EndpointContact(this);
+    household = EndpointHousehold(this);
     organization = EndpointOrganization(this);
+    dashboard = EndpointDashboard(this);
     donation = EndpointDonation(this);
     operator = EndpointOperator(this);
     greeting = EndpointGreeting(this);
@@ -1158,7 +1282,11 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointContact contact;
 
+  late final EndpointHousehold household;
+
   late final EndpointOrganization organization;
+
+  late final EndpointDashboard dashboard;
 
   late final EndpointDonation donation;
 
@@ -1196,7 +1324,9 @@ class Client extends _isc.ServerpodClientShared {
     'billing': billing,
     'booking': booking,
     'contact': contact,
+    'household': household,
     'organization': organization,
+    'dashboard': dashboard,
     'donation': donation,
     'operator': operator,
     'greeting': greeting,

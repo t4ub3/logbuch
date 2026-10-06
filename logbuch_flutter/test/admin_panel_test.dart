@@ -13,8 +13,8 @@ Future<void> _pumpAdmin(
   AppLocale locale = AppLocale.en,
 }) => pumpApp(tester, const AdminPanel(), client, size: size, locale: locale);
 
-FilledButton _saveButton(WidgetTester tester) =>
-    tester.widget(find.widgetWithText(FilledButton, 'Save'));
+ElevatedButton _saveButton(WidgetTester tester) =>
+    tester.widget(find.widgetWithText(ElevatedButton, 'Save'));
 
 void main() {
   const sections = [
@@ -89,7 +89,7 @@ void main() {
 
     await tester.tap(find.text('New room'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
     await tester.pumpAndSettle();
 
     expect(find.text('Required'), findsNWidgets(3));
@@ -103,7 +103,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.enterText(field('Floor'), '1');
     await tester.tap(find.text('A crib can be set up'));
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
     await tester.pumpAndSettle();
 
     final room = client.room.rooms.last;
@@ -130,7 +130,7 @@ void main() {
     await tester.enterText(field('Name'), 'Teen');
     await tester.enterText(field('From age'), '12');
     await tester.enterText(field('To age'), '17');
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
     await tester.pumpAndSettle();
 
     expect(
@@ -147,7 +147,7 @@ void main() {
     await tester.tap(find.byTooltip('Delete').first);
     await tester.pumpAndSettle();
     expect(find.text('Delete “Standard”?'), findsOneWidget);
-    await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Delete'));
     await tester.pumpAndSettle();
 
     expect(
@@ -186,7 +186,7 @@ void main() {
 
     await tester.tap(find.text('New season'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
     await tester.pumpAndSettle();
     expect(find.text('Required'), findsNWidgets(2));
     await tester.tap(find.text('Cancel'));
@@ -220,7 +220,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('per person').last);
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
     await tester.pumpAndSettle();
 
     final fee = client.fee.fees.last;
@@ -286,7 +286,7 @@ void main() {
       await tester.enterText(cell(1), '');
       await tester.enterText(cell(3), '31');
       await tester.pump();
-      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
       await tester.pumpAndSettle();
 
       final saved = {

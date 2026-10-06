@@ -1,8 +1,10 @@
 import 'package:logbuch_server/src/auth/roles.dart';
+import 'package:logbuch_server/src/common/today.dart';
 import 'package:logbuch_server/src/common/validation.dart';
 import 'package:logbuch_server/src/contacts/contact_endpoint.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:logbuch_server/src/generated/serverpod.dart';
+import 'package:logbuch_server/src/guests/kitchen_overview.dart';
 
 /// The guests of a booking, in groups such as families.
 class GuestEndpoint extends AppEndpoint {
@@ -20,6 +22,76 @@ class GuestEndpoint extends AppEndpoint {
         ),
       ),
     );
+  }
+
+  /// The guests of the booking summed up for the kitchen: how many there
+  /// are in every age group, and their dietary needs.
+  Future<KitchenOverview> kitchenOverview(
+    Session session,
+    int bookingId,
+  ) async {
+    final booking = await Booking.db.findById(session, bookingId);
+    if (booking == null) {
+      throw ValidationException(reason: ValidationError.notFound);
+    }
+    return buildKitchenOverview(
+      booking: booking,
+      groups: await getByBooking(session, bookingId),
+      ageGroups: await AgeGroup.db.find(session),
+      today: await todayInGermany(session),
+    );
+  }
+
+  /// Adds the members of a household to the booking, as a new group named
+  /// after the household. Members who are guests of the booking already are
+  /// left out, so that nobody is there twice.
+  Future<GuestGroup> addHousehold(
+    Session session,
+    int bookingId,
+    int householdId,
+  ) async {
+    requireAdmin(session);
+    return session.db.transaction((transaction) async {
+      final household = await Household.db.findById(
+        session,
+        householdId,
+        include: Household.include(
+          members: HouseholdMember.includeList(orderBy: (t) => t.id),
+        ),
+        transaction: transaction,
+      );
+      if (household == null) {
+        throw ValidationException(reason: ValidationError.notFound);
+      }
+      final guests = await Guest.db.find(
+        session,
+        where: (t) => t.group.bookingId.equals(bookingId),
+        transaction: transaction,
+      );
+      final present = {for (final guest in guests) guest.contactId};
+      final added = [
+        for (final member in household.members ?? <HouseholdMember>[])
+          if (!present.contains(member.contactId)) member.contactId,
+      ];
+      if (added.isEmpty) {
+        throw ValidationException(reason: ValidationError.alreadyGuest);
+      }
+
+      final group = await GuestGroup.db.insertRow(
+        session,
+        GuestGroup(bookingId: bookingId, name: household.name),
+        transaction: transaction,
+      );
+      await Guest.db.insert(
+        session,
+        [
+          for (final contactId in added)
+            Guest(groupId: group.id!, contactId: contactId),
+        ],
+        transaction: transaction,
+      );
+      return group;
+    });
   }
 
   Future<GuestGroup> addGroup(Session session, GuestGroup group) async {

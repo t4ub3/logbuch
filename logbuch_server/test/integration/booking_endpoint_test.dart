@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:test/test.dart';
 
@@ -300,6 +302,82 @@ void main() {
         await expectLater(
           endpoints.contact.delete(sessionBuilder, lead.id!),
           throwsValidation(ValidationError.inUse),
+        );
+      });
+    });
+
+    group('when asking for the confirmation of a booking', () {
+      Future<Booking> withStatus(BookingStatus status, {bool dated = true}) =>
+          endpoints.booking.add(
+            sessionBuilder,
+            booking(
+              'Camp',
+              arrival: dated ? DateTime.utc(2026, 10, 12) : null,
+              departure: dated ? DateTime.utc(2026, 10, 16) : null,
+              status: status,
+            ),
+          );
+
+      Future<void> saveOperator() => endpoints.operator.save(
+        sessionBuilder,
+        Operator(
+          name: 'Haus am See e. V.',
+          street: 'Seeweg 1',
+          zip: '34117',
+          city: 'Kassel',
+          taxOffice: '',
+          taxNumber: '',
+          purposes: '',
+          place: '',
+        ),
+      );
+
+      test('that is confirmed then it comes as a PDF', () async {
+        await saveOperator();
+        final confirmed = await withStatus(BookingStatus.confirmed);
+
+        // Those who only look at bookings can send it out as well.
+        final pdf = await endpoints.booking.getConfirmationPdf(
+          sessionBuilder.asViewer,
+          confirmed.id!,
+        );
+
+        final start = pdf.buffer.asUint8List(pdf.offsetInBytes, 5);
+        expect(ascii.decode(start), '%PDF-');
+      });
+
+      test('that is only an inquiry or cancelled then there is none', () async {
+        await saveOperator();
+
+        for (final status in [BookingStatus.inquiry, BookingStatus.cancelled]) {
+          final unconfirmed = await withStatus(status);
+          await expectLater(
+            endpoints.booking.getConfirmationPdf(
+              sessionBuilder,
+              unconfirmed.id!,
+            ),
+            throwsValidation(ValidationError.notConfirmed),
+          );
+        }
+      });
+
+      test('that has no dates then there is none', () async {
+        await saveOperator();
+        final undated = await withStatus(BookingStatus.option, dated: false);
+
+        await expectLater(
+          endpoints.booking.getConfirmationPdf(sessionBuilder, undated.id!),
+          throwsValidation(ValidationError.datesRequired),
+        );
+      });
+
+      test('before the operator has a name and an address '
+          'then there is none', () async {
+        final confirmed = await withStatus(BookingStatus.confirmed);
+
+        await expectLater(
+          endpoints.booking.getConfirmationPdf(sessionBuilder, confirmed.id!),
+          throwsValidation(ValidationError.operatorIncomplete),
         );
       });
     });

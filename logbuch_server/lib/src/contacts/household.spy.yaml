@@ -1,0 +1,7 @@
+### Contacts who usually travel together, such as a family. A household can
+### be added to a booking as a guest group in one step.
+class: Household
+table: households
+fields:
+  name: String
+  members: List<HouseholdMember>?, relation(name=household_members)

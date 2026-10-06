@@ -1,14 +1,51 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logbuch_client/logbuch_client.dart';
+import 'package:logbuch_flutter/components/open_file.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_details.dart';
-import 'package:logbuch_flutter/panels/bookings/booking_editor.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_form.dart';
 import 'package:logbuch_flutter/panels/bookings_panel.dart';
 import 'package:logbuch_flutter/providers/bookings_view_provider.dart';
 import 'package:logbuch_flutter/providers/tabs_provider.dart';
 
 import 'fake_client.dart';
+
+/// Shows the booking tab that is open the way the main screen does, so that
+/// the page follows what is saved.
+class _OpenTab extends ConsumerWidget {
+  const _OpenTab();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tab = ref
+        .watch(tabsProvider)
+        .tabs
+        .whereType<BookingTab>()
+        .firstOrNull;
+    return switch (tab) {
+      null => const SizedBox.shrink(),
+      BookingTab(booking: null) => NewBookingForm(tab: tab),
+      BookingTab() => BookingDetails(tab: tab),
+    };
+  }
+}
+
+/// Opens a tab with [booking], or with the form for a new one.
+Future<void> _openTab(
+  WidgetTester tester,
+  FakeClient client, [
+  Booking? booking,
+]) async {
+  await pumpApp(tester, const _OpenTab(), client);
+  ProviderScope.containerOf(
+    tester.element(find.byType(_OpenTab)),
+  ).read(tabsProvider.notifier).openBooking(booking);
+  await tester.pumpAndSettle();
+}
 
 void main() {
   group('booking details', () {
@@ -19,10 +56,123 @@ void main() {
 
       expect(find.text('Class trip'), findsOneWidget);
       expect(find.text('Oct 12, 2026 – Oct 16, 2026'), findsOneWidget);
-      expect(find.text('Marie Weber'), findsOneWidget);
+      expect(inCard('Overview', find.text('Marie Weber')), findsOneWidget);
       expect(find.text('marie.weber@example.com'), findsOneWidget);
       expect(find.text('One invoice for the booking'), findsOneWidget);
-      expect(find.text('Edit'), findsOneWidget);
+    });
+
+    testWidgets('only show the booking, with a button per card to change it', (
+      tester,
+    ) async {
+      final client = filledClient();
+      final tab = BookingTab(booking: client.booking.bookings.first);
+      await pumpApp(tester, BookingDetails(tab: tab), client);
+
+      for (final title in ['Overview', 'Rooms', 'Guests', 'Assignment']) {
+        expect(inCard(title, find.byTooltip('Edit')), findsOneWidget);
+      }
+      expect(inCard('Billing', find.byTooltip('Edit')), findsOneWidget);
+      // What the kitchen needs and the price follow from the rest.
+      expect(inCard('Kitchen', find.byTooltip('Edit')), findsNothing);
+      expect(inCard('Price', find.byTooltip('Edit')), findsNothing);
+
+      // Nothing on the page itself is saved or changed.
+      expect(find.byType(ElevatedButton), findsNothing);
+      expect(find.byType(Checkbox), findsNothing);
+      expect(find.byType(Draggable<List<int>>), findsNothing);
+      expect(find.byTooltip('Delete'), findsNothing);
+    });
+
+    testWidgets('put the cards in two columns where there is room for them', (
+      tester,
+    ) async {
+      final client = filledClient();
+      final tab = BookingTab(booking: client.booking.bookings.first);
+      Offset at(String title) => tester.getTopLeft(card(title));
+      double width(String title) => tester.getSize(card(title)).width;
+
+      await pumpApp(tester, BookingDetails(tab: tab), client);
+      // The overview is as wide as both columns.
+      expect(at('Rooms').dy, greaterThan(at('Overview').dy));
+      expect(at('Guests').dy, at('Rooms').dy);
+      expect(at('Guests').dx, greaterThan(at('Rooms').dx));
+      expect(width('Guests'), width('Rooms'));
+      expect(
+        tester.getTopRight(card('Guests')).dx,
+        tester.getTopRight(card('Overview')).dx,
+      );
+      expect(at('Assignment').dx, at('Rooms').dx);
+      expect(at('Kitchen').dx, at('Guests').dx);
+
+      await pumpApp(
+        tester,
+        BookingDetails(tab: tab),
+        client,
+        size: const Size(700, 800),
+      );
+      // Too narrow for two columns, so the cards are below each other.
+      var below = at('Overview').dy;
+      for (final title in [
+        'Rooms',
+        'Guests',
+        'Assignment',
+        'Kitchen',
+        'Price',
+        'Billing',
+      ]) {
+        expect(at(title).dx, at('Overview').dx, reason: title);
+        expect(width(title), width('Overview'), reason: title);
+        expect(at(title).dy, greaterThan(below), reason: title);
+        below = at(title).dy;
+      }
+    });
+
+    testWidgets('open the confirmation of a confirmed booking as a PDF', (
+      tester,
+    ) async {
+      final opened = <String, Uint8List>{};
+      final client = filledClient(role: UserRole.viewer);
+      final tab = BookingTab(booking: client.booking.bookings.first);
+      await pumpApp(
+        tester,
+        BookingDetails(tab: tab),
+        client,
+        overrides: [
+          fileOpenerProvider.overrideWithValue(
+            (name, bytes) async => opened[name] = bytes,
+          ),
+        ],
+      );
+
+      await tester.tap(find.text('Confirmation'));
+      await tester.pumpAndSettle();
+
+      expect(opened.keys.single, 'Buchungsbestaetigung-1.pdf');
+      expect(String.fromCharCodes(opened.values.single), '%PDF-confirmation');
+    });
+
+    testWidgets('offer no confirmation for a cancelled or undated booking', (
+      tester,
+    ) async {
+      final client = filledClient();
+      final cancelled = client.booking.bookings.last;
+      await pumpApp(
+        tester,
+        BookingDetails(tab: BookingTab(booking: cancelled)),
+        client,
+      );
+      expect(find.text('Confirmation'), findsNothing);
+
+      final undated = client.booking.bookings.first.copyWith(
+        arrival: null,
+        departure: null,
+      );
+      await pumpApp(
+        tester,
+        BookingDetails(tab: BookingTab(booking: undated)),
+        client,
+      );
+      expect(find.text('Confirmation'), findsNothing);
     });
 
     testWidgets('say when a booking is cancelled', (tester) async {
@@ -34,36 +184,20 @@ void main() {
       expect(find.text('Confirmed'), findsNothing);
     });
 
-    testWidgets('let the booking take the rooms that are free', (
-      tester,
-    ) async {
+    testWidgets('list the rooms the booking holds', (tester) async {
       final client = filledClient();
       final tab = BookingTab(booking: client.booking.bookings.first);
       await pumpApp(tester, BookingDetails(tab: tab), client);
 
-      await tester.tap(find.text('Rooms'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Room 101'), findsOneWidget);
-      expect(find.text('Room 103'), findsOneWidget);
-      // Room 102 is neither free nor held by the booking.
-      expect(find.text('Room 102'), findsNothing);
-      expect(find.text('4 beds selected · 5 guests expected'), findsOneWidget);
-      FilledButton save() =>
-          tester.widget(find.widgetWithText(FilledButton, 'Save'));
-      expect(save().onPressed, isNull);
-
-      await tester.tap(find.text('Room 103'));
-      await tester.pump();
-      expect(find.text('6 beds selected · 5 guests expected'), findsOneWidget);
-
-      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
-      await tester.pumpAndSettle();
-
-      final saved = client.booking.bookings.first;
-      // Only rooms known to the fake are kept, which leaves out room 103.
-      expect(saved.rooms!.map((r) => r.roomId), [1]);
-      expect(find.text('Rooms saved'), findsOneWidget);
+      expect(inCard('Rooms', find.text('Room 101')), findsOneWidget);
+      expect(
+        inCard('Rooms', find.text('4 beds in 1 room · 5 guests expected')),
+        findsOneWidget,
+      );
+      expect(
+        inCard('Rooms', find.textContaining('4 beds · ')),
+        findsOneWidget,
+      );
     });
 
     testWidgets('ask for dates before rooms can be chosen', (tester) async {
@@ -78,40 +212,166 @@ void main() {
         client,
       );
 
-      await tester.tap(find.text('Rooms'));
-      await tester.pumpAndSettle();
-
       expect(
         find.text('Set the dates of the booking to choose its rooms.'),
         findsOneWidget,
       );
+      expect(inCard('Rooms', find.byTooltip('Edit')), findsNothing);
     });
   });
 
-  testWidgets('the editor keeps the days of a booking it saves', (
+  group('the overlay of the rooms', () {
+    testWidgets('lets the booking take the rooms that are free', (
+      tester,
+    ) async {
+      final client = filledClient();
+      await _openTab(tester, client, client.booking.bookings.first);
+
+      await editCard(tester, 'Rooms');
+
+      expect(inOverlay(find.text('Room 101')), findsOneWidget);
+      expect(inOverlay(find.text('Room 103')), findsOneWidget);
+      // Room 102 is neither free nor held by the booking.
+      expect(find.text('Room 102'), findsNothing);
+      expect(find.text('4 beds selected · 5 guests expected'), findsOneWidget);
+      ElevatedButton save() =>
+          tester.widget(find.widgetWithText(ElevatedButton, 'Save'));
+      expect(save().onPressed, isNull);
+
+      await tester.tap(inOverlay(find.text('Room 103')));
+      await tester.pump();
+      expect(find.text('6 beds selected · 5 guests expected'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      // Only rooms known to the fake are kept, which leaves out room 103.
+      expect(client.booking.bookings.first.rooms!.map((r) => r.roomId), [1]);
+      expect(find.byType(BookingOverlay), findsNothing);
+      expect(inCard('Rooms', find.text('Room 101')), findsOneWidget);
+    });
+
+    testWidgets('leaves the page showing the rooms as they were saved', (
+      tester,
+    ) async {
+      final client = filledClient();
+      await _openTab(tester, client, client.booking.bookings.first);
+
+      await editCard(tester, 'Rooms');
+      await tester.tap(inOverlay(find.text('Room 101')));
+      await tester.pump();
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      expect(client.booking.bookings.first.rooms, isEmpty);
+      expect(find.text('Room 101'), findsNothing);
+      // Without rooms there is nobody to put into them either.
+      expect(
+        inCard('Rooms', find.text('The booking holds no rooms yet.')),
+        findsOneWidget,
+      );
+      expect(
+        inCard('Assignment', find.text('The booking holds no rooms yet.')),
+        findsOneWidget,
+      );
+      expect(inCard('Assignment', find.byTooltip('Edit')), findsNothing);
+    });
+
+    testWidgets('changes nothing when it is cancelled', (tester) async {
+      final client = filledClient();
+      await _openTab(tester, client, client.booking.bookings.first);
+
+      await editCard(tester, 'Rooms');
+      await tester.tap(inOverlay(find.text('Room 101')));
+      await tester.pump();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(client.booking.bookings.first.rooms!.map((r) => r.roomId), [1]);
+      expect(find.byType(BookingOverlay), findsNothing);
+      expect(inCard('Rooms', find.text('Room 101')), findsOneWidget);
+    });
+  });
+
+  group('the overlay of the overview', () {
+    testWidgets('keeps the days of a booking it saves', (tester) async {
+      final client = filledClient();
+      final booking = client.booking.bookings.first;
+      await _openTab(tester, client, booking);
+
+      await editCard(tester, 'Overview');
+      expect(find.text('Edit booking'), findsOneWidget);
+      await tester.enterText(field('Title'), 'Class trip 7b');
+      await tester.enterText(field('Expected guests'), '24');
+      await tester.ensureVisible(find.widgetWithText(ElevatedButton, 'Save'));
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      final saved = client.booking.updated.single;
+      expect(saved.id, booking.id);
+      expect(saved.title, 'Class trip 7b');
+      expect(saved.arrival, DateTime.utc(2026, 10, 12));
+      expect(saved.departure, DateTime.utc(2026, 10, 16));
+      expect(saved.leadId, 1);
+      expect(saved.status, BookingStatus.confirmed);
+      expect(saved.billingMode, BillingMode.single);
+      expect(saved.expectedGuestCount, 24);
+      expect(saved.optionExpiresAt, isNull);
+
+      // The overlay is gone and the page shows the booking as it was saved.
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.text('Class trip 7b'), findsOneWidget);
+      expect(inCard('Overview', find.text('24')), findsOneWidget);
+    });
+
+    testWidgets('leaves the booking alone when it is cancelled', (
+      tester,
+    ) async {
+      final client = filledClient();
+      await _openTab(tester, client, client.booking.bookings.first);
+
+      await editCard(tester, 'Overview');
+      await tester.enterText(field('Title'), 'Something else');
+      await tester.ensureVisible(find.text('Cancel'));
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(client.booking.updated, isEmpty);
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.text('Class trip'), findsOneWidget);
+    });
+  });
+
+  testWidgets('a new booking is created in its tab, which then shows it', (
     tester,
   ) async {
     final client = filledClient();
-    final booking = client.booking.bookings.first;
-    final tab = BookingTab(booking: booking, editing: true);
-    await pumpApp(tester, BookingEditor(tab: tab), client);
+    await _openTab(tester, client);
+    expect(find.text('New booking'), findsOneWidget);
 
-    await tester.enterText(field('Title'), 'Class trip 7b');
-    await tester.enterText(field('Expected guests'), '24');
-    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Save'));
-    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    // A booking needs a title and a lead.
+    await tester.ensureVisible(find.widgetWithText(ElevatedButton, 'Save'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+    await tester.pumpAndSettle();
+    expect(find.text('Required'), findsNWidgets(2));
+    expect(client.booking.added, isEmpty);
+
+    await tester.enterText(field('Title'), 'Retreat');
+    await tester.tap(find.byType(DropdownMenu<Contact>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Marie Weber').last);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.widgetWithText(ElevatedButton, 'Save'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
     await tester.pumpAndSettle();
 
-    final saved = client.booking.updated.single;
-    expect(saved.id, booking.id);
-    expect(saved.title, 'Class trip 7b');
-    expect(saved.arrival, DateTime.utc(2026, 10, 12));
-    expect(saved.departure, DateTime.utc(2026, 10, 16));
-    expect(saved.leadId, 1);
-    expect(saved.status, BookingStatus.confirmed);
-    expect(saved.billingMode, BillingMode.single);
-    expect(saved.expectedGuestCount, 24);
-    expect(saved.optionExpiresAt, isNull);
+    final added = client.booking.added.single;
+    expect(added.title, 'Retreat');
+    expect(added.leadId, 1);
+    expect(added.status, BookingStatus.inquiry);
+    expect(added.arrival, isNull);
+    expect(find.byType(BookingDetails), findsOneWidget);
+    expect(find.text('Retreat'), findsOneWidget);
   });
 
   group('bookings panel', () {

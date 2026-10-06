@@ -1,0 +1,11 @@
+### The invoice of a folio as a PDF, kept as it was first produced.
+class: InvoiceDocument
+table: invoice_documents
+serverOnly: true
+fields:
+  folio: Folio?, relation(onDelete=Cascade)
+  pdf: ByteData
+indexes:
+  invoice_documents_folio_idx:
+    fields: folioId
+    unique: true

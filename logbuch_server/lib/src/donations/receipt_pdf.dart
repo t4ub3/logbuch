@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:logbuch_server/src/common/german_format.dart';
 import 'package:logbuch_server/src/donations/receipt_text.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:pdf/pdf.dart';

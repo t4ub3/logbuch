@@ -1,0 +1,10 @@
+### A contact in a household. A contact can be in several households.
+class: HouseholdMember
+table: household_members
+fields:
+  household: Household?, relation(name=household_members, onDelete=Cascade)
+  contact: Contact?, relation(onDelete=Cascade)
+indexes:
+  household_members_unique_idx:
+    fields: householdId, contactId
+    unique: true

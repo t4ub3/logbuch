@@ -50,6 +50,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$admin$en admin = Translations$admin$en.internal(_root);
 	late final Translations$auth$en auth = Translations$auth$en.internal(_root);
 	late final Translations$donations$en donations = Translations$donations$en.internal(_root);
+	late final Translations$dashboard$en dashboard = Translations$dashboard$en.internal(_root);
 	late final Translations$settings$en settings = Translations$settings$en.internal(_root);
 }
 
@@ -108,6 +109,15 @@ class Translations$common$en {
 
 	/// en: 'Clear'
 	String get clear => 'Clear';
+
+	/// en: 'Close'
+	String get close => 'Close';
+
+	/// en: 'Copy'
+	String get copy => 'Copy';
+
+	/// en: 'Copied'
+	String get copied => 'Copied';
 }
 
 // Path: tabs
@@ -144,6 +154,9 @@ class Translations$menu$en {
 
 	/// en: 'Donations'
 	String get donations => 'Donations';
+
+	/// en: 'Dashboard'
+	String get dashboard => 'Dashboard';
 }
 
 // Path: bookings
@@ -192,9 +205,6 @@ class Translations$bookings$en {
 
 	/// en: 'Yearly view'
 	String get yearlyView => 'Yearly view';
-
-	/// en: 'Edit'
-	String get edit => 'Edit';
 
 	/// en: 'Email'
 	String get email => 'Email';
@@ -284,9 +294,6 @@ class Translations$bookings$en {
 		other: '${n} guests expected',
 	);
 
-	/// en: 'Rooms saved'
-	String get roomsSaved => 'Rooms saved';
-
 	/// en: 'Guests'
 	String get guests => 'Guests';
 
@@ -365,8 +372,8 @@ class Translations$bookings$en {
 	/// en: 'Everybody has a room.'
 	String get everybodyAssigned => 'Everybody has a room.';
 
-	/// en: 'The booking holds no rooms yet. Choose them under Rooms.'
-	String get noRoomsHeld => 'The booking holds no rooms yet. Choose them under Rooms.';
+	/// en: 'The booking holds no rooms yet.'
+	String get noRoomsHeld => 'The booking holds no rooms yet.';
 
 	/// en: 'Move to'
 	String get moveTo => 'Move to';
@@ -498,6 +505,48 @@ class Translations$bookings$en {
 
 	/// en: 'Tax rate'
 	String get taxRate => 'Tax rate';
+
+	/// en: 'Open invoice'
+	String get openInvoice => 'Open invoice';
+
+	/// en: 'The invoice could not be opened: {error}'
+	String openInvoiceFailed({required Object error}) => 'The invoice could not be opened: ${error}';
+
+	/// en: 'Renew document'
+	String get renewInvoice => 'Renew document';
+
+	/// en: 'The invoice is produced again with the details as they are now, such as the bank details, and replaces the stored document. Only do this while the invoice has not been sent.'
+	String get renewInvoiceHint => 'The invoice is produced again with the details as they are now, such as the bank details, and replaces the stored document. Only do this while the invoice has not been sent.';
+
+	/// en: 'Kitchen'
+	String get kitchen => 'Kitchen';
+
+	/// en: 'Guests by age group'
+	String get guestsByAge => 'Guests by age group';
+
+	/// en: 'Guests in total'
+	String get guestsInTotal => 'Guests in total';
+
+	/// en: 'None chosen'
+	String get noMealPlan => 'None chosen';
+
+	/// en: 'No dietary needs were noted for the guests.'
+	String get noDietaryNeeds => 'No dietary needs were noted for the guests.';
+
+	/// en: 'Add household'
+	String get addHousehold => 'Add household';
+
+	/// en: 'There are no households yet. Create them under Contacts, Households.'
+	String get noHouseholdsYet => 'There are no households yet. Create them under Contacts, Households.';
+
+	/// en: 'Confirmation'
+	String get confirmation => 'Confirmation';
+
+	/// en: 'The confirmation could not be opened: {error}'
+	String openConfirmationFailed({required Object error}) => 'The confirmation could not be opened: ${error}';
+
+	/// en: '{beds} in {rooms}'
+	String bedsInRooms({required Object beds, required Object rooms}) => '${beds} in ${rooms}';
 }
 
 // Path: contacts
@@ -579,6 +628,27 @@ class Translations$contacts$en {
 
 	/// en: 'Its contacts stay, without an organization.'
 	String get deleteOrganizationHint => 'Its contacts stay, without an organization.';
+
+	/// en: 'Households'
+	String get households => 'Households';
+
+	/// en: 'No households'
+	String get noHouseholds => 'No households';
+
+	/// en: 'New household'
+	String get addHousehold => 'New household';
+
+	/// en: 'Edit household'
+	String get editHousehold => 'Edit household';
+
+	/// en: 'Add a member'
+	String get addMember => 'Add a member';
+
+	/// en: 'No members yet'
+	String get noMembers => 'No members yet';
+
+	/// en: 'Its members stay as contacts.'
+	String get deleteHouseholdHint => 'Its members stay as contacts.';
 }
 
 // Path: rooms
@@ -726,6 +796,76 @@ class Translations$donations$en {
 
 	/// en: 'The receipt could not be opened: {error}'
 	String openFailed({required Object error}) => 'The receipt could not be opened: ${error}';
+}
+
+// Path: dashboard
+class Translations$dashboard$en {
+	Translations$dashboard$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Arrivals in the next 7 days'
+	String get arrivals => 'Arrivals in the next 7 days';
+
+	/// en: 'Nobody arrives in the next 7 days.'
+	String get noArrivals => 'Nobody arrives in the next 7 days.';
+
+	/// en: 'Departures in the next 7 days'
+	String get departures => 'Departures in the next 7 days';
+
+	/// en: 'Nobody departs in the next 7 days.'
+	String get noDepartures => 'Nobody departs in the next 7 days.';
+
+	/// en: 'Tonight'
+	String get tonight => 'Tonight';
+
+	/// en: '{occupied} of {total} rooms occupied'
+	String roomsOccupied({required Object occupied, required Object total}) => '${occupied} of ${total} rooms occupied';
+
+	/// en: '(zero) {No guests in the house} (one) {{n} guest in the house} (other) {{n} guests in the house}'
+	String guestsTonight({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: 'No guests in the house',
+		one: '${n} guest in the house',
+		other: '${n} guests in the house',
+	);
+
+	/// en: '(one) {{n} room} (other) {{n} rooms}'
+	String roomCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		one: '${n} room',
+		other: '${n} rooms',
+	);
+
+	/// en: 'Options expiring soon'
+	String get options => 'Options expiring soon';
+
+	/// en: 'No option expires in the next 14 days.'
+	String get noOptions => 'No option expires in the next 14 days.';
+
+	/// en: 'Expires on {date}'
+	String expires({required Object date}) => 'Expires on ${date}';
+
+	/// en: 'Expired on {date}'
+	String expired({required Object date}) => 'Expired on ${date}';
+
+	/// en: 'Unpaid invoices'
+	String get balances => 'Unpaid invoices';
+
+	/// en: 'No invoice is waiting for payment.'
+	String get noBalances => 'No invoice is waiting for payment.';
+
+	/// en: 'Guests to cater for'
+	String get catering => 'Guests to cater for';
+
+	/// en: 'Today'
+	String get today => 'Today';
+
+	/// en: 'Tomorrow'
+	String get tomorrow => 'Tomorrow';
+
+	/// en: 'No guests.'
+	String get noGuests => 'No guests.';
 }
 
 // Path: settings
@@ -991,8 +1131,8 @@ class Translations$admin$errors$en {
 	/// en: 'There is nothing to invoice.'
 	String get nothingToInvoice => 'There is nothing to invoice.';
 
-	/// en: 'Parts of the booking cannot be priced yet. See the Price tab for what is missing.'
-	String get pricingIncomplete => 'Parts of the booking cannot be priced yet. See the Price tab for what is missing.';
+	/// en: 'Parts of the booking cannot be priced yet. Its price says what is missing.'
+	String get pricingIncomplete => 'Parts of the booking cannot be priced yet. Its price says what is missing.';
 
 	/// en: 'This is more than was overpaid.'
 	String get notOverpaid => 'This is more than was overpaid.';
@@ -1002,6 +1142,12 @@ class Translations$admin$errors$en {
 
 	/// en: 'The details of the operator are incomplete. Fill them in under Admin, Operator.'
 	String get operatorIncomplete => 'The details of the operator are incomplete. Fill them in under Admin, Operator.';
+
+	/// en: 'Nobody in this household can be added: it has no members, or all of them are guests of the booking already.'
+	String get alreadyGuest => 'Nobody in this household can be added: it has no members, or all of them are guests of the booking already.';
+
+	/// en: 'A confirmation is only available for a booking that is an option or confirmed.'
+	String get notConfirmed => 'A confirmation is only available for a booking that is an option or confirmed.';
 }
 
 // Path: admin.rooms
@@ -1278,8 +1424,8 @@ class Translations$admin$operator$en {
 
 	// Translations
 
-	/// en: 'The organisation that runs the house. These details are printed on donation receipts, which can only be issued once everything is filled in.'
-	String get hint => 'The organisation that runs the house. These details are printed on donation receipts, which can only be issued once everything is filled in.';
+	/// en: 'The organisation that runs the house. These details are printed on invoices and donation receipts. Receipts can only be issued once everything about the tax office is filled in.'
+	String get hint => 'The organisation that runs the house. These details are printed on invoices and donation receipts. Receipts can only be issued once everything about the tax office is filled in.';
 
 	/// en: 'Street'
 	String get street => 'Street';
@@ -1331,6 +1477,33 @@ class Translations$admin$operator$en {
 
 	/// en: 'Saved'
 	String get saved => 'Saved';
+
+	/// en: 'Printed on invoices, so that payers know where and by when to pay.'
+	String get bankHint => 'Printed on invoices, so that payers know where and by when to pay.';
+
+	/// en: 'Account holder'
+	String get accountHolder => 'Account holder';
+
+	/// en: 'IBAN'
+	String get iban => 'IBAN';
+
+	/// en: 'BIC'
+	String get bic => 'BIC';
+
+	/// en: 'Bank'
+	String get bankName => 'Bank';
+
+	/// en: 'Payment terms'
+	String get paymentTerms => 'Payment terms';
+
+	/// en: 'In German, for example: Zahlbar innerhalb von 14 Tagen ohne Abzug.'
+	String get paymentTermsHint => 'In German, for example: Zahlbar innerhalb von 14 Tagen ohne Abzug.';
+
+	/// en: 'Note on booking confirmations'
+	String get confirmationNote => 'Note on booking confirmations';
+
+	/// en: 'In German, for example when rooms are ready on the day of arrival.'
+	String get confirmationNoteHint => 'In German, for example when rooms are ready on the day of arrival.';
 }
 
 // Path: auth.roles
@@ -1399,12 +1572,16 @@ extension on Translations {
 			'common.search' => 'Search',
 			'common.signOut' => 'Sign out',
 			'common.clear' => 'Clear',
+			'common.close' => 'Close',
+			'common.copy' => 'Copy',
+			'common.copied' => 'Copied',
 			'tabs.close' => 'Close tab',
 			'menu.calendar' => 'Calendar',
 			'menu.contacts' => 'Contacts',
 			'menu.admin' => 'Admin',
 			'menu.settings' => 'Settings',
 			'menu.donations' => 'Donations',
+			'menu.dashboard' => 'Dashboard',
 			'bookings.newBooking' => 'New booking',
 			'bookings.agenda' => 'Agenda',
 			'bookings.month' => 'Month',
@@ -1418,7 +1595,6 @@ extension on Translations {
 			'bookings.today' => 'Today',
 			'bookings.more' => ({required Object n}) => '+${n} more',
 			'bookings.yearlyView' => 'Yearly view',
-			'bookings.edit' => 'Edit',
 			'bookings.email' => 'Email',
 			'bookings.phone' => 'Phone',
 			'bookings.status' => 'Status',
@@ -1454,7 +1630,6 @@ extension on Translations {
 			'bookings.noFreeRooms' => 'No rooms are free for these dates.',
 			'bookings.selectedBeds' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} bed selected', other: '${n} beds selected', ), 
 			'bookings.guestsExpected' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} guest expected', other: '${n} guests expected', ), 
-			'bookings.roomsSaved' => 'Rooms saved',
 			'bookings.guests' => 'Guests',
 			'bookings.assignment' => 'Assignment',
 			'bookings.price' => 'Price',
@@ -1480,7 +1655,7 @@ extension on Translations {
 			'bookings.guestCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} guest', other: '${n} guests', ), 
 			'bookings.unassigned' => 'Without a room',
 			'bookings.everybodyAssigned' => 'Everybody has a room.',
-			'bookings.noRoomsHeld' => 'The booking holds no rooms yet. Choose them under Rooms.',
+			'bookings.noRoomsHeld' => 'The booking holds no rooms yet.',
 			'bookings.moveTo' => 'Move to',
 			'bookings.bedsUsed' => ({required Object used, required Object beds}) => '${used} of ${beds} beds',
 			'bookings.roomFull' => 'Full',
@@ -1537,6 +1712,20 @@ extension on Translations {
 			'bookings.unitPrice' => 'Price each',
 			'bookings.isDiscount' => 'This is a discount',
 			'bookings.taxRate' => 'Tax rate',
+			'bookings.openInvoice' => 'Open invoice',
+			'bookings.openInvoiceFailed' => ({required Object error}) => 'The invoice could not be opened: ${error}',
+			'bookings.renewInvoice' => 'Renew document',
+			'bookings.renewInvoiceHint' => 'The invoice is produced again with the details as they are now, such as the bank details, and replaces the stored document. Only do this while the invoice has not been sent.',
+			'bookings.kitchen' => 'Kitchen',
+			'bookings.guestsByAge' => 'Guests by age group',
+			'bookings.guestsInTotal' => 'Guests in total',
+			'bookings.noMealPlan' => 'None chosen',
+			'bookings.noDietaryNeeds' => 'No dietary needs were noted for the guests.',
+			'bookings.addHousehold' => 'Add household',
+			'bookings.noHouseholdsYet' => 'There are no households yet. Create them under Contacts, Households.',
+			'bookings.confirmation' => 'Confirmation',
+			'bookings.openConfirmationFailed' => ({required Object error}) => 'The confirmation could not be opened: ${error}',
+			'bookings.bedsInRooms' => ({required Object beds, required Object rooms}) => '${beds} in ${rooms}',
 			'contacts.empty' => 'No contacts',
 			'contacts.people' => 'People',
 			'contacts.organizations' => 'Organizations',
@@ -1561,6 +1750,13 @@ extension on Translations {
 			'contacts.addOrganization' => 'New organization',
 			'contacts.editOrganization' => 'Edit organization',
 			'contacts.deleteOrganizationHint' => 'Its contacts stay, without an organization.',
+			'contacts.households' => 'Households',
+			'contacts.noHouseholds' => 'No households',
+			'contacts.addHousehold' => 'New household',
+			'contacts.editHousehold' => 'Edit household',
+			'contacts.addMember' => 'Add a member',
+			'contacts.noMembers' => 'No members yet',
+			'contacts.deleteHouseholdHint' => 'Its members stay as contacts.',
 			'rooms.empty' => 'No rooms',
 			'rooms.room' => ({required Object number}) => 'Room ${number}',
 			'rooms.beds' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} bed', other: '${n} beds', ), 
@@ -1596,10 +1792,12 @@ extension on Translations {
 			'admin.errors.roomNotHeld' => 'The booking does not hold this room.',
 			'admin.errors.alreadyInvoiced' => 'This is invoiced and can no longer be changed.',
 			'admin.errors.nothingToInvoice' => 'There is nothing to invoice.',
-			'admin.errors.pricingIncomplete' => 'Parts of the booking cannot be priced yet. See the Price tab for what is missing.',
+			'admin.errors.pricingIncomplete' => 'Parts of the booking cannot be priced yet. Its price says what is missing.',
 			'admin.errors.notOverpaid' => 'This is more than was overpaid.',
 			'admin.errors.alreadyReceipted' => 'This donation is on a receipt and can no longer be changed.',
 			'admin.errors.operatorIncomplete' => 'The details of the operator are incomplete. Fill them in under Admin, Operator.',
+			'admin.errors.alreadyGuest' => 'Nobody in this household can be added: it has no members, or all of them are guests of the booking already.',
+			'admin.errors.notConfirmed' => 'A confirmation is only available for a booking that is an option or confirmed.',
 			'admin.rooms.add' => 'New room',
 			'admin.rooms.edit' => 'Edit room',
 			'admin.rooms.number' => 'Room number',
@@ -1668,7 +1866,7 @@ extension on Translations {
 			'admin.users.empty' => 'No users',
 			'admin.users.unknownEmail' => 'No email address',
 			'admin.users.you' => 'you',
-			'admin.operator.hint' => 'The organisation that runs the house. These details are printed on donation receipts, which can only be issued once everything is filled in.',
+			'admin.operator.hint' => 'The organisation that runs the house. These details are printed on invoices and donation receipts. Receipts can only be issued once everything about the tax office is filled in.',
 			'admin.operator.street' => 'Street',
 			'admin.operator.zip' => 'Postal code',
 			'admin.operator.city' => 'City',
@@ -1686,6 +1884,15 @@ extension on Translations {
 			'admin.operator.place' => 'Place where receipts are signed',
 			'admin.operator.signatory' => 'Signed by',
 			'admin.operator.saved' => 'Saved',
+			'admin.operator.bankHint' => 'Printed on invoices, so that payers know where and by when to pay.',
+			'admin.operator.accountHolder' => 'Account holder',
+			'admin.operator.iban' => 'IBAN',
+			'admin.operator.bic' => 'BIC',
+			'admin.operator.bankName' => 'Bank',
+			'admin.operator.paymentTerms' => 'Payment terms',
+			'admin.operator.paymentTermsHint' => 'In German, for example: Zahlbar innerhalb von 14 Tagen ohne Abzug.',
+			'admin.operator.confirmationNote' => 'Note on booking confirmations',
+			'admin.operator.confirmationNoteHint' => 'In German, for example when rooms are ready on the day of arrival.',
 			'auth.waitingTitle' => 'Waiting for access',
 			'auth.waitingText' => ({required Object email}) => 'Your account ${email} has no role yet. An admin has to give you access.',
 			'auth.checkAgain' => 'Check again',
@@ -1712,6 +1919,24 @@ extension on Translations {
 			'donations.created' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No receipts created', one: '${n} receipt created', other: '${n} receipts created', ), 
 			'donations.openPdf' => 'Open the PDF',
 			'donations.openFailed' => ({required Object error}) => 'The receipt could not be opened: ${error}',
+			'dashboard.arrivals' => 'Arrivals in the next 7 days',
+			'dashboard.noArrivals' => 'Nobody arrives in the next 7 days.',
+			'dashboard.departures' => 'Departures in the next 7 days',
+			'dashboard.noDepartures' => 'Nobody departs in the next 7 days.',
+			'dashboard.tonight' => 'Tonight',
+			'dashboard.roomsOccupied' => ({required Object occupied, required Object total}) => '${occupied} of ${total} rooms occupied',
+			'dashboard.guestsTonight' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No guests in the house', one: '${n} guest in the house', other: '${n} guests in the house', ), 
+			'dashboard.roomCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} room', other: '${n} rooms', ), 
+			'dashboard.options' => 'Options expiring soon',
+			'dashboard.noOptions' => 'No option expires in the next 14 days.',
+			'dashboard.expires' => ({required Object date}) => 'Expires on ${date}',
+			'dashboard.expired' => ({required Object date}) => 'Expired on ${date}',
+			'dashboard.balances' => 'Unpaid invoices',
+			'dashboard.noBalances' => 'No invoice is waiting for payment.',
+			'dashboard.catering' => 'Guests to cater for',
+			'dashboard.today' => 'Today',
+			'dashboard.tomorrow' => 'Tomorrow',
+			'dashboard.noGuests' => 'No guests.',
 			'settings.title' => 'Settings',
 			'settings.language' => 'Language',
 			'settings.systemLanguage' => 'System default',
