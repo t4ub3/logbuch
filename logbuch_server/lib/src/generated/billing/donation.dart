@@ -16,6 +16,7 @@ import 'package:serverpod/serverpod.dart' as _is;
 import '../billing/donation_source.dart' as _i6ugrixl;
 import '../billing/payment.dart' as _i5od23c2;
 import '../contacts/contact.dart' as _imbxrfja;
+import '../donations/donation_receipt.dart' as _i8tqi4gv;
 
 /// Money a contact gave without getting something for it. Only recorded
 /// when the donor said so, never worked out from what was overpaid.
@@ -30,6 +31,8 @@ abstract class Donation
     this.paymentId,
     this.payment,
     required this.source,
+    this.receiptId,
+    this.receipt,
   });
 
   factory Donation({
@@ -41,6 +44,8 @@ abstract class Donation
     int? paymentId,
     _i5od23c2.Payment? payment,
     required _i6ugrixl.DonationSource source,
+    int? receiptId,
+    _i8tqi4gv.DonationReceipt? receipt,
   }) = _DonationImpl;
 
   factory Donation.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -63,6 +68,12 @@ abstract class Donation
       source: _i6ugrixl.DonationSource.fromJson(
         (jsonSerialization['source'] as String),
       ),
+      receiptId: jsonSerialization['receiptId'] as int?,
+      receipt: jsonSerialization['receipt'] == null
+          ? null
+          : _iil9w69f.Protocol().deserialize<_i8tqi4gv.DonationReceipt>(
+              jsonSerialization['receipt'],
+            ),
     );
   }
 
@@ -88,6 +99,12 @@ abstract class Donation
 
   _i6ugrixl.DonationSource source;
 
+  int? receiptId;
+
+  /// The receipt the donation is on. A donation on a receipt cannot be
+  /// changed or removed anymore.
+  _i8tqi4gv.DonationReceipt? receipt;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -103,6 +120,8 @@ abstract class Donation
     int? paymentId,
     _i5od23c2.Payment? payment,
     _i6ugrixl.DonationSource? source,
+    int? receiptId,
+    _i8tqi4gv.DonationReceipt? receipt,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -116,6 +135,8 @@ abstract class Donation
       if (paymentId != null) 'paymentId': paymentId,
       if (payment != null) 'payment': payment?.toJson(),
       'source': source.toJson(),
+      if (receiptId != null) 'receiptId': receiptId,
+      if (receipt != null) 'receipt': receipt?.toJson(),
     };
   }
 
@@ -131,16 +152,20 @@ abstract class Donation
       if (paymentId != null) 'paymentId': paymentId,
       if (payment != null) 'payment': payment?.toJsonForProtocol(),
       'source': source.toJson(),
+      if (receiptId != null) 'receiptId': receiptId,
+      if (receipt != null) 'receipt': receipt?.toJsonForProtocol(),
     };
   }
 
   static DonationInclude include({
     _imbxrfja.ContactInclude? contact,
     _i5od23c2.PaymentInclude? payment,
+    _i8tqi4gv.DonationReceiptInclude? receipt,
   }) {
     return DonationInclude._(
       contact: contact,
       payment: payment,
+      receipt: receipt,
     );
   }
 
@@ -180,6 +205,8 @@ class _DonationImpl extends Donation {
     int? paymentId,
     _i5od23c2.Payment? payment,
     required _i6ugrixl.DonationSource source,
+    int? receiptId,
+    _i8tqi4gv.DonationReceipt? receipt,
   }) : super._(
          id: id,
          contactId: contactId,
@@ -189,6 +216,8 @@ class _DonationImpl extends Donation {
          paymentId: paymentId,
          payment: payment,
          source: source,
+         receiptId: receiptId,
+         receipt: receipt,
        );
 
   /// Returns a shallow copy of this [Donation]
@@ -204,6 +233,8 @@ class _DonationImpl extends Donation {
     Object? paymentId = _Undefined,
     Object? payment = _Undefined,
     _i6ugrixl.DonationSource? source,
+    Object? receiptId = _Undefined,
+    Object? receipt = _Undefined,
   }) {
     return Donation(
       id: id is int? ? id : this.id,
@@ -218,6 +249,10 @@ class _DonationImpl extends Donation {
           ? payment
           : this.payment?.copyWith(),
       source: source ?? this.source,
+      receiptId: receiptId is int? ? receiptId : this.receiptId,
+      receipt: receipt is _i8tqi4gv.DonationReceipt?
+          ? receipt
+          : this.receipt?.copyWith(),
     );
   }
 }
@@ -251,6 +286,11 @@ class DonationUpdateTable extends _is.UpdateTable<DonationTable> {
     table.source,
     value,
   );
+
+  _is.ColumnValue<int, int> receiptId(int? value) => _is.ColumnValue(
+    table.receiptId,
+    value,
+  );
 }
 
 class DonationTable extends _is.Table<int?> {
@@ -277,6 +317,10 @@ class DonationTable extends _is.Table<int?> {
       this,
       _is.EnumSerialization.byName,
     );
+    receiptId = _is.ColumnInt(
+      'receiptId',
+      this,
+    );
   }
 
   late final DonationUpdateTable updateTable;
@@ -295,6 +339,12 @@ class DonationTable extends _is.Table<int?> {
   _i5od23c2.PaymentTable? _payment;
 
   late final _is.ColumnEnum<_i6ugrixl.DonationSource> source;
+
+  late final _is.ColumnInt receiptId;
+
+  /// The receipt the donation is on. A donation on a receipt cannot be
+  /// changed or removed anymore.
+  _i8tqi4gv.DonationReceiptTable? _receipt;
 
   _imbxrfja.ContactTable get contact {
     if (_contact != null) return _contact!;
@@ -322,6 +372,19 @@ class DonationTable extends _is.Table<int?> {
     return _payment!;
   }
 
+  _i8tqi4gv.DonationReceiptTable get receipt {
+    if (_receipt != null) return _receipt!;
+    _receipt = _is.createRelationTable(
+      relationFieldName: 'receipt',
+      field: Donation.t.receiptId,
+      foreignField: _i8tqi4gv.DonationReceipt.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i8tqi4gv.DonationReceiptTable(tableRelation: foreignTableRelation),
+    );
+    return _receipt!;
+  }
+
   @override
   List<_is.Column> get columns => [
     id,
@@ -330,6 +393,7 @@ class DonationTable extends _is.Table<int?> {
     date,
     paymentId,
     source,
+    receiptId,
   ];
 
   @override
@@ -340,6 +404,9 @@ class DonationTable extends _is.Table<int?> {
     if (relationField == 'payment') {
       return payment;
     }
+    if (relationField == 'receipt') {
+      return receipt;
+    }
     return null;
   }
 }
@@ -348,19 +415,24 @@ class DonationInclude extends _is.IncludeObject {
   DonationInclude._({
     _imbxrfja.ContactInclude? contact,
     _i5od23c2.PaymentInclude? payment,
+    _i8tqi4gv.DonationReceiptInclude? receipt,
   }) {
     _contact = contact;
     _payment = payment;
+    _receipt = receipt;
   }
 
   _imbxrfja.ContactInclude? _contact;
 
   _i5od23c2.PaymentInclude? _payment;
 
+  _i8tqi4gv.DonationReceiptInclude? _receipt;
+
   @override
   Map<String, _is.Include?> get includes => {
     'contact': _contact,
     'payment': _payment,
+    'receipt': _receipt,
   };
 
   @override
@@ -839,6 +911,29 @@ class DonationAttachRowRepository {
       transaction: transaction,
     );
   }
+
+  /// Creates a relation between the given [Donation] and [DonationReceipt]
+  /// by setting the [Donation]'s foreign key `receiptId` to refer to the [DonationReceipt].
+  Future<void> receipt(
+    _is.DatabaseSession session,
+    Donation donation,
+    _i8tqi4gv.DonationReceipt receipt, {
+    _is.Transaction? transaction,
+  }) async {
+    if (donation.id == null) {
+      throw ArgumentError.notNull('donation.id');
+    }
+    if (receipt.id == null) {
+      throw ArgumentError.notNull('receipt.id');
+    }
+
+    var $donation = donation.copyWith(receiptId: receipt.id);
+    await session.db.updateRow<Donation>(
+      $donation,
+      columns: [Donation.t.receiptId],
+      transaction: transaction,
+    );
+  }
 }
 
 class DonationDetachRowRepository {
@@ -862,6 +957,28 @@ class DonationDetachRowRepository {
     await session.db.updateRow<Donation>(
       $donation,
       columns: [Donation.t.paymentId],
+      transaction: transaction,
+    );
+  }
+
+  /// Detaches the relation between this [Donation] and the [DonationReceipt] set in `receipt`
+  /// by setting the [Donation]'s foreign key `receiptId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> receipt(
+    _is.DatabaseSession session,
+    Donation donation, {
+    _is.Transaction? transaction,
+  }) async {
+    if (donation.id == null) {
+      throw ArgumentError.notNull('donation.id');
+    }
+
+    var $donation = donation.copyWith(receiptId: null);
+    await session.db.updateRow<Donation>(
+      $donation,
+      columns: [Donation.t.receiptId],
       transaction: transaction,
     );
   }

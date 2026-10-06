@@ -9,3 +9,6 @@ fields:
   ### The payment the donation was part of, if it was left over from one.
   payment: Payment?, relation(name=payment_donations, optional, onDelete=Restrict)
   source: DonationSource
+  ### The receipt the donation is on. A donation on a receipt cannot be
+  ### changed or removed anymore.
+  receipt: DonationReceipt?, relation(name=receipt_donations, optional, onDelete=Restrict)

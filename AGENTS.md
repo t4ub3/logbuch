@@ -51,7 +51,7 @@ The app is launched from `logbuch_flutter/lib/driver.dart`, which starts the Flu
 
 Log|Buch manages group guest houses (*Gruppenhäuser*) in Germany: bookings with guest lists, room assignment, billing per booking, per group or per guest, and donation receipts. Amounts are in EUR and the house is in the Europe/Berlin timezone. The UI is translated into English and German.
 
-It is built in this order. Steps 1 to 6 and the login exist, the rest is planned. There are no deposits and no cancellation fees:
+It is built in this order. Steps 1 to 7 and the login exist, the rest is planned. There are no deposits and no cancellation fees:
 
 1. Setup and admin area: rooms, price categories, age groups, seasons, meal plans, room and meal rates, fees.
 2. Contacts and organizations.
@@ -79,6 +79,8 @@ One installation manages one house. Some names are older than this plan and were
 - A folio is the account of one payer for one booking. `distributeLines` in `lib/src/billing/folio_distribution.dart` decides who pays which line by the billing mode of the booking. `BillingEndpoint.getFolios` first brings the calculated charges of all folios that are not invoiced in line with the booking, so they are never stale; charges added by hand (`manual`, `discount`) are kept.
 - Invoicing a folio gives it the next number of the year, such as `2026-0001`, and freezes its charges: later changes to rates, guests or rooms do not touch it, and the billing mode of the booking cannot change anymore. A folio cannot be invoiced while a part of the booking cannot be priced.
 - A payment with a negative amount is a refund. What is paid beyond the charges stays a credit until the user decides. It becomes a `Donation` only through `BillingEndpoint.donate`, which the app calls when the user confirms that the payer wants to donate it. Never create donations from balances.
+- `DonationEndpoint.createReceipts` issues one receipt (*Sammelbestätigung*) per donor for the donations of a year that are on none yet, numbered like `SB-2026-0001`. The PDF is built on the server by `lib/src/donations/receipt_pdf.dart` and stored with the receipt, so it stays as it was issued. A donation on a receipt can no longer be removed. A donor without a full address gets no receipt, and none are issued while the details of the operator (`Operator`, edited under Admin) are incomplete.
+- The text of a receipt is in `lib/src/donations/receipt_text.dart`. It is German whatever the language of the app, and follows the official template, whose wording must be kept. The operator's notice from the tax office decides the first sentence; § 60a AO is the default until the operator has confirmed which notice applies.
 - Server tests sign in with `withAdmin`, `asViewer` and `withoutRole` from `test/integration/roles.dart`. Tests of logic without a database are in `test/unit/`.
 
 ## Flutter app

@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
+import 'dart:typed_data' as _idt;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:logbuch_client/src/protocol/auth/app_user.dart' as _il34w39i;
 import 'package:logbuch_client/src/protocol/auth/user_role.dart' as _iesc6ap1;
@@ -23,6 +24,12 @@ import 'package:logbuch_client/src/protocol/bookings/bookings.dart'
 import 'package:logbuch_client/src/protocol/contacts/contact.dart' as _izv2jndr;
 import 'package:logbuch_client/src/protocol/contacts/organization.dart'
     as _igjrrozn;
+import 'package:logbuch_client/src/protocol/donations/donation_receipt.dart'
+    as _i8cfzthc;
+import 'package:logbuch_client/src/protocol/donations/operator.dart'
+    as _i6bqazya;
+import 'package:logbuch_client/src/protocol/donations/receipt_preview.dart'
+    as _imgf7vt5;
 import 'package:logbuch_client/src/protocol/greetings/greeting.dart'
     as _ij8ru2br;
 import 'package:logbuch_client/src/protocol/guests/guest.dart' as _i44zmmsa;
@@ -569,6 +576,102 @@ class EndpointOrganization extends EndpointApp {
   );
 }
 
+/// Donations and the yearly receipts for them.
+/// {@category Endpoint}
+class EndpointDonation extends EndpointApp {
+  EndpointDonation(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'donation';
+
+  /// The donations made in [year], with their donors and receipts.
+  _ida.Future<List<_ibol987g.Donation>> getByYear(int year) =>
+      caller.callServerEndpoint<List<_ibol987g.Donation>>(
+        'donation',
+        'getByYear',
+        {'year': year},
+      );
+
+  /// Records a donation that was not left over from a payment.
+  _ida.Future<_ibol987g.Donation> addDirect(_ibol987g.Donation donation) =>
+      caller.callServerEndpoint<_ibol987g.Donation>(
+        'donation',
+        'addDirect',
+        {'donation': donation},
+      );
+
+  /// Removes a donation that was recorded with [addDirect], unless it is on
+  /// a receipt. A donation from a payment is taken back in its booking.
+  _ida.Future<void> delete(int id) => caller.callServerEndpoint<void>(
+    'donation',
+    'delete',
+    {'id': id},
+  );
+
+  /// The receipts that [createReceipts] would issue for [year]: one per
+  /// donor with donations that are on no receipt yet.
+  _ida.Future<List<_imgf7vt5.ReceiptPreview>> previewReceipts(int year) =>
+      caller.callServerEndpoint<List<_imgf7vt5.ReceiptPreview>>(
+        'donation',
+        'previewReceipts',
+        {'year': year},
+      );
+
+  /// Issues a receipt to every donor for their donations of [year] that are
+  /// on no receipt yet, and returns the new receipts.
+  ///
+  /// A donor without a full address gets none until the address is there,
+  /// as a receipt has to state it. From now on the donations of a receipt
+  /// cannot change.
+  _ida.Future<List<_i8cfzthc.DonationReceipt>> createReceipts(int year) =>
+      caller.callServerEndpoint<List<_i8cfzthc.DonationReceipt>>(
+        'donation',
+        'createReceipts',
+        {'year': year},
+      );
+
+  /// The receipts issued for [year], without their documents.
+  _ida.Future<List<_i8cfzthc.DonationReceipt>> getReceipts(int year) =>
+      caller.callServerEndpoint<List<_i8cfzthc.DonationReceipt>>(
+        'donation',
+        'getReceipts',
+        {'year': year},
+      );
+
+  /// The document of a receipt as it was issued, a PDF.
+  _ida.Future<_idt.ByteData> getReceiptPdf(int receiptId) =>
+      caller.callServerEndpoint<_idt.ByteData>(
+        'donation',
+        'getReceiptPdf',
+        {'receiptId': receiptId},
+      );
+}
+
+/// The details of the organisation that runs the house. There is one set of
+/// them per installation.
+/// {@category Endpoint}
+class EndpointOperator extends EndpointApp {
+  EndpointOperator(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'operator';
+
+  /// The details, or null if none were entered yet.
+  _ida.Future<_i6bqazya.Operator?> load() =>
+      caller.callServerEndpoint<_i6bqazya.Operator?>(
+        'operator',
+        'load',
+        {},
+      );
+
+  _ida.Future<_i6bqazya.Operator> save(_i6bqazya.Operator operator) =>
+      caller.callServerEndpoint<_i6bqazya.Operator>(
+        'operator',
+        'save',
+        {'operator': operator},
+      );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -1027,6 +1130,8 @@ class Client extends _isc.ServerpodClientShared {
     booking = EndpointBooking(this);
     contact = EndpointContact(this);
     organization = EndpointOrganization(this);
+    donation = EndpointDonation(this);
+    operator = EndpointOperator(this);
     greeting = EndpointGreeting(this);
     guest = EndpointGuest(this);
     ageGroup = EndpointAgeGroup(this);
@@ -1054,6 +1159,10 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointContact contact;
 
   late final EndpointOrganization organization;
+
+  late final EndpointDonation donation;
+
+  late final EndpointOperator operator;
 
   late final EndpointGreeting greeting;
 
@@ -1088,6 +1197,8 @@ class Client extends _isc.ServerpodClientShared {
     'booking': booking,
     'contact': contact,
     'organization': organization,
+    'donation': donation,
+    'operator': operator,
     'greeting': greeting,
     'guest': guest,
     'ageGroup': ageGroup,

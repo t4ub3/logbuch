@@ -1,0 +1,8 @@
+### What a receipt for a contact would cover, before it is issued.
+class: ReceiptPreview
+fields:
+  contact: Contact
+  donationCount: int
+  total: int
+  ### A receipt needs the full address of the donor.
+  addressComplete: bool

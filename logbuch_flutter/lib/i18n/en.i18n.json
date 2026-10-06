@@ -24,7 +24,8 @@
         "calendar": "Calendar",
         "contacts": "Contacts",
         "admin": "Admin",
-        "settings": "Settings"
+        "settings": "Settings",
+        "donations": "Donations"
     },
     "bookings": {
         "newBooking": "New booking",
@@ -225,7 +226,8 @@
             "mealPlans": "Meal plans",
             "rates": "Prices",
             "fees": "Fees",
-            "users": "Users"
+            "users": "Users",
+            "operator": "Operator"
         },
         "deleteTitle": "Delete “{name}”?",
         "invalidNumber": "Enter a whole number",
@@ -252,7 +254,9 @@
             "alreadyInvoiced": "This is invoiced and can no longer be changed.",
             "nothingToInvoice": "There is nothing to invoice.",
             "pricingIncomplete": "Parts of the booking cannot be priced yet. See the Price tab for what is missing.",
-            "notOverpaid": "This is more than was overpaid."
+            "notOverpaid": "This is more than was overpaid.",
+            "alreadyReceipted": "This donation is on a receipt and can no longer be changed.",
+            "operatorIncomplete": "The details of the operator are incomplete. Fill them in under Admin, Operator."
         },
         "rooms": {
             "add": "New room",
@@ -342,6 +346,26 @@
             "empty": "No users",
             "unknownEmail": "No email address",
             "you": "you"
+        },
+        "operator": {
+            "hint": "The organisation that runs the house. These details are printed on donation receipts, which can only be issued once everything is filled in.",
+            "street": "Street",
+            "zip": "Postal code",
+            "city": "City",
+            "taxOffice": "Tax office",
+            "taxNumber": "Tax number",
+            "noticeType": "Notice of the tax office",
+            "exemptionNotice": "Freistellungsbescheid",
+            "statutoryCompliance": "Feststellungsbescheid nach § 60a AO",
+            "noticeDate": "Date of the notice",
+            "assessmentPeriod": "Assessment period of the notice",
+            "purposes": "Promoted purposes, following “zur Förderung”",
+            "purposesHint": "In German, for example: der Jugendhilfe",
+            "purposesObject": "Promoted purposes, following “Wir fördern nach unserer Satzung”",
+            "purposesObjectHint": "In German, for example: die Jugendhilfe",
+            "place": "Place where receipts are signed",
+            "signatory": "Signed by",
+            "saved": "Saved"
         }
     },
     "auth": {
@@ -354,6 +378,34 @@
             "viewer": "View only",
             "none": "No access"
         }
+    },
+    "donations": {
+        "title": "Donations {year}",
+        "empty": "No donations in {year}",
+        "add": "New donation",
+        "donor": "Donor",
+        "amount": "Amount",
+        "date": "Date",
+        "fromPayment": "Left over from a payment",
+        "total": "Total",
+        "noReceipt": "No receipt yet",
+        "receipts": "Receipts",
+        "createReceipts": "Create receipts",
+        "previewTitle": "Receipts for {year}",
+        "previewHint": "Every donor gets one receipt for all donations of the year that are on no receipt yet. After that these donations can no longer be changed.",
+        "previewNone": "No donation of {year} is waiting for a receipt.",
+        "donationCount": {
+            "one": "{n} donation",
+            "other": "{n} donations"
+        },
+        "addressMissing": "No receipt: the address is incomplete",
+        "created": {
+            "zero": "No receipts created",
+            "one": "{n} receipt created",
+            "other": "{n} receipts created"
+        },
+        "openPdf": "Open the PDF",
+        "openFailed": "The receipt could not be opened: {error}"
     },
     "settings": {
         "title": "Settings",

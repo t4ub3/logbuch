@@ -12,6 +12,8 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:logbuch_server/src/generated/auth/app_user.dart' as _ikienaka;
+import 'package:logbuch_server/src/generated/billing/donation.dart'
+    as _imjtz2ad;
 import 'package:logbuch_server/src/generated/billing/folio.dart' as _iuuqib0o;
 import 'package:logbuch_server/src/generated/bookings/bookings.dart'
     as _iz54m678;
@@ -19,6 +21,10 @@ import 'package:logbuch_server/src/generated/contacts/contact.dart'
     as _i4e319y1;
 import 'package:logbuch_server/src/generated/contacts/organization.dart'
     as _i0zrc0jf;
+import 'package:logbuch_server/src/generated/donations/donation_receipt.dart'
+    as _iyoacxs7;
+import 'package:logbuch_server/src/generated/donations/receipt_preview.dart'
+    as _iawfc4vl;
 import 'package:logbuch_server/src/generated/guests/guest_group.dart'
     as _ikiew98c;
 import 'package:logbuch_server/src/generated/pricing/age_group.dart'
@@ -57,6 +63,10 @@ import 'common/validation_error.dart' as _ij920vmm;
 import 'common/validation_exception.dart' as _ifwcmx8g;
 import 'contacts/contact.dart' as _io9atw8a;
 import 'contacts/organization.dart' as _iycrigka;
+import 'donations/donation_receipt.dart' as _igquyr3v;
+import 'donations/operator.dart' as _i80h05fc;
+import 'donations/receipt_preview.dart' as _i5pbbm36;
+import 'donations/tax_notice_type.dart' as _i3nhuzax;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'guests/guest.dart' as _inxh79pp;
 import 'guests/guest_group.dart' as _iar0olgw;
@@ -91,6 +101,10 @@ export 'common/validation_error.dart';
 export 'common/validation_exception.dart';
 export 'contacts/contact.dart';
 export 'contacts/organization.dart';
+export 'donations/donation_receipt.dart';
+export 'donations/operator.dart';
+export 'donations/receipt_preview.dart';
+export 'donations/tax_notice_type.dart';
 export 'greetings/greeting.dart';
 export 'guests/guest.dart';
 export 'guests/guest_group.dart';
@@ -554,6 +568,85 @@ class Protocol extends _is.DatabaseSerializationManager {
       managed: true,
     ),
     _isp.TableDefinition(
+      name: 'donation_receipts',
+      dartName: 'DonationReceipt',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'contactId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'year',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'number',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'total',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'issuedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'pdf',
+          columnType: _isp.ColumnType.bytea,
+          isNullable: true,
+          dartType: 'dart:typed_data:ByteData?',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'donation_receipts_fk_0',
+          columns: ['contactId'],
+          referenceTable: 'contacts',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.restrict,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'donation_receipts_number_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'number',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
       name: 'donations',
       dartName: 'Donation',
       schema: 'public',
@@ -596,6 +689,12 @@ class Protocol extends _is.DatabaseSerializationManager {
           isNullable: false,
           dartType: 'protocol:DonationSource',
         ),
+        _isp.ColumnDefinition(
+          name: 'receiptId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
       ],
       foreignKeys: [
         _isp.ForeignKeyDefinition(
@@ -612,6 +711,16 @@ class Protocol extends _is.DatabaseSerializationManager {
           constraintName: 'donations_fk_1',
           columns: ['paymentId'],
           referenceTable: 'payments',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.restrict,
+          matchType: null,
+        ),
+        _isp.ForeignKeyDefinition(
+          constraintName: 'donations_fk_2',
+          columns: ['receiptId'],
+          referenceTable: 'donation_receipts',
           referenceTableSchema: 'public',
           referenceColumns: ['id'],
           onUpdate: _isp.ForeignKeyAction.noAction,
@@ -1082,6 +1191,103 @@ class Protocol extends _is.DatabaseSerializationManager {
       managed: true,
     ),
     _isp.TableDefinition(
+      name: 'operator',
+      dartName: 'Operator',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'name',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'street',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'zip',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'city',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'taxOffice',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'taxNumber',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'noticeType',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'protocol:TaxNoticeType',
+          columnDefault: '\'statutoryCompliance\'',
+        ),
+        _isp.ColumnDefinition(
+          name: 'noticeDate',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'assessmentPeriod',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'purposes',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'purposesObject',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'place',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'signatory',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [],
+      managed: true,
+    ),
+    _isp.TableDefinition(
       name: 'organizations',
       dartName: 'Organization',
       schema: 'public',
@@ -1528,6 +1734,18 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _iycrigka.Organization) {
       return _iycrigka.Organization.fromJson(data) as T;
     }
+    if (t == _igquyr3v.DonationReceipt) {
+      return _igquyr3v.DonationReceipt.fromJson(data) as T;
+    }
+    if (t == _i80h05fc.Operator) {
+      return _i80h05fc.Operator.fromJson(data) as T;
+    }
+    if (t == _i5pbbm36.ReceiptPreview) {
+      return _i5pbbm36.ReceiptPreview.fromJson(data) as T;
+    }
+    if (t == _i3nhuzax.TaxNoticeType) {
+      return _i3nhuzax.TaxNoticeType.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
@@ -1636,6 +1854,21 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_iycrigka.Organization?>()) {
       return (data != null ? _iycrigka.Organization.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_igquyr3v.DonationReceipt?>()) {
+      return (data != null ? _igquyr3v.DonationReceipt.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_i80h05fc.Operator?>()) {
+      return (data != null ? _i80h05fc.Operator.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i5pbbm36.ReceiptPreview?>()) {
+      return (data != null ? _i5pbbm36.ReceiptPreview.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_i3nhuzax.TaxNoticeType?>()) {
+      return (data != null ? _i3nhuzax.TaxNoticeType.fromJson(data) : null)
+          as T;
     }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
@@ -1808,6 +2041,24 @@ class Protocol extends _is.DatabaseSerializationManager {
               .toList()
           as T;
     }
+    if (t == List<_imjtz2ad.Donation>) {
+      return (data as List)
+              .map((e) => deserialize<_imjtz2ad.Donation>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_iawfc4vl.ReceiptPreview>) {
+      return (data as List)
+              .map((e) => deserialize<_iawfc4vl.ReceiptPreview>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_iyoacxs7.DonationReceipt>) {
+      return (data as List)
+              .map((e) => deserialize<_iyoacxs7.DonationReceipt>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_ikiew98c.GuestGroup>) {
       return (data as List)
               .map((e) => deserialize<_ikiew98c.GuestGroup>(e))
@@ -1885,6 +2136,10 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ifwcmx8g.ValidationException => 'ValidationException',
       _io9atw8a.Contact => 'Contact',
       _iycrigka.Organization => 'Organization',
+      _igquyr3v.DonationReceipt => 'DonationReceipt',
+      _i80h05fc.Operator => 'Operator',
+      _i5pbbm36.ReceiptPreview => 'ReceiptPreview',
+      _i3nhuzax.TaxNoticeType => 'TaxNoticeType',
       _izw8z7ou.Greeting => 'Greeting',
       _inxh79pp.Guest => 'Guest',
       _iar0olgw.GuestGroup => 'GuestGroup',
@@ -1950,6 +2205,14 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'Contact';
       case _iycrigka.Organization():
         return 'Organization';
+      case _igquyr3v.DonationReceipt():
+        return 'DonationReceipt';
+      case _i80h05fc.Operator():
+        return 'Operator';
+      case _i5pbbm36.ReceiptPreview():
+        return 'ReceiptPreview';
+      case _i3nhuzax.TaxNoticeType():
+        return 'TaxNoticeType';
       case _izw8z7ou.Greeting():
         return 'Greeting';
       case _inxh79pp.Guest():
@@ -2061,6 +2324,18 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'Organization') {
       return deserialize<_iycrigka.Organization>(data['data']);
     }
+    if (dataClassName == 'DonationReceipt') {
+      return deserialize<_igquyr3v.DonationReceipt>(data['data']);
+    }
+    if (dataClassName == 'Operator') {
+      return deserialize<_i80h05fc.Operator>(data['data']);
+    }
+    if (dataClassName == 'ReceiptPreview') {
+      return deserialize<_i5pbbm36.ReceiptPreview>(data['data']);
+    }
+    if (dataClassName == 'TaxNoticeType') {
+      return deserialize<_i3nhuzax.TaxNoticeType>(data['data']);
+    }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
     }
@@ -2169,6 +2444,10 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _io9atw8a.Contact.t;
       case _iycrigka.Organization:
         return _iycrigka.Organization.t;
+      case _igquyr3v.DonationReceipt:
+        return _igquyr3v.DonationReceipt.t;
+      case _i80h05fc.Operator:
+        return _i80h05fc.Operator.t;
       case _inxh79pp.Guest:
         return _inxh79pp.Guest.t;
       case _iar0olgw.GuestGroup:

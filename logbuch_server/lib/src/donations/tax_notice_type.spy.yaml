@@ -1,0 +1,8 @@
+### The notice of the tax office that lets the operator issue donation
+### receipts: a Freistellungsbescheid, or a Feststellungsbescheid nach
+### Paragraph 60a AO.
+enum: TaxNoticeType
+serialized: byName
+values:
+  - exemptionNotice
+  - statutoryCompliance

@@ -5,6 +5,7 @@ import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/age_groups_section.dart';
 import 'package:logbuch_flutter/panels/admin/fees_section.dart';
 import 'package:logbuch_flutter/panels/admin/meal_plans_section.dart';
+import 'package:logbuch_flutter/panels/admin/operator_section.dart';
 import 'package:logbuch_flutter/panels/admin/price_categories_section.dart';
 import 'package:logbuch_flutter/panels/admin/rates_section.dart';
 import 'package:logbuch_flutter/panels/admin/rooms_section.dart';
@@ -72,6 +73,11 @@ class AdminPanel extends ConsumerWidget {
                 label: Text(t.fees),
                 icon: const Icon(Icons.receipt_long),
               ),
+              ButtonSegment(
+                value: AdminSection.operator,
+                label: Text(t.operator),
+                icon: const Icon(Icons.apartment),
+              ),
               if (canEdit)
                 ButtonSegment(
                   value: AdminSection.users,
@@ -96,6 +102,7 @@ class AdminPanel extends ConsumerWidget {
             AdminSection.mealPlans => const MealPlansSection(),
             AdminSection.rates => const RatesSection(),
             AdminSection.fees => const FeesSection(),
+            AdminSection.operator => const OperatorSection(),
             AdminSection.users => const UsersSection(),
           },
         ),

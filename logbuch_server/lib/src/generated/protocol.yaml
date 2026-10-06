@@ -40,6 +40,17 @@ organization:
   - add:
   - update:
   - delete:
+donation:
+  - getByYear:
+  - addDirect:
+  - delete:
+  - previewReceipts:
+  - createReceipts:
+  - getReceipts:
+  - getReceiptPdf:
+operator:
+  - load:
+  - save:
 greeting:
   - hello:
 guest:

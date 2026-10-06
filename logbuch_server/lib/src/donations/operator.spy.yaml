@@ -1,0 +1,25 @@
+### The organisation that runs the house. Its details are printed on
+### donation receipts.
+class: Operator
+table: operator
+fields:
+  name: String
+  street: String
+  zip: String
+  city: String
+  taxOffice: String
+  taxNumber: String
+  noticeType: TaxNoticeType, default=statutoryCompliance
+  noticeDate: DateTime?
+  ### The year an exemption notice was issued for.
+  assessmentPeriod: String?
+  ### What the operator promotes, worded to follow "zur Foerderung", such as
+  ### "der Jugendhilfe".
+  purposes: String
+  ### The same, worded to follow "Wir foerdern nach unserer Satzung", such
+  ### as "die Jugendhilfe". Only a notice by Paragraph 60a AO needs it.
+  purposesObject: String?
+  ### Where receipts are signed.
+  place: String
+  ### Who signs the receipts.
+  signatory: String?

@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
@@ -44,6 +47,10 @@ class FakeClient extends Fake implements Client {
   final FakePricing pricing = FakePricing();
   @override
   final FakeBilling billing = FakeBilling();
+  @override
+  final FakeDonations donation = FakeDonations();
+  @override
+  final FakeOperators operator = FakeOperators();
 }
 
 class FakeUsers extends Fake implements EndpointUser {
@@ -372,6 +379,63 @@ class FakeBilling extends Fake implements EndpointBilling {
   }
 }
 
+class FakeDonations extends Fake implements EndpointDonation {
+  var donations = <Donation>[];
+  var receipts = <DonationReceipt>[];
+
+  /// The receipts that are waiting to be issued.
+  var previews = <ReceiptPreview>[];
+
+  /// What [createReceipts] issues.
+  var toCreate = <DonationReceipt>[];
+
+  @override
+  Future<List<Donation>> getByYear(int year) async => [
+    for (final donation in donations)
+      if (donation.date.year == year) donation,
+  ];
+
+  @override
+  Future<List<DonationReceipt>> getReceipts(int year) async => [
+    for (final receipt in receipts)
+      if (receipt.year == year) receipt,
+  ];
+
+  @override
+  Future<List<ReceiptPreview>> previewReceipts(int year) async => previews;
+
+  @override
+  Future<List<DonationReceipt>> createReceipts(int year) async {
+    final created = toCreate;
+    receipts = [...receipts, ...created];
+    previews = [];
+    toCreate = [];
+    return created;
+  }
+
+  @override
+  Future<Donation> addDirect(Donation donation) async {
+    final added = donation.copyWith(id: 900 + donations.length);
+    donations = [...donations, added];
+    return added;
+  }
+
+  @override
+  Future<ByteData> getReceiptPdf(int receiptId) async =>
+      ByteData.sublistView(Uint8List.fromList('%PDF-fake'.codeUnits));
+}
+
+class FakeOperators extends Fake implements EndpointOperator {
+  Operator? operator;
+
+  @override
+  Future<Operator?> load() async => operator;
+
+  @override
+  Future<Operator> save(Operator operator) async =>
+      this.operator = operator.copyWith(id: 1);
+}
+
 /// A client with a small but complete setup: two rooms with prices and
 /// fees, two contacts, and bookings in October 2026.
 FakeClient filledClient({UserRole? role = UserRole.admin}) {
@@ -570,6 +634,58 @@ FakeClient filledClient({UserRole? role = UserRole.admin}) {
       payments: [],
     ),
   ];
+  // This year one donation is on a receipt and one is waiting for its own.
+  final year = DateTime.now().year;
+  final felix = client.contact.contacts.first;
+  final issued = DonationReceipt(
+    id: 1,
+    contactId: felix.id!,
+    contact: felix,
+    year: year,
+    number: 'SB-$year-0001',
+    total: 5000,
+    issuedAt: DateTime.utc(year, 4, 1),
+  );
+  client.donation.receipts = [issued];
+  client.donation.donations = [
+    Donation(
+      id: 1,
+      contactId: felix.id!,
+      contact: felix,
+      amount: 5000,
+      date: DateTime.utc(year, 3, 1),
+      source: DonationSource.direct,
+      receiptId: issued.id,
+      receipt: issued,
+    ),
+    Donation(
+      id: 2,
+      contactId: teacher.id!,
+      contact: teacher,
+      amount: 1000,
+      date: DateTime.utc(year, 10, 16),
+      source: DonationSource.overpayment,
+    ),
+  ];
+  client.donation.previews = [
+    ReceiptPreview(
+      contact: teacher,
+      donationCount: 1,
+      total: 1000,
+      addressComplete: true,
+    ),
+  ];
+  client.donation.toCreate = [
+    DonationReceipt(
+      id: 2,
+      contactId: teacher.id!,
+      contact: teacher,
+      year: year,
+      number: 'SB-$year-0002',
+      total: 1000,
+      issuedAt: DateTime.utc(year, 12, 31),
+    ),
+  ];
   client.pricing.price = BookingPrice(
     lines: [
       ChargeLine(
@@ -609,6 +725,7 @@ Future<void> pumpApp(
   FakeClient client, {
   Size size = const Size(1200, 800),
   AppLocale locale = AppLocale.en,
+  List<Override> overrides = const [],
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -622,6 +739,7 @@ Future<void> pumpApp(
       overrides: [
         serverpodClientProvider.overrideWithValue(client),
         sharedPreferencesProvider.overrideWithValue(preferences),
+        ...overrides,
       ],
       child: TranslationProvider(
         child: MaterialApp(

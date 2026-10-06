@@ -1,0 +1,19 @@
+### The receipt for all donations of a contact in one year
+### (Sammelbestaetigung). Once it is issued, its donations cannot change.
+class: DonationReceipt
+table: donation_receipts
+fields:
+  contact: Contact?, relation(onDelete=Restrict)
+  year: int
+  number: String
+  total: int
+  ### The day the receipt was issued.
+  issuedAt: DateTime
+  ### The document as it was issued. Read with the endpoint, as it is too
+  ### large to travel with every receipt.
+  pdf: ByteData?, scope=serverOnly
+  donations: List<Donation>?, relation(name=receipt_donations)
+indexes:
+  donation_receipts_number_idx:
+    fields: number
+    unique: true

@@ -25,6 +25,7 @@ void main() {
     'Meal plans',
     'Prices',
     'Fees',
+    'Operator',
     'Users',
   ];
 

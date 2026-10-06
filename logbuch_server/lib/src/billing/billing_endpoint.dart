@@ -1,5 +1,6 @@
 import 'package:logbuch_server/src/auth/roles.dart';
 import 'package:logbuch_server/src/billing/folio_distribution.dart';
+import 'package:logbuch_server/src/common/today.dart';
 import 'package:logbuch_server/src/common/validation.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:logbuch_server/src/generated/serverpod.dart';
@@ -114,7 +115,10 @@ class BillingEndpoint extends AppEndpoint {
         throw ValidationException(reason: ValidationError.nothingToInvoice);
       }
 
-      final today = await _today(session, transaction);
+      final today = await todayInGermany(
+        session,
+        transaction: transaction,
+      );
       await Folio.db.updateRow(
         session,
         known.copyWith(
@@ -213,7 +217,8 @@ class BillingEndpoint extends AppEndpoint {
     });
   }
 
-  /// Takes back a donation; the money counts as overpaid again.
+  /// Takes back a donation; the money counts as overpaid again. A
+  /// donation that is on a receipt stays.
   Future<void> deleteDonation(Session session, int id) async {
     requireAdmin(session);
     await session.db.transaction((transaction) async {
@@ -224,6 +229,9 @@ class BillingEndpoint extends AppEndpoint {
         transaction: transaction,
       );
       if (donation == null) return;
+      if (donation.receiptId != null) {
+        throw ValidationException(reason: ValidationError.alreadyReceipted);
+      }
       await Donation.db.deleteRow(session, donation, transaction: transaction);
       if (donation.payment case final payment?) {
         await _updateStatus(session, payment.folioId, transaction);
@@ -420,16 +428,6 @@ class BillingEndpoint extends AppEndpoint {
       folio.copyWith(status: status),
       transaction: transaction,
     );
-  }
-
-  /// Today in Germany, as a date at midnight UTC.
-  Future<DateTime> _today(Session session, Transaction transaction) async {
-    final result = await session.db.unsafeQuery(
-      "SELECT (now() AT TIME ZONE 'Europe/Berlin')::date::timestamp",
-      transaction: transaction,
-    );
-    final today = result.first.first as DateTime;
-    return DateTime.utc(today.year, today.month, today.day);
   }
 
   /// The next number of the year, such as 2026-0001. Numbers are given one

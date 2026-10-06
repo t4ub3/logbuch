@@ -47,6 +47,7 @@ class TranslationsDe extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$rooms$de rooms = _Translations$rooms$de._(_root);
 	@override late final _Translations$admin$de admin = _Translations$admin$de._(_root);
 	@override late final _Translations$auth$de auth = _Translations$auth$de._(_root);
+	@override late final _Translations$donations$de donations = _Translations$donations$de._(_root);
 	@override late final _Translations$settings$de settings = _Translations$settings$de._(_root);
 }
 
@@ -96,6 +97,7 @@ class _Translations$menu$de extends Translations$menu$en {
 	@override String get contacts => 'Kontakte';
 	@override String get admin => 'Verwaltung';
 	@override String get settings => 'Einstellungen';
+	@override String get donations => 'Spenden';
 }
 
 // Path: bookings
@@ -300,6 +302,7 @@ class _Translations$admin$de extends Translations$admin$en {
 	@override late final _Translations$admin$rates$de rates = _Translations$admin$rates$de._(_root);
 	@override late final _Translations$admin$fees$de fees = _Translations$admin$fees$de._(_root);
 	@override late final _Translations$admin$users$de users = _Translations$admin$users$de._(_root);
+	@override late final _Translations$admin$operator$de operator = _Translations$admin$operator$de._(_root);
 }
 
 // Path: auth
@@ -314,6 +317,41 @@ class _Translations$auth$de extends Translations$auth$en {
 	@override String get checkAgain => 'Erneut prüfen';
 	@override String get account => 'Konto';
 	@override late final _Translations$auth$roles$de roles = _Translations$auth$roles$de._(_root);
+}
+
+// Path: donations
+class _Translations$donations$de extends Translations$donations$en {
+	_Translations$donations$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String title({required Object year}) => 'Spenden ${year}';
+	@override String empty({required Object year}) => 'Keine Spenden in ${year}';
+	@override String get add => 'Neue Spende';
+	@override String get donor => 'Spender';
+	@override String get amount => 'Betrag';
+	@override String get date => 'Datum';
+	@override String get fromPayment => 'Rest einer Zahlung';
+	@override String get total => 'Gesamt';
+	@override String get noReceipt => 'Noch keine Bestätigung';
+	@override String get receipts => 'Zuwendungsbestätigungen';
+	@override String get createReceipts => 'Bestätigungen erstellen';
+	@override String previewTitle({required Object year}) => 'Zuwendungsbestätigungen für ${year}';
+	@override String get previewHint => 'Jeder Spender erhält eine Bestätigung über alle Spenden des Jahres, die noch auf keiner Bestätigung stehen. Danach können diese Spenden nicht mehr geändert werden.';
+	@override String previewNone({required Object year}) => 'Keine Spende aus ${year} wartet auf eine Bestätigung.';
+	@override String donationCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n,
+		one: '${n} Spende',
+		other: '${n} Spenden',
+	);
+	@override String get addressMissing => 'Keine Bestätigung: Die Anschrift ist unvollständig';
+	@override String created({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n,
+		zero: 'Keine Bestätigungen erstellt',
+		one: '${n} Bestätigung erstellt',
+		other: '${n} Bestätigungen erstellt',
+	);
+	@override String get openPdf => 'PDF öffnen';
+	@override String openFailed({required Object error}) => 'Die Bestätigung konnte nicht geöffnet werden: ${error}';
 }
 
 // Path: settings
@@ -420,6 +458,7 @@ class _Translations$admin$sections$de extends Translations$admin$sections$en {
 	@override String get rates => 'Preise';
 	@override String get fees => 'Gebühren';
 	@override String get users => 'Benutzer';
+	@override String get operator => 'Träger';
 }
 
 // Path: admin.errors
@@ -451,6 +490,8 @@ class _Translations$admin$errors$de extends Translations$admin$errors$en {
 	@override String get nothingToInvoice => 'Es gibt nichts abzurechnen.';
 	@override String get pricingIncomplete => 'Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht unter Preis.';
 	@override String get notOverpaid => 'Das ist mehr, als überzahlt wurde.';
+	@override String get alreadyReceipted => 'Diese Spende steht auf einer Bestätigung und kann nicht mehr geändert werden.';
+	@override String get operatorIncomplete => 'Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen.';
 }
 
 // Path: admin.rooms
@@ -592,6 +633,33 @@ class _Translations$admin$users$de extends Translations$admin$users$en {
 	@override String get you => 'Sie';
 }
 
+// Path: admin.operator
+class _Translations$admin$operator$de extends Translations$admin$operator$en {
+	_Translations$admin$operator$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get hint => 'Die Organisation, die das Haus betreibt. Diese Angaben stehen auf den Zuwendungsbestätigungen, die erst erstellt werden können, wenn alles ausgefüllt ist.';
+	@override String get street => 'Straße';
+	@override String get zip => 'Postleitzahl';
+	@override String get city => 'Ort';
+	@override String get taxOffice => 'Finanzamt';
+	@override String get taxNumber => 'Steuernummer';
+	@override String get noticeType => 'Bescheid des Finanzamts';
+	@override String get exemptionNotice => 'Freistellungsbescheid';
+	@override String get statutoryCompliance => 'Feststellungsbescheid nach § 60a AO';
+	@override String get noticeDate => 'Datum des Bescheids';
+	@override String get assessmentPeriod => 'Veranlagungszeitraum des Bescheids';
+	@override String get purposes => 'Geförderte Zwecke, nach „zur Förderung“';
+	@override String get purposesHint => 'Zum Beispiel: der Jugendhilfe';
+	@override String get purposesObject => 'Geförderte Zwecke, nach „Wir fördern nach unserer Satzung“';
+	@override String get purposesObjectHint => 'Zum Beispiel: die Jugendhilfe';
+	@override String get place => 'Ort der Unterschrift';
+	@override String get signatory => 'Unterzeichnet von';
+	@override String get saved => 'Gespeichert';
+}
+
 // Path: auth.roles
 class _Translations$auth$roles$de extends Translations$auth$roles$en {
 	_Translations$auth$roles$de._(TranslationsDe root) : this._root = root, super.internal(root);
@@ -647,6 +715,7 @@ extension on TranslationsDe {
 			'menu.contacts' => 'Kontakte',
 			'menu.admin' => 'Verwaltung',
 			'menu.settings' => 'Einstellungen',
+			'menu.donations' => 'Spenden',
 			'bookings.newBooking' => 'Neue Buchung',
 			'bookings.agenda' => 'Agenda',
 			'bookings.month' => 'Monat',
@@ -814,6 +883,7 @@ extension on TranslationsDe {
 			'admin.sections.rates' => 'Preise',
 			'admin.sections.fees' => 'Gebühren',
 			'admin.sections.users' => 'Benutzer',
+			'admin.sections.operator' => 'Träger',
 			'admin.deleteTitle' => ({required Object name}) => '„${name}“ löschen?',
 			'admin.invalidNumber' => 'Bitte eine ganze Zahl eingeben',
 			'admin.invalidAmount' => 'Bitte einen Betrag wie 12,50 eingeben',
@@ -839,6 +909,8 @@ extension on TranslationsDe {
 			'admin.errors.nothingToInvoice' => 'Es gibt nichts abzurechnen.',
 			'admin.errors.pricingIncomplete' => 'Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht unter Preis.',
 			'admin.errors.notOverpaid' => 'Das ist mehr, als überzahlt wurde.',
+			'admin.errors.alreadyReceipted' => 'Diese Spende steht auf einer Bestätigung und kann nicht mehr geändert werden.',
+			'admin.errors.operatorIncomplete' => 'Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen.',
 			'admin.rooms.add' => 'Neues Zimmer',
 			'admin.rooms.edit' => 'Zimmer bearbeiten',
 			'admin.rooms.number' => 'Zimmernummer',
@@ -907,6 +979,24 @@ extension on TranslationsDe {
 			'admin.users.empty' => 'Keine Benutzer',
 			'admin.users.unknownEmail' => 'Keine E-Mail-Adresse',
 			'admin.users.you' => 'Sie',
+			'admin.operator.hint' => 'Die Organisation, die das Haus betreibt. Diese Angaben stehen auf den Zuwendungsbestätigungen, die erst erstellt werden können, wenn alles ausgefüllt ist.',
+			'admin.operator.street' => 'Straße',
+			'admin.operator.zip' => 'Postleitzahl',
+			'admin.operator.city' => 'Ort',
+			'admin.operator.taxOffice' => 'Finanzamt',
+			'admin.operator.taxNumber' => 'Steuernummer',
+			'admin.operator.noticeType' => 'Bescheid des Finanzamts',
+			'admin.operator.exemptionNotice' => 'Freistellungsbescheid',
+			'admin.operator.statutoryCompliance' => 'Feststellungsbescheid nach § 60a AO',
+			'admin.operator.noticeDate' => 'Datum des Bescheids',
+			'admin.operator.assessmentPeriod' => 'Veranlagungszeitraum des Bescheids',
+			'admin.operator.purposes' => 'Geförderte Zwecke, nach „zur Förderung“',
+			'admin.operator.purposesHint' => 'Zum Beispiel: der Jugendhilfe',
+			'admin.operator.purposesObject' => 'Geförderte Zwecke, nach „Wir fördern nach unserer Satzung“',
+			'admin.operator.purposesObjectHint' => 'Zum Beispiel: die Jugendhilfe',
+			'admin.operator.place' => 'Ort der Unterschrift',
+			'admin.operator.signatory' => 'Unterzeichnet von',
+			'admin.operator.saved' => 'Gespeichert',
 			'auth.waitingTitle' => 'Warten auf Freigabe',
 			'auth.waitingText' => ({required Object email}) => 'Ihr Konto ${email} hat noch keine Rolle. Ein Admin muss den Zugriff freigeben.',
 			'auth.checkAgain' => 'Erneut prüfen',
@@ -914,6 +1004,25 @@ extension on TranslationsDe {
 			'auth.roles.admin' => 'Admin',
 			'auth.roles.viewer' => 'Nur ansehen',
 			'auth.roles.none' => 'Kein Zugriff',
+			'donations.title' => ({required Object year}) => 'Spenden ${year}',
+			'donations.empty' => ({required Object year}) => 'Keine Spenden in ${year}',
+			'donations.add' => 'Neue Spende',
+			'donations.donor' => 'Spender',
+			'donations.amount' => 'Betrag',
+			'donations.date' => 'Datum',
+			'donations.fromPayment' => 'Rest einer Zahlung',
+			'donations.total' => 'Gesamt',
+			'donations.noReceipt' => 'Noch keine Bestätigung',
+			'donations.receipts' => 'Zuwendungsbestätigungen',
+			'donations.createReceipts' => 'Bestätigungen erstellen',
+			'donations.previewTitle' => ({required Object year}) => 'Zuwendungsbestätigungen für ${year}',
+			'donations.previewHint' => 'Jeder Spender erhält eine Bestätigung über alle Spenden des Jahres, die noch auf keiner Bestätigung stehen. Danach können diese Spenden nicht mehr geändert werden.',
+			'donations.previewNone' => ({required Object year}) => 'Keine Spende aus ${year} wartet auf eine Bestätigung.',
+			'donations.donationCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, one: '${n} Spende', other: '${n} Spenden', ), 
+			'donations.addressMissing' => 'Keine Bestätigung: Die Anschrift ist unvollständig',
+			'donations.created' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, zero: 'Keine Bestätigungen erstellt', one: '${n} Bestätigung erstellt', other: '${n} Bestätigungen erstellt', ), 
+			'donations.openPdf' => 'PDF öffnen',
+			'donations.openFailed' => ({required Object error}) => 'Die Bestätigung konnte nicht geöffnet werden: ${error}',
 			'settings.title' => 'Einstellungen',
 			'settings.language' => 'Sprache',
 			'settings.systemLanguage' => 'Systemstandard',

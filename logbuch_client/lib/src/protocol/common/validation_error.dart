@@ -34,7 +34,9 @@ enum ValidationError implements _isc.SerializableModel {
   alreadyInvoiced,
   nothingToInvoice,
   pricingIncomplete,
-  notOverpaid;
+  notOverpaid,
+  alreadyReceipted,
+  operatorIncomplete;
 
   static ValidationError fromJson(String name) {
     switch (name) {
@@ -82,6 +84,10 @@ enum ValidationError implements _isc.SerializableModel {
         return ValidationError.pricingIncomplete;
       case 'notOverpaid':
         return ValidationError.notOverpaid;
+      case 'alreadyReceipted':
+        return ValidationError.alreadyReceipted;
+      case 'operatorIncomplete':
+        return ValidationError.operatorIncomplete;
       default:
         throw ArgumentError(
           'Value "$name" cannot be converted to "ValidationError"',

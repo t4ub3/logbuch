@@ -9,6 +9,7 @@ environment:
 resolution: workspace
 
 dependencies:
+  pdf: ^3.11.3
   serverpod: 4.0.3
   serverpod_auth_idp_server: 4.0.3
   serverpod_cloud_storage: 4.0.3

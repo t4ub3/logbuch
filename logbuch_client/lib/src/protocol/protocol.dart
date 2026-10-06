@@ -12,12 +12,17 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:logbuch_client/src/protocol/auth/app_user.dart' as _il34w39i;
+import 'package:logbuch_client/src/protocol/billing/donation.dart' as _ibol987g;
 import 'package:logbuch_client/src/protocol/billing/folio.dart' as _in6c8fr8;
 import 'package:logbuch_client/src/protocol/bookings/bookings.dart'
     as _iey0gn1f;
 import 'package:logbuch_client/src/protocol/contacts/contact.dart' as _izv2jndr;
 import 'package:logbuch_client/src/protocol/contacts/organization.dart'
     as _igjrrozn;
+import 'package:logbuch_client/src/protocol/donations/donation_receipt.dart'
+    as _i8cfzthc;
+import 'package:logbuch_client/src/protocol/donations/receipt_preview.dart'
+    as _imgf7vt5;
 import 'package:logbuch_client/src/protocol/guests/guest_group.dart'
     as _ihpk2u4j;
 import 'package:logbuch_client/src/protocol/pricing/age_group.dart'
@@ -55,6 +60,10 @@ import 'common/validation_error.dart' as _ij920vmm;
 import 'common/validation_exception.dart' as _ifwcmx8g;
 import 'contacts/contact.dart' as _io9atw8a;
 import 'contacts/organization.dart' as _iycrigka;
+import 'donations/donation_receipt.dart' as _igquyr3v;
+import 'donations/operator.dart' as _i80h05fc;
+import 'donations/receipt_preview.dart' as _i5pbbm36;
+import 'donations/tax_notice_type.dart' as _i3nhuzax;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'guests/guest.dart' as _inxh79pp;
 import 'guests/guest_group.dart' as _iar0olgw;
@@ -89,6 +98,10 @@ export 'common/validation_error.dart';
 export 'common/validation_exception.dart';
 export 'contacts/contact.dart';
 export 'contacts/organization.dart';
+export 'donations/donation_receipt.dart';
+export 'donations/operator.dart';
+export 'donations/receipt_preview.dart';
+export 'donations/tax_notice_type.dart';
 export 'greetings/greeting.dart';
 export 'guests/guest.dart';
 export 'guests/guest_group.dart';
@@ -192,6 +205,18 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _iycrigka.Organization) {
       return _iycrigka.Organization.fromJson(data) as T;
+    }
+    if (t == _igquyr3v.DonationReceipt) {
+      return _igquyr3v.DonationReceipt.fromJson(data) as T;
+    }
+    if (t == _i80h05fc.Operator) {
+      return _i80h05fc.Operator.fromJson(data) as T;
+    }
+    if (t == _i5pbbm36.ReceiptPreview) {
+      return _i5pbbm36.ReceiptPreview.fromJson(data) as T;
+    }
+    if (t == _i3nhuzax.TaxNoticeType) {
+      return _i3nhuzax.TaxNoticeType.fromJson(data) as T;
     }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
@@ -301,6 +326,21 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _isc.getType<_iycrigka.Organization?>()) {
       return (data != null ? _iycrigka.Organization.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_igquyr3v.DonationReceipt?>()) {
+      return (data != null ? _igquyr3v.DonationReceipt.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_i80h05fc.Operator?>()) {
+      return (data != null ? _i80h05fc.Operator.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_i5pbbm36.ReceiptPreview?>()) {
+      return (data != null ? _i5pbbm36.ReceiptPreview.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_i3nhuzax.TaxNoticeType?>()) {
+      return (data != null ? _i3nhuzax.TaxNoticeType.fromJson(data) : null)
+          as T;
     }
     if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
@@ -473,6 +513,24 @@ class Protocol extends _isc.SerializationManager {
               .toList()
           as T;
     }
+    if (t == List<_ibol987g.Donation>) {
+      return (data as List)
+              .map((e) => deserialize<_ibol987g.Donation>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_imgf7vt5.ReceiptPreview>) {
+      return (data as List)
+              .map((e) => deserialize<_imgf7vt5.ReceiptPreview>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i8cfzthc.DonationReceipt>) {
+      return (data as List)
+              .map((e) => deserialize<_i8cfzthc.DonationReceipt>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_ihpk2u4j.GuestGroup>) {
       return (data as List)
               .map((e) => deserialize<_ihpk2u4j.GuestGroup>(e))
@@ -547,6 +605,10 @@ class Protocol extends _isc.SerializationManager {
       _ifwcmx8g.ValidationException => 'ValidationException',
       _io9atw8a.Contact => 'Contact',
       _iycrigka.Organization => 'Organization',
+      _igquyr3v.DonationReceipt => 'DonationReceipt',
+      _i80h05fc.Operator => 'Operator',
+      _i5pbbm36.ReceiptPreview => 'ReceiptPreview',
+      _i3nhuzax.TaxNoticeType => 'TaxNoticeType',
       _izw8z7ou.Greeting => 'Greeting',
       _inxh79pp.Guest => 'Guest',
       _iar0olgw.GuestGroup => 'GuestGroup',
@@ -612,6 +674,14 @@ class Protocol extends _isc.SerializationManager {
         return 'Contact';
       case _iycrigka.Organization():
         return 'Organization';
+      case _igquyr3v.DonationReceipt():
+        return 'DonationReceipt';
+      case _i80h05fc.Operator():
+        return 'Operator';
+      case _i5pbbm36.ReceiptPreview():
+        return 'ReceiptPreview';
+      case _i3nhuzax.TaxNoticeType():
+        return 'TaxNoticeType';
       case _izw8z7ou.Greeting():
         return 'Greeting';
       case _inxh79pp.Guest():
@@ -718,6 +788,18 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'Organization') {
       return deserialize<_iycrigka.Organization>(data['data']);
+    }
+    if (dataClassName == 'DonationReceipt') {
+      return deserialize<_igquyr3v.DonationReceipt>(data['data']);
+    }
+    if (dataClassName == 'Operator') {
+      return deserialize<_i80h05fc.Operator>(data['data']);
+    }
+    if (dataClassName == 'ReceiptPreview') {
+      return deserialize<_i5pbbm36.ReceiptPreview>(data['data']);
+    }
+    if (dataClassName == 'TaxNoticeType') {
+      return deserialize<_i3nhuzax.TaxNoticeType>(data['data']);
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);

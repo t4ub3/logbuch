@@ -6,6 +6,7 @@ import 'package:logbuch_flutter/panels/admin_panel.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_extensions.dart';
 import 'package:logbuch_flutter/panels/bookings_panel.dart';
 import 'package:logbuch_flutter/panels/contacts_panel.dart';
+import 'package:logbuch_flutter/panels/donations_panel.dart';
 import 'package:logbuch_flutter/panels/settings_panel.dart';
 import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:logbuch_flutter/theme/dimmed_accent.dart';
@@ -14,6 +15,7 @@ import 'package:yaru/yaru.dart';
 enum MenuItem {
   calendar(BookingsPanel()),
   contacts(ContactsPanel()),
+  donations(DonationsPanel()),
   admin(AdminPanel()),
   settings(SettingsPanel());
 
@@ -24,6 +26,7 @@ enum MenuItem {
   String title(Translations t) => switch (this) {
     calendar => t.menu.calendar,
     contacts => t.menu.contacts,
+    donations => t.menu.donations,
     admin => t.menu.admin,
     settings => t.menu.settings,
   };
@@ -32,6 +35,7 @@ enum MenuItem {
     calendar => selected ? YaruIcons.calendar_filled : YaruIcons.calendar,
     contacts =>
       selected ? YaruIcons.address_book_filled : YaruIcons.address_book,
+    donations => selected ? YaruIcons.star_filled : YaruIcons.star,
     admin => selected ? YaruIcons.wrench_filled : YaruIcons.wrench,
     settings => selected ? YaruIcons.gear_filled : YaruIcons.gear,
   };

@@ -12,6 +12,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:logbuch_server/src/generated/auth/user_role.dart' as _ix6woxrf;
 import 'package:logbuch_server/src/generated/billing/charge.dart' as _ik0w9o9c;
+import 'package:logbuch_server/src/generated/billing/donation.dart'
+    as _imjtz2ad;
 import 'package:logbuch_server/src/generated/billing/payment.dart' as _ijoeqr7q;
 import 'package:logbuch_server/src/generated/bookings/bookings.dart'
     as _iz54m678;
@@ -19,6 +21,8 @@ import 'package:logbuch_server/src/generated/contacts/contact.dart'
     as _i4e319y1;
 import 'package:logbuch_server/src/generated/contacts/organization.dart'
     as _i0zrc0jf;
+import 'package:logbuch_server/src/generated/donations/operator.dart'
+    as _it92t9k2;
 import 'package:logbuch_server/src/generated/guests/guest.dart' as _iju6pcvn;
 import 'package:logbuch_server/src/generated/guests/guest_group.dart'
     as _ikiew98c;
@@ -47,6 +51,8 @@ import '../billing/billing_endpoint.dart' as _irc9lmoc;
 import '../bookings/booking_endpoint.dart' as _i7f5j1eo;
 import '../contacts/contact_endpoint.dart' as _i468fl3m;
 import '../contacts/organization_endpoint.dart' as _i05r4tmt;
+import '../donations/donation_endpoint.dart' as _ipeykwyx;
+import '../donations/operator_endpoint.dart' as _ihleekzx;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
 import '../guests/guest_endpoint.dart' as _i2qdn6vg;
 import '../pricing/age_group_endpoint.dart' as _inglletr;
@@ -103,6 +109,18 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'organization',
+          null,
+        ),
+      'donation': _ipeykwyx.DonationEndpoint()
+        ..initialize(
+          server,
+          'donation',
+          null,
+        ),
+      'operator': _ihleekzx.OperatorEndpoint()
+        ..initialize(
+          server,
+          'operator',
           null,
         ),
       'greeting': _il624ik7.GreetingEndpoint()
@@ -887,6 +905,180 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         params['id'],
                       ),
+        ),
+      },
+    );
+    connectors['donation'] = _is.EndpointConnector(
+      name: 'donation',
+      endpoint: endpoints['donation']!,
+      methodConnectors: {
+        'getByYear': _is.MethodConnector(
+          name: 'getByYear',
+          params: {
+            'year': _is.ParameterDescription(
+              name: 'year',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['donation'] as _ipeykwyx.DonationEndpoint)
+                  .getByYear(
+                    session,
+                    params['year'],
+                  ),
+        ),
+        'addDirect': _is.MethodConnector(
+          name: 'addDirect',
+          params: {
+            'donation': _is.ParameterDescription(
+              name: 'donation',
+              type: _is.getType<_imjtz2ad.Donation>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['donation'] as _ipeykwyx.DonationEndpoint)
+                  .addDirect(
+                    session,
+                    params['donation'],
+                  ),
+        ),
+        'delete': _is.MethodConnector(
+          name: 'delete',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['donation'] as _ipeykwyx.DonationEndpoint).delete(
+                    session,
+                    params['id'],
+                  ),
+        ),
+        'previewReceipts': _is.MethodConnector(
+          name: 'previewReceipts',
+          params: {
+            'year': _is.ParameterDescription(
+              name: 'year',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['donation'] as _ipeykwyx.DonationEndpoint)
+                  .previewReceipts(
+                    session,
+                    params['year'],
+                  ),
+        ),
+        'createReceipts': _is.MethodConnector(
+          name: 'createReceipts',
+          params: {
+            'year': _is.ParameterDescription(
+              name: 'year',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['donation'] as _ipeykwyx.DonationEndpoint)
+                  .createReceipts(
+                    session,
+                    params['year'],
+                  ),
+        ),
+        'getReceipts': _is.MethodConnector(
+          name: 'getReceipts',
+          params: {
+            'year': _is.ParameterDescription(
+              name: 'year',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['donation'] as _ipeykwyx.DonationEndpoint)
+                  .getReceipts(
+                    session,
+                    params['year'],
+                  ),
+        ),
+        'getReceiptPdf': _is.MethodConnector(
+          name: 'getReceiptPdf',
+          params: {
+            'receiptId': _is.ParameterDescription(
+              name: 'receiptId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['donation'] as _ipeykwyx.DonationEndpoint)
+                  .getReceiptPdf(
+                    session,
+                    params['receiptId'],
+                  ),
+        ),
+      },
+    );
+    connectors['operator'] = _is.EndpointConnector(
+      name: 'operator',
+      endpoint: endpoints['operator']!,
+      methodConnectors: {
+        'load': _is.MethodConnector(
+          name: 'load',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['operator'] as _ihleekzx.OperatorEndpoint)
+                  .load(session),
+        ),
+        'save': _is.MethodConnector(
+          name: 'save',
+          params: {
+            'operator': _is.ParameterDescription(
+              name: 'operator',
+              type: _is.getType<_it92t9k2.Operator>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['operator'] as _ihleekzx.OperatorEndpoint).save(
+                    session,
+                    params['operator'],
+                  ),
         ),
       },
     );

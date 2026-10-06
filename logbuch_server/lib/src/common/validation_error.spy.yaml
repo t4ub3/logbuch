@@ -23,3 +23,5 @@ values:
   - nothingToInvoice
   - pricingIncomplete
   - notOverpaid
+  - alreadyReceipted
+  - operatorIncomplete

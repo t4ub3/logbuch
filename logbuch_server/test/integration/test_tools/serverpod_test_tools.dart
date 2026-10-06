@@ -13,6 +13,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
 import 'dart:io' as _idi;
+import 'dart:typed_data' as _idt;
 import 'package:logbuch_server/src/generated/auth/app_user.dart' as _ikienaka;
 import 'package:logbuch_server/src/generated/auth/user_role.dart' as _ix6woxrf;
 import 'package:logbuch_server/src/generated/billing/charge.dart' as _ik0w9o9c;
@@ -26,6 +27,12 @@ import 'package:logbuch_server/src/generated/contacts/contact.dart'
     as _i4e319y1;
 import 'package:logbuch_server/src/generated/contacts/organization.dart'
     as _i0zrc0jf;
+import 'package:logbuch_server/src/generated/donations/donation_receipt.dart'
+    as _iyoacxs7;
+import 'package:logbuch_server/src/generated/donations/operator.dart'
+    as _it92t9k2;
+import 'package:logbuch_server/src/generated/donations/receipt_preview.dart'
+    as _iawfc4vl;
 import 'package:logbuch_server/src/generated/greetings/greeting.dart'
     as _if7khkhb;
 import 'package:logbuch_server/src/generated/guests/guest.dart' as _iju6pcvn;
@@ -197,6 +204,10 @@ class TestEndpoints {
 
   late final _OrganizationEndpoint organization;
 
+  late final _DonationEndpoint donation;
+
+  late final _OperatorEndpoint operator;
+
   late final _GreetingEndpoint greeting;
 
   late final _GuestEndpoint guest;
@@ -252,6 +263,14 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     organization = _OrganizationEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    donation = _DonationEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    operator = _OperatorEndpoint(
       endpoints,
       serializationManager,
     );
@@ -1486,6 +1505,306 @@ class _OrganizationEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _DonationEndpoint {
+  _DonationEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<List<_imjtz2ad.Donation>> getByYear(
+    _ist.TestSessionBuilder sessionBuilder,
+    int year,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'donation',
+            method: 'getByYear',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'donation',
+          methodName: 'getByYear',
+          parameters: _ist.testObjectToJson({'year': year}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_imjtz2ad.Donation>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_imjtz2ad.Donation> addDirect(
+    _ist.TestSessionBuilder sessionBuilder,
+    _imjtz2ad.Donation donation,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'donation',
+            method: 'addDirect',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'donation',
+          methodName: 'addDirect',
+          parameters: _ist.testObjectToJson({'donation': donation}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_imjtz2ad.Donation>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<void> delete(
+    _ist.TestSessionBuilder sessionBuilder,
+    int id,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'donation',
+            method: 'delete',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'donation',
+          methodName: 'delete',
+          parameters: _ist.testObjectToJson({'id': id}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_iawfc4vl.ReceiptPreview>> previewReceipts(
+    _ist.TestSessionBuilder sessionBuilder,
+    int year,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'donation',
+            method: 'previewReceipts',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'donation',
+          methodName: 'previewReceipts',
+          parameters: _ist.testObjectToJson({'year': year}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_iawfc4vl.ReceiptPreview>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_iyoacxs7.DonationReceipt>> createReceipts(
+    _ist.TestSessionBuilder sessionBuilder,
+    int year,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'donation',
+            method: 'createReceipts',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'donation',
+          methodName: 'createReceipts',
+          parameters: _ist.testObjectToJson({'year': year}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_iyoacxs7.DonationReceipt>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_iyoacxs7.DonationReceipt>> getReceipts(
+    _ist.TestSessionBuilder sessionBuilder,
+    int year,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'donation',
+            method: 'getReceipts',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'donation',
+          methodName: 'getReceipts',
+          parameters: _ist.testObjectToJson({'year': year}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_iyoacxs7.DonationReceipt>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_idt.ByteData> getReceiptPdf(
+    _ist.TestSessionBuilder sessionBuilder,
+    int receiptId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'donation',
+            method: 'getReceiptPdf',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'donation',
+          methodName: 'getReceiptPdf',
+          parameters: _ist.testObjectToJson({'receiptId': receiptId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_idt.ByteData>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _OperatorEndpoint {
+  _OperatorEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_it92t9k2.Operator?> load(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'operator',
+            method: 'load',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'operator',
+          methodName: 'load',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_it92t9k2.Operator?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_it92t9k2.Operator> save(
+    _ist.TestSessionBuilder sessionBuilder,
+    _it92t9k2.Operator operator,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'operator',
+            method: 'save',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'operator',
+          methodName: 'save',
+          parameters: _ist.testObjectToJson({'operator': operator}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_it92t9k2.Operator>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

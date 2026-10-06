@@ -49,6 +49,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$rooms$en rooms = Translations$rooms$en.internal(_root);
 	late final Translations$admin$en admin = Translations$admin$en.internal(_root);
 	late final Translations$auth$en auth = Translations$auth$en.internal(_root);
+	late final Translations$donations$en donations = Translations$donations$en.internal(_root);
 	late final Translations$settings$en settings = Translations$settings$en.internal(_root);
 }
 
@@ -140,6 +141,9 @@ class Translations$menu$en {
 
 	/// en: 'Settings'
 	String get settings => 'Settings';
+
+	/// en: 'Donations'
+	String get donations => 'Donations';
 }
 
 // Path: bookings
@@ -625,6 +629,7 @@ class Translations$admin$en {
 	late final Translations$admin$rates$en rates = Translations$admin$rates$en.internal(_root);
 	late final Translations$admin$fees$en fees = Translations$admin$fees$en.internal(_root);
 	late final Translations$admin$users$en users = Translations$admin$users$en.internal(_root);
+	late final Translations$admin$operator$en operator = Translations$admin$operator$en.internal(_root);
 }
 
 // Path: auth
@@ -648,6 +653,79 @@ class Translations$auth$en {
 	String get account => 'Account';
 
 	late final Translations$auth$roles$en roles = Translations$auth$roles$en.internal(_root);
+}
+
+// Path: donations
+class Translations$donations$en {
+	Translations$donations$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Donations {year}'
+	String title({required Object year}) => 'Donations ${year}';
+
+	/// en: 'No donations in {year}'
+	String empty({required Object year}) => 'No donations in ${year}';
+
+	/// en: 'New donation'
+	String get add => 'New donation';
+
+	/// en: 'Donor'
+	String get donor => 'Donor';
+
+	/// en: 'Amount'
+	String get amount => 'Amount';
+
+	/// en: 'Date'
+	String get date => 'Date';
+
+	/// en: 'Left over from a payment'
+	String get fromPayment => 'Left over from a payment';
+
+	/// en: 'Total'
+	String get total => 'Total';
+
+	/// en: 'No receipt yet'
+	String get noReceipt => 'No receipt yet';
+
+	/// en: 'Receipts'
+	String get receipts => 'Receipts';
+
+	/// en: 'Create receipts'
+	String get createReceipts => 'Create receipts';
+
+	/// en: 'Receipts for {year}'
+	String previewTitle({required Object year}) => 'Receipts for ${year}';
+
+	/// en: 'Every donor gets one receipt for all donations of the year that are on no receipt yet. After that these donations can no longer be changed.'
+	String get previewHint => 'Every donor gets one receipt for all donations of the year that are on no receipt yet. After that these donations can no longer be changed.';
+
+	/// en: 'No donation of {year} is waiting for a receipt.'
+	String previewNone({required Object year}) => 'No donation of ${year} is waiting for a receipt.';
+
+	/// en: '(one) {{n} donation} (other) {{n} donations}'
+	String donationCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		one: '${n} donation',
+		other: '${n} donations',
+	);
+
+	/// en: 'No receipt: the address is incomplete'
+	String get addressMissing => 'No receipt: the address is incomplete';
+
+	/// en: '(zero) {No receipts created} (one) {{n} receipt created} (other) {{n} receipts created}'
+	String created({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		zero: 'No receipts created',
+		one: '${n} receipt created',
+		other: '${n} receipts created',
+	);
+
+	/// en: 'Open the PDF'
+	String get openPdf => 'Open the PDF';
+
+	/// en: 'The receipt could not be opened: {error}'
+	String openFailed({required Object error}) => 'The receipt could not be opened: ${error}';
 }
 
 // Path: settings
@@ -840,6 +918,9 @@ class Translations$admin$sections$en {
 
 	/// en: 'Users'
 	String get users => 'Users';
+
+	/// en: 'Operator'
+	String get operator => 'Operator';
 }
 
 // Path: admin.errors
@@ -915,6 +996,12 @@ class Translations$admin$errors$en {
 
 	/// en: 'This is more than was overpaid.'
 	String get notOverpaid => 'This is more than was overpaid.';
+
+	/// en: 'This donation is on a receipt and can no longer be changed.'
+	String get alreadyReceipted => 'This donation is on a receipt and can no longer be changed.';
+
+	/// en: 'The details of the operator are incomplete. Fill them in under Admin, Operator.'
+	String get operatorIncomplete => 'The details of the operator are incomplete. Fill them in under Admin, Operator.';
 }
 
 // Path: admin.rooms
@@ -1183,6 +1270,69 @@ class Translations$admin$users$en {
 	String get you => 'you';
 }
 
+// Path: admin.operator
+class Translations$admin$operator$en {
+	Translations$admin$operator$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'The organisation that runs the house. These details are printed on donation receipts, which can only be issued once everything is filled in.'
+	String get hint => 'The organisation that runs the house. These details are printed on donation receipts, which can only be issued once everything is filled in.';
+
+	/// en: 'Street'
+	String get street => 'Street';
+
+	/// en: 'Postal code'
+	String get zip => 'Postal code';
+
+	/// en: 'City'
+	String get city => 'City';
+
+	/// en: 'Tax office'
+	String get taxOffice => 'Tax office';
+
+	/// en: 'Tax number'
+	String get taxNumber => 'Tax number';
+
+	/// en: 'Notice of the tax office'
+	String get noticeType => 'Notice of the tax office';
+
+	/// en: 'Freistellungsbescheid'
+	String get exemptionNotice => 'Freistellungsbescheid';
+
+	/// en: 'Feststellungsbescheid nach § 60a AO'
+	String get statutoryCompliance => 'Feststellungsbescheid nach § 60a AO';
+
+	/// en: 'Date of the notice'
+	String get noticeDate => 'Date of the notice';
+
+	/// en: 'Assessment period of the notice'
+	String get assessmentPeriod => 'Assessment period of the notice';
+
+	/// en: 'Promoted purposes, following “zur Förderung”'
+	String get purposes => 'Promoted purposes, following “zur Förderung”';
+
+	/// en: 'In German, for example: der Jugendhilfe'
+	String get purposesHint => 'In German, for example: der Jugendhilfe';
+
+	/// en: 'Promoted purposes, following “Wir fördern nach unserer Satzung”'
+	String get purposesObject => 'Promoted purposes, following “Wir fördern nach unserer Satzung”';
+
+	/// en: 'In German, for example: die Jugendhilfe'
+	String get purposesObjectHint => 'In German, for example: die Jugendhilfe';
+
+	/// en: 'Place where receipts are signed'
+	String get place => 'Place where receipts are signed';
+
+	/// en: 'Signed by'
+	String get signatory => 'Signed by';
+
+	/// en: 'Saved'
+	String get saved => 'Saved';
+}
+
 // Path: auth.roles
 class Translations$auth$roles$en {
 	Translations$auth$roles$en.internal(this._root);
@@ -1254,6 +1404,7 @@ extension on Translations {
 			'menu.contacts' => 'Contacts',
 			'menu.admin' => 'Admin',
 			'menu.settings' => 'Settings',
+			'menu.donations' => 'Donations',
 			'bookings.newBooking' => 'New booking',
 			'bookings.agenda' => 'Agenda',
 			'bookings.month' => 'Month',
@@ -1421,6 +1572,7 @@ extension on Translations {
 			'admin.sections.rates' => 'Prices',
 			'admin.sections.fees' => 'Fees',
 			'admin.sections.users' => 'Users',
+			'admin.sections.operator' => 'Operator',
 			'admin.deleteTitle' => ({required Object name}) => 'Delete “${name}”?',
 			'admin.invalidNumber' => 'Enter a whole number',
 			'admin.invalidAmount' => 'Enter an amount such as 12.50',
@@ -1446,6 +1598,8 @@ extension on Translations {
 			'admin.errors.nothingToInvoice' => 'There is nothing to invoice.',
 			'admin.errors.pricingIncomplete' => 'Parts of the booking cannot be priced yet. See the Price tab for what is missing.',
 			'admin.errors.notOverpaid' => 'This is more than was overpaid.',
+			'admin.errors.alreadyReceipted' => 'This donation is on a receipt and can no longer be changed.',
+			'admin.errors.operatorIncomplete' => 'The details of the operator are incomplete. Fill them in under Admin, Operator.',
 			'admin.rooms.add' => 'New room',
 			'admin.rooms.edit' => 'Edit room',
 			'admin.rooms.number' => 'Room number',
@@ -1514,6 +1668,24 @@ extension on Translations {
 			'admin.users.empty' => 'No users',
 			'admin.users.unknownEmail' => 'No email address',
 			'admin.users.you' => 'you',
+			'admin.operator.hint' => 'The organisation that runs the house. These details are printed on donation receipts, which can only be issued once everything is filled in.',
+			'admin.operator.street' => 'Street',
+			'admin.operator.zip' => 'Postal code',
+			'admin.operator.city' => 'City',
+			'admin.operator.taxOffice' => 'Tax office',
+			'admin.operator.taxNumber' => 'Tax number',
+			'admin.operator.noticeType' => 'Notice of the tax office',
+			'admin.operator.exemptionNotice' => 'Freistellungsbescheid',
+			'admin.operator.statutoryCompliance' => 'Feststellungsbescheid nach § 60a AO',
+			'admin.operator.noticeDate' => 'Date of the notice',
+			'admin.operator.assessmentPeriod' => 'Assessment period of the notice',
+			'admin.operator.purposes' => 'Promoted purposes, following “zur Förderung”',
+			'admin.operator.purposesHint' => 'In German, for example: der Jugendhilfe',
+			'admin.operator.purposesObject' => 'Promoted purposes, following “Wir fördern nach unserer Satzung”',
+			'admin.operator.purposesObjectHint' => 'In German, for example: die Jugendhilfe',
+			'admin.operator.place' => 'Place where receipts are signed',
+			'admin.operator.signatory' => 'Signed by',
+			'admin.operator.saved' => 'Saved',
 			'auth.waitingTitle' => 'Waiting for access',
 			'auth.waitingText' => ({required Object email}) => 'Your account ${email} has no role yet. An admin has to give you access.',
 			'auth.checkAgain' => 'Check again',
@@ -1521,6 +1693,25 @@ extension on Translations {
 			'auth.roles.admin' => 'Admin',
 			'auth.roles.viewer' => 'View only',
 			'auth.roles.none' => 'No access',
+			'donations.title' => ({required Object year}) => 'Donations ${year}',
+			'donations.empty' => ({required Object year}) => 'No donations in ${year}',
+			'donations.add' => 'New donation',
+			'donations.donor' => 'Donor',
+			'donations.amount' => 'Amount',
+			'donations.date' => 'Date',
+			'donations.fromPayment' => 'Left over from a payment',
+			'donations.total' => 'Total',
+			'donations.noReceipt' => 'No receipt yet',
+			'donations.receipts' => 'Receipts',
+			'donations.createReceipts' => 'Create receipts',
+			'donations.previewTitle' => ({required Object year}) => 'Receipts for ${year}',
+			'donations.previewHint' => 'Every donor gets one receipt for all donations of the year that are on no receipt yet. After that these donations can no longer be changed.',
+			'donations.previewNone' => ({required Object year}) => 'No donation of ${year} is waiting for a receipt.',
+			'donations.donationCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} donation', other: '${n} donations', ), 
+			'donations.addressMissing' => 'No receipt: the address is incomplete',
+			'donations.created' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No receipts created', one: '${n} receipt created', other: '${n} receipts created', ), 
+			'donations.openPdf' => 'Open the PDF',
+			'donations.openFailed' => ({required Object error}) => 'The receipt could not be opened: ${error}',
 			'settings.title' => 'Settings',
 			'settings.language' => 'Language',
 			'settings.systemLanguage' => 'System default',

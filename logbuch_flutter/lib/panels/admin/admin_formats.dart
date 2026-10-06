@@ -86,5 +86,7 @@ String? validationMessage(BuildContext context, Object error) {
     ValidationError.nothingToInvoice => t.nothingToInvoice,
     ValidationError.pricingIncomplete => t.pricingIncomplete,
     ValidationError.notOverpaid => t.notOverpaid,
+    ValidationError.alreadyReceipted => t.alreadyReceipted,
+    ValidationError.operatorIncomplete => t.operatorIncomplete,
   };
 }

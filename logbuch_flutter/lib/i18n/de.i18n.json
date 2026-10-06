@@ -24,7 +24,8 @@
         "calendar": "Kalender",
         "contacts": "Kontakte",
         "admin": "Verwaltung",
-        "settings": "Einstellungen"
+        "settings": "Einstellungen",
+        "donations": "Spenden"
     },
     "bookings": {
         "newBooking": "Neue Buchung",
@@ -225,7 +226,8 @@
             "mealPlans": "Verpflegung",
             "rates": "Preise",
             "fees": "Gebühren",
-            "users": "Benutzer"
+            "users": "Benutzer",
+            "operator": "Träger"
         },
         "deleteTitle": "„{name}“ löschen?",
         "invalidNumber": "Bitte eine ganze Zahl eingeben",
@@ -252,7 +254,9 @@
             "alreadyInvoiced": "Das ist bereits in Rechnung gestellt und kann nicht mehr geändert werden.",
             "nothingToInvoice": "Es gibt nichts abzurechnen.",
             "pricingIncomplete": "Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht unter Preis.",
-            "notOverpaid": "Das ist mehr, als überzahlt wurde."
+            "notOverpaid": "Das ist mehr, als überzahlt wurde.",
+            "alreadyReceipted": "Diese Spende steht auf einer Bestätigung und kann nicht mehr geändert werden.",
+            "operatorIncomplete": "Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen."
         },
         "rooms": {
             "add": "Neues Zimmer",
@@ -342,6 +346,26 @@
             "empty": "Keine Benutzer",
             "unknownEmail": "Keine E-Mail-Adresse",
             "you": "Sie"
+        },
+        "operator": {
+            "hint": "Die Organisation, die das Haus betreibt. Diese Angaben stehen auf den Zuwendungsbestätigungen, die erst erstellt werden können, wenn alles ausgefüllt ist.",
+            "street": "Straße",
+            "zip": "Postleitzahl",
+            "city": "Ort",
+            "taxOffice": "Finanzamt",
+            "taxNumber": "Steuernummer",
+            "noticeType": "Bescheid des Finanzamts",
+            "exemptionNotice": "Freistellungsbescheid",
+            "statutoryCompliance": "Feststellungsbescheid nach § 60a AO",
+            "noticeDate": "Datum des Bescheids",
+            "assessmentPeriod": "Veranlagungszeitraum des Bescheids",
+            "purposes": "Geförderte Zwecke, nach „zur Förderung“",
+            "purposesHint": "Zum Beispiel: der Jugendhilfe",
+            "purposesObject": "Geförderte Zwecke, nach „Wir fördern nach unserer Satzung“",
+            "purposesObjectHint": "Zum Beispiel: die Jugendhilfe",
+            "place": "Ort der Unterschrift",
+            "signatory": "Unterzeichnet von",
+            "saved": "Gespeichert"
         }
     },
     "auth": {
@@ -354,6 +378,34 @@
             "viewer": "Nur ansehen",
             "none": "Kein Zugriff"
         }
+    },
+    "donations": {
+        "title": "Spenden {year}",
+        "empty": "Keine Spenden in {year}",
+        "add": "Neue Spende",
+        "donor": "Spender",
+        "amount": "Betrag",
+        "date": "Datum",
+        "fromPayment": "Rest einer Zahlung",
+        "total": "Gesamt",
+        "noReceipt": "Noch keine Bestätigung",
+        "receipts": "Zuwendungsbestätigungen",
+        "createReceipts": "Bestätigungen erstellen",
+        "previewTitle": "Zuwendungsbestätigungen für {year}",
+        "previewHint": "Jeder Spender erhält eine Bestätigung über alle Spenden des Jahres, die noch auf keiner Bestätigung stehen. Danach können diese Spenden nicht mehr geändert werden.",
+        "previewNone": "Keine Spende aus {year} wartet auf eine Bestätigung.",
+        "donationCount": {
+            "one": "{n} Spende",
+            "other": "{n} Spenden"
+        },
+        "addressMissing": "Keine Bestätigung: Die Anschrift ist unvollständig",
+        "created": {
+            "zero": "Keine Bestätigungen erstellt",
+            "one": "{n} Bestätigung erstellt",
+            "other": "{n} Bestätigungen erstellt"
+        },
+        "openPdf": "PDF öffnen",
+        "openFailed": "Die Bestätigung konnte nicht geöffnet werden: {error}"
     },
     "settings": {
         "title": "Einstellungen",
