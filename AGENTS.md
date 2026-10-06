@@ -47,4 +47,43 @@ If the user asks you to test the app:
 
 The app is launched from `logbuch_flutter/lib/driver.dart`, which starts the Flutter driver extension with text entry emulation turned off so the app stays usable by hand. To let the driver type, set `enableTextEntryEmulation: true` there and `hot_restart` the app.
 
-IMPORTANT: After building the first version of the app, update this AGENTS.md file with information about the app we're building. KEEP the info about the MCP server and the checklist. Remove this paragraph.
+## The app
+
+Log|Buch manages group guest houses (*Gruppenhäuser*) in Germany: bookings with guest lists, room assignment, billing per booking, per group or per guest, and donation receipts. Amounts are in EUR and the house is in the Europe/Berlin timezone. The UI is translated into English and German.
+
+It is built in this order. Steps 1 to 6 and the login exist, the rest is planned. There are no deposits and no cancellation fees:
+
+1. Setup and admin area: rooms, price categories, age groups, seasons, meal plans, room and meal rates, fees.
+2. Contacts and organizations.
+3. Bookings with the rooms they hold, availability, occupancy plan.
+4. Guests in groups and the room assignment board. Dietary notes are an optional field of the guest, not of the contact.
+5. Pricing engine that turns a booking into charges.
+6. Folios, payments, billing modes, overpayments kept as donations.
+7. Yearly donation receipts.
+8. Documents, dashboard, households, imports.
+
+One installation manages one house. Some names are older than this plan and were kept: a booking has a `title` and a `lead`, a room a `roomNumber` and a `bedAmount`, a contact a `mail`.
+
+## Conventions
+
+- Money is an `int` in cents, never a `double`. Tax rates are an `int` in basis points, so 700 is 7 %.
+- A date without a time of day (season bounds, later also arrival, departure and birth dates) is a `DateTime` at midnight UTC. The server rejects anything else with `requireDateOnly` in `lib/src/common/validation.dart`. The Flutter app converts with `toUtcDate` and `toLocalDate` in `lib/panels/admin/admin_formats.dart`.
+- Seasons and age groups include both ends of their range and must not overlap.
+- Prices are stored per season: a `RoomRate` per price category and age group, a `MealRate` per meal plan and age group. A missing rate means there is no price, which is not the same as a price of 0.
+- Business rules are enforced on the server. An endpoint rejects invalid input with a `ValidationException`, whose `ValidationError` the Flutter app turns into a translated message with `validationMessage`.
+- Users have one of two roles: an admin changes data, a viewer only reads. Every endpoint extends `AppEndpoint` in `lib/src/auth/roles.dart`, which requires a signed-in user with a role, and every method that changes data calls `requireAdmin(session)` first. Roles are scopes of the auth user and are read from the database on each call, so a change applies at once. The first user to sign up becomes admin; later users have no role until an admin gives them one.
+- A booking's `arrival` and `departure` are dates without a time, and may both be missing. It holds its rooms for the nights in between, so a room is free again on the day of departure. Rooms are taken with `BookingEndpoint.setRooms`, which locks them inside a transaction; cancelled bookings hold nothing.
+- A guest is a contact in a guest group of a booking. Guests are assigned to a `BookingRoom`, so only to rooms their booking holds. A room may hold more guests than it has beds while guests are moved around; the app shows that it is overfull, the server does not reject it.
+- What a booking costs is calculated by `calculatePrice` in `lib/src/pricing/price_calculation.dart`, a function without database access. Each guest pays per night by the season of the night, the price category of their room and their age group, which is their age on the day they arrive unless one is set for the guest. Nothing is guessed: what cannot be priced is left out and returned as a `PricingProblem`. Empty beds cost nothing.
+- All prices include tax. Lodging and meals are taxed at 7 % (`lodgingTaxRate`); a fee has its own rate, which starts at 7 % as well.
+- A folio is the account of one payer for one booking. `distributeLines` in `lib/src/billing/folio_distribution.dart` decides who pays which line by the billing mode of the booking. `BillingEndpoint.getFolios` first brings the calculated charges of all folios that are not invoiced in line with the booking, so they are never stale; charges added by hand (`manual`, `discount`) are kept.
+- Invoicing a folio gives it the next number of the year, such as `2026-0001`, and freezes its charges: later changes to rates, guests or rooms do not touch it, and the billing mode of the booking cannot change anymore. A folio cannot be invoiced while a part of the booking cannot be priced.
+- A payment with a negative amount is a refund. What is paid beyond the charges stays a credit until the user decides. It becomes a `Donation` only through `BillingEndpoint.donate`, which the app calls when the user confirms that the payer wants to donate it. Never create donations from balances.
+- Server tests sign in with `withAdmin`, `asViewer` and `withoutRole` from `test/integration/roles.dart`. Tests of logic without a database are in `test/unit/`.
+
+## Flutter app
+
+- State lives in Riverpod providers with code generation, one provider per file in `lib/providers/`. Texts are in `lib/i18n/*.i18n.json` and always added in both languages. After changing a provider or a text, run `dart run build_runner build --delete-conflicting-outputs` in `logbuch_flutter`.
+- The admin area is `lib/panels/admin_panel.dart`, with one file per section in `lib/panels/admin/`. Its lists and form dialogs are built from the widgets in `admin_widgets.dart`, which the contacts use as well.
+- `canEditProvider` says whether the signed-in user may change data. Everything that adds, edits or deletes is hidden from viewers.
+- Run `flutter test` in `logbuch_flutter` after changing the app. Widget tests replace the Serverpod client with the fake in `test/fake_client.dart`.

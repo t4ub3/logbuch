@@ -3,7 +3,14 @@ table: bookings
 fields:
   createdAt: DateTime, default=now
   title: String
-  from: DateTime?
-  to: DateTime?
-  lead: Contact
-  status: BookingStatus, default=requested
+  arrival: DateTime?
+  departure: DateTime?
+  lead: Contact?, relation(onDelete=Restrict)
+  organization: Organization?, relation(optional, onDelete=Restrict)
+  status: BookingStatus, default=inquiry
+  optionExpiresAt: DateTime?
+  mealPlan: MealPlan?, relation(optional, onDelete=Restrict)
+  billingMode: BillingMode, default=single
+  expectedGuestCount: int?
+  notes: String?
+  rooms: List<BookingRoom>?, relation(name=booking_rooms)

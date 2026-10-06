@@ -12,8 +12,12 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:logbuch_client/src/protocol/protocol.dart' as _i7rf0d0e;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import '../bookings/billing_mode.dart' as _ikjlxdwh;
+import '../bookings/booking_room.dart' as _icgf4f53;
 import '../bookings/booking_status.dart' as _ilk1qg37;
 import '../contacts/contact.dart' as _imbxrfja;
+import '../contacts/organization.dart' as _i0w1hmpk;
+import '../pricing/meal_plan.dart' as _iqp4km0h;
 
 abstract class Booking
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
@@ -21,21 +25,42 @@ abstract class Booking
     this.id,
     DateTime? createdAt,
     required this.title,
-    this.from,
-    this.to,
-    required this.lead,
+    this.arrival,
+    this.departure,
+    required this.leadId,
+    this.lead,
+    this.organizationId,
+    this.organization,
     _ilk1qg37.BookingStatus? status,
+    this.optionExpiresAt,
+    this.mealPlanId,
+    this.mealPlan,
+    _ikjlxdwh.BillingMode? billingMode,
+    this.expectedGuestCount,
+    this.notes,
+    this.rooms,
   }) : createdAt = createdAt ?? DateTime.now(),
-       status = status ?? _ilk1qg37.BookingStatus.requested;
+       status = status ?? _ilk1qg37.BookingStatus.inquiry,
+       billingMode = billingMode ?? _ikjlxdwh.BillingMode.single;
 
   factory Booking({
     int? id,
     DateTime? createdAt,
     required String title,
-    DateTime? from,
-    DateTime? to,
-    required _imbxrfja.Contact lead,
+    DateTime? arrival,
+    DateTime? departure,
+    required int leadId,
+    _imbxrfja.Contact? lead,
+    int? organizationId,
+    _i0w1hmpk.Organization? organization,
     _ilk1qg37.BookingStatus? status,
+    DateTime? optionExpiresAt,
+    int? mealPlanId,
+    _iqp4km0h.MealPlan? mealPlan,
+    _ikjlxdwh.BillingMode? billingMode,
+    int? expectedGuestCount,
+    String? notes,
+    List<_icgf4f53.BookingRoom>? rooms,
   }) = _BookingImpl;
 
   factory Booking.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -45,19 +70,51 @@ abstract class Booking
           ? null
           : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       title: jsonSerialization['title'] as String,
-      from: jsonSerialization['from'] == null
+      arrival: jsonSerialization['arrival'] == null
           ? null
-          : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['from']),
-      to: jsonSerialization['to'] == null
+          : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['arrival']),
+      departure: jsonSerialization['departure'] == null
           ? null
-          : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['to']),
-      lead: _i7rf0d0e.Protocol().deserialize<_imbxrfja.Contact>(
-        jsonSerialization['lead'],
-      ),
+          : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['departure']),
+      leadId: jsonSerialization['leadId'] as int,
+      lead: jsonSerialization['lead'] == null
+          ? null
+          : _i7rf0d0e.Protocol().deserialize<_imbxrfja.Contact>(
+              jsonSerialization['lead'],
+            ),
+      organizationId: jsonSerialization['organizationId'] as int?,
+      organization: jsonSerialization['organization'] == null
+          ? null
+          : _i7rf0d0e.Protocol().deserialize<_i0w1hmpk.Organization>(
+              jsonSerialization['organization'],
+            ),
       status: jsonSerialization['status'] == null
           ? null
           : _ilk1qg37.BookingStatus.fromJson(
               (jsonSerialization['status'] as String),
+            ),
+      optionExpiresAt: jsonSerialization['optionExpiresAt'] == null
+          ? null
+          : _isc.DateTimeJsonExtension.fromJson(
+              jsonSerialization['optionExpiresAt'],
+            ),
+      mealPlanId: jsonSerialization['mealPlanId'] as int?,
+      mealPlan: jsonSerialization['mealPlan'] == null
+          ? null
+          : _i7rf0d0e.Protocol().deserialize<_iqp4km0h.MealPlan>(
+              jsonSerialization['mealPlan'],
+            ),
+      billingMode: jsonSerialization['billingMode'] == null
+          ? null
+          : _ikjlxdwh.BillingMode.fromJson(
+              (jsonSerialization['billingMode'] as String),
+            ),
+      expectedGuestCount: jsonSerialization['expectedGuestCount'] as int?,
+      notes: jsonSerialization['notes'] as String?,
+      rooms: jsonSerialization['rooms'] == null
+          ? null
+          : _i7rf0d0e.Protocol().deserialize<List<_icgf4f53.BookingRoom>>(
+              jsonSerialization['rooms'],
             ),
     );
   }
@@ -71,13 +128,33 @@ abstract class Booking
 
   String title;
 
-  DateTime? from;
+  DateTime? arrival;
 
-  DateTime? to;
+  DateTime? departure;
 
-  _imbxrfja.Contact lead;
+  int leadId;
+
+  _imbxrfja.Contact? lead;
+
+  int? organizationId;
+
+  _i0w1hmpk.Organization? organization;
 
   _ilk1qg37.BookingStatus status;
+
+  DateTime? optionExpiresAt;
+
+  int? mealPlanId;
+
+  _iqp4km0h.MealPlan? mealPlan;
+
+  _ikjlxdwh.BillingMode billingMode;
+
+  int? expectedGuestCount;
+
+  String? notes;
+
+  List<_icgf4f53.BookingRoom>? rooms;
 
   /// Returns a shallow copy of this [Booking]
   /// with some or all fields replaced by the given arguments.
@@ -86,10 +163,20 @@ abstract class Booking
     int? id,
     DateTime? createdAt,
     String? title,
-    DateTime? from,
-    DateTime? to,
+    DateTime? arrival,
+    DateTime? departure,
+    int? leadId,
     _imbxrfja.Contact? lead,
+    int? organizationId,
+    _i0w1hmpk.Organization? organization,
     _ilk1qg37.BookingStatus? status,
+    DateTime? optionExpiresAt,
+    int? mealPlanId,
+    _iqp4km0h.MealPlan? mealPlan,
+    _ikjlxdwh.BillingMode? billingMode,
+    int? expectedGuestCount,
+    String? notes,
+    List<_icgf4f53.BookingRoom>? rooms,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -98,10 +185,20 @@ abstract class Booking
       if (id != null) 'id': id,
       'createdAt': createdAt.toJson(),
       'title': title,
-      if (from != null) 'from': from?.toJson(),
-      if (to != null) 'to': to?.toJson(),
-      'lead': lead.toJson(),
+      if (arrival != null) 'arrival': arrival?.toJson(),
+      if (departure != null) 'departure': departure?.toJson(),
+      'leadId': leadId,
+      if (lead != null) 'lead': lead?.toJson(),
+      if (organizationId != null) 'organizationId': organizationId,
+      if (organization != null) 'organization': organization?.toJson(),
       'status': status.toJson(),
+      if (optionExpiresAt != null) 'optionExpiresAt': optionExpiresAt?.toJson(),
+      if (mealPlanId != null) 'mealPlanId': mealPlanId,
+      if (mealPlan != null) 'mealPlan': mealPlan?.toJson(),
+      'billingMode': billingMode.toJson(),
+      if (expectedGuestCount != null) 'expectedGuestCount': expectedGuestCount,
+      if (notes != null) 'notes': notes,
+      if (rooms != null) 'rooms': rooms?.toJson(valueToJson: (v) => v.toJson()),
     };
   }
 
@@ -112,10 +209,22 @@ abstract class Booking
       if (id != null) 'id': id,
       'createdAt': createdAt.toJson(),
       'title': title,
-      if (from != null) 'from': from?.toJson(),
-      if (to != null) 'to': to?.toJson(),
-      'lead': lead.toJsonForProtocol(),
+      if (arrival != null) 'arrival': arrival?.toJson(),
+      if (departure != null) 'departure': departure?.toJson(),
+      'leadId': leadId,
+      if (lead != null) 'lead': lead?.toJsonForProtocol(),
+      if (organizationId != null) 'organizationId': organizationId,
+      if (organization != null)
+        'organization': organization?.toJsonForProtocol(),
       'status': status.toJson(),
+      if (optionExpiresAt != null) 'optionExpiresAt': optionExpiresAt?.toJson(),
+      if (mealPlanId != null) 'mealPlanId': mealPlanId,
+      if (mealPlan != null) 'mealPlan': mealPlan?.toJsonForProtocol(),
+      'billingMode': billingMode.toJson(),
+      if (expectedGuestCount != null) 'expectedGuestCount': expectedGuestCount,
+      if (notes != null) 'notes': notes,
+      if (rooms != null)
+        'rooms': rooms?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
     };
   }
 
@@ -132,18 +241,38 @@ class _BookingImpl extends Booking {
     int? id,
     DateTime? createdAt,
     required String title,
-    DateTime? from,
-    DateTime? to,
-    required _imbxrfja.Contact lead,
+    DateTime? arrival,
+    DateTime? departure,
+    required int leadId,
+    _imbxrfja.Contact? lead,
+    int? organizationId,
+    _i0w1hmpk.Organization? organization,
     _ilk1qg37.BookingStatus? status,
+    DateTime? optionExpiresAt,
+    int? mealPlanId,
+    _iqp4km0h.MealPlan? mealPlan,
+    _ikjlxdwh.BillingMode? billingMode,
+    int? expectedGuestCount,
+    String? notes,
+    List<_icgf4f53.BookingRoom>? rooms,
   }) : super._(
          id: id,
          createdAt: createdAt,
          title: title,
-         from: from,
-         to: to,
+         arrival: arrival,
+         departure: departure,
+         leadId: leadId,
          lead: lead,
+         organizationId: organizationId,
+         organization: organization,
          status: status,
+         optionExpiresAt: optionExpiresAt,
+         mealPlanId: mealPlanId,
+         mealPlan: mealPlan,
+         billingMode: billingMode,
+         expectedGuestCount: expectedGuestCount,
+         notes: notes,
+         rooms: rooms,
        );
 
   /// Returns a shallow copy of this [Booking]
@@ -154,19 +283,51 @@ class _BookingImpl extends Booking {
     Object? id = _Undefined,
     DateTime? createdAt,
     String? title,
-    Object? from = _Undefined,
-    Object? to = _Undefined,
-    _imbxrfja.Contact? lead,
+    Object? arrival = _Undefined,
+    Object? departure = _Undefined,
+    int? leadId,
+    Object? lead = _Undefined,
+    Object? organizationId = _Undefined,
+    Object? organization = _Undefined,
     _ilk1qg37.BookingStatus? status,
+    Object? optionExpiresAt = _Undefined,
+    Object? mealPlanId = _Undefined,
+    Object? mealPlan = _Undefined,
+    _ikjlxdwh.BillingMode? billingMode,
+    Object? expectedGuestCount = _Undefined,
+    Object? notes = _Undefined,
+    Object? rooms = _Undefined,
   }) {
     return Booking(
       id: id is int? ? id : this.id,
       createdAt: createdAt ?? this.createdAt,
       title: title ?? this.title,
-      from: from is DateTime? ? from : this.from,
-      to: to is DateTime? ? to : this.to,
-      lead: lead ?? this.lead.copyWith(),
+      arrival: arrival is DateTime? ? arrival : this.arrival,
+      departure: departure is DateTime? ? departure : this.departure,
+      leadId: leadId ?? this.leadId,
+      lead: lead is _imbxrfja.Contact? ? lead : this.lead?.copyWith(),
+      organizationId: organizationId is int?
+          ? organizationId
+          : this.organizationId,
+      organization: organization is _i0w1hmpk.Organization?
+          ? organization
+          : this.organization?.copyWith(),
       status: status ?? this.status,
+      optionExpiresAt: optionExpiresAt is DateTime?
+          ? optionExpiresAt
+          : this.optionExpiresAt,
+      mealPlanId: mealPlanId is int? ? mealPlanId : this.mealPlanId,
+      mealPlan: mealPlan is _iqp4km0h.MealPlan?
+          ? mealPlan
+          : this.mealPlan?.copyWith(),
+      billingMode: billingMode ?? this.billingMode,
+      expectedGuestCount: expectedGuestCount is int?
+          ? expectedGuestCount
+          : this.expectedGuestCount,
+      notes: notes is String? ? notes : this.notes,
+      rooms: rooms is List<_icgf4f53.BookingRoom>?
+          ? rooms
+          : this.rooms?.map((e0) => e0.copyWith()).toList(),
     );
   }
 }

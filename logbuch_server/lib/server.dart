@@ -4,6 +4,7 @@ import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:serverpod_auth_idp_server/providers/email.dart';
 import 'package:serverpod_cloud_storage/serverpod_cloud_storage.dart';
 
+import 'src/auth/roles.dart';
 import 'src/cache_busting.dart';
 import 'src/generated/serverpod.dart';
 import 'src/web/routes/app_config_route.dart';
@@ -33,7 +34,15 @@ void run(List<String> args) async {
         appDisplayName: 'logbuch',
       ),
     ],
+    // The first user to sign up becomes the admin who gives the others
+    // their roles.
+    authUsersConfig: const AuthUsersConfig(
+      onBeforeAuthUserCreated: grantFirstUserAdmin,
+    ),
   );
+  // Roles are scopes of the user. Read them on every call instead of taking
+  // them from the session token, so that a changed role applies at once.
+  pod.authenticationHandler = withCurrentScopes(pod.authenticationHandler!);
 
   // Serve all files in the web/static relative directory under /web.
   // These are used by the default web page.

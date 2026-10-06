@@ -1,0 +1,7 @@
+### What a booking costs by the current rates and fees. Parts that cannot be
+### priced are left out of the lines and listed as problems.
+class: BookingPrice
+fields:
+  lines: List<ChargeLine>
+  total: int
+  problems: List<PricingProblem>

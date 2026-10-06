@@ -8,9 +8,12 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
+// ignore_for_file: dead_code, unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:logbuch_server/src/generated/protocol.dart' as _iil9w69f;
 import 'package:serverpod/serverpod.dart' as _is;
+import '../contacts/organization.dart' as _i0w1hmpk;
 
 abstract class Contact
     implements _is.TableRow<int?>, _is.ProtocolSerialization {
@@ -21,6 +24,15 @@ abstract class Contact
     required this.lastName,
     this.mail,
     this.phone,
+    this.birthDate,
+    this.street,
+    this.zip,
+    this.city,
+    this.country,
+    this.organizationId,
+    this.organization,
+    this.notes,
+    this.privacyConsentAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory Contact({
@@ -30,6 +42,15 @@ abstract class Contact
     required String lastName,
     String? mail,
     String? phone,
+    DateTime? birthDate,
+    String? street,
+    String? zip,
+    String? city,
+    String? country,
+    int? organizationId,
+    _i0w1hmpk.Organization? organization,
+    String? notes,
+    DateTime? privacyConsentAt,
   }) = _ContactImpl;
 
   factory Contact.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -42,6 +63,25 @@ abstract class Contact
       lastName: jsonSerialization['lastName'] as String,
       mail: jsonSerialization['mail'] as String?,
       phone: jsonSerialization['phone'] as String?,
+      birthDate: jsonSerialization['birthDate'] == null
+          ? null
+          : _is.DateTimeJsonExtension.fromJson(jsonSerialization['birthDate']),
+      street: jsonSerialization['street'] as String?,
+      zip: jsonSerialization['zip'] as String?,
+      city: jsonSerialization['city'] as String?,
+      country: jsonSerialization['country'] as String?,
+      organizationId: jsonSerialization['organizationId'] as int?,
+      organization: jsonSerialization['organization'] == null
+          ? null
+          : _iil9w69f.Protocol().deserialize<_i0w1hmpk.Organization>(
+              jsonSerialization['organization'],
+            ),
+      notes: jsonSerialization['notes'] as String?,
+      privacyConsentAt: jsonSerialization['privacyConsentAt'] == null
+          ? null
+          : _is.DateTimeJsonExtension.fromJson(
+              jsonSerialization['privacyConsentAt'],
+            ),
     );
   }
 
@@ -62,6 +102,24 @@ abstract class Contact
 
   String? phone;
 
+  DateTime? birthDate;
+
+  String? street;
+
+  String? zip;
+
+  String? city;
+
+  String? country;
+
+  int? organizationId;
+
+  _i0w1hmpk.Organization? organization;
+
+  String? notes;
+
+  DateTime? privacyConsentAt;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -75,6 +133,15 @@ abstract class Contact
     String? lastName,
     String? mail,
     String? phone,
+    DateTime? birthDate,
+    String? street,
+    String? zip,
+    String? city,
+    String? country,
+    int? organizationId,
+    _i0w1hmpk.Organization? organization,
+    String? notes,
+    DateTime? privacyConsentAt,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -86,6 +153,16 @@ abstract class Contact
       'lastName': lastName,
       if (mail != null) 'mail': mail,
       if (phone != null) 'phone': phone,
+      if (birthDate != null) 'birthDate': birthDate?.toJson(),
+      if (street != null) 'street': street,
+      if (zip != null) 'zip': zip,
+      if (city != null) 'city': city,
+      if (country != null) 'country': country,
+      if (organizationId != null) 'organizationId': organizationId,
+      if (organization != null) 'organization': organization?.toJson(),
+      if (notes != null) 'notes': notes,
+      if (privacyConsentAt != null)
+        'privacyConsentAt': privacyConsentAt?.toJson(),
     };
   }
 
@@ -99,11 +176,22 @@ abstract class Contact
       'lastName': lastName,
       if (mail != null) 'mail': mail,
       if (phone != null) 'phone': phone,
+      if (birthDate != null) 'birthDate': birthDate?.toJson(),
+      if (street != null) 'street': street,
+      if (zip != null) 'zip': zip,
+      if (city != null) 'city': city,
+      if (country != null) 'country': country,
+      if (organizationId != null) 'organizationId': organizationId,
+      if (organization != null)
+        'organization': organization?.toJsonForProtocol(),
+      if (notes != null) 'notes': notes,
+      if (privacyConsentAt != null)
+        'privacyConsentAt': privacyConsentAt?.toJson(),
     };
   }
 
-  static ContactInclude include() {
-    return ContactInclude._();
+  static ContactInclude include({_i0w1hmpk.OrganizationInclude? organization}) {
+    return ContactInclude._(organization: organization);
   }
 
   static ContactIncludeList includeList({
@@ -140,6 +228,15 @@ class _ContactImpl extends Contact {
     required String lastName,
     String? mail,
     String? phone,
+    DateTime? birthDate,
+    String? street,
+    String? zip,
+    String? city,
+    String? country,
+    int? organizationId,
+    _i0w1hmpk.Organization? organization,
+    String? notes,
+    DateTime? privacyConsentAt,
   }) : super._(
          id: id,
          createdAt: createdAt,
@@ -147,6 +244,15 @@ class _ContactImpl extends Contact {
          lastName: lastName,
          mail: mail,
          phone: phone,
+         birthDate: birthDate,
+         street: street,
+         zip: zip,
+         city: city,
+         country: country,
+         organizationId: organizationId,
+         organization: organization,
+         notes: notes,
+         privacyConsentAt: privacyConsentAt,
        );
 
   /// Returns a shallow copy of this [Contact]
@@ -160,6 +266,15 @@ class _ContactImpl extends Contact {
     String? lastName,
     Object? mail = _Undefined,
     Object? phone = _Undefined,
+    Object? birthDate = _Undefined,
+    Object? street = _Undefined,
+    Object? zip = _Undefined,
+    Object? city = _Undefined,
+    Object? country = _Undefined,
+    Object? organizationId = _Undefined,
+    Object? organization = _Undefined,
+    Object? notes = _Undefined,
+    Object? privacyConsentAt = _Undefined,
   }) {
     return Contact(
       id: id is int? ? id : this.id,
@@ -168,6 +283,21 @@ class _ContactImpl extends Contact {
       lastName: lastName ?? this.lastName,
       mail: mail is String? ? mail : this.mail,
       phone: phone is String? ? phone : this.phone,
+      birthDate: birthDate is DateTime? ? birthDate : this.birthDate,
+      street: street is String? ? street : this.street,
+      zip: zip is String? ? zip : this.zip,
+      city: city is String? ? city : this.city,
+      country: country is String? ? country : this.country,
+      organizationId: organizationId is int?
+          ? organizationId
+          : this.organizationId,
+      organization: organization is _i0w1hmpk.Organization?
+          ? organization
+          : this.organization?.copyWith(),
+      notes: notes is String? ? notes : this.notes,
+      privacyConsentAt: privacyConsentAt is DateTime?
+          ? privacyConsentAt
+          : this.privacyConsentAt,
     );
   }
 }
@@ -200,6 +330,48 @@ class ContactUpdateTable extends _is.UpdateTable<ContactTable> {
     table.phone,
     value,
   );
+
+  _is.ColumnValue<DateTime, DateTime> birthDate(DateTime? value) =>
+      _is.ColumnValue(
+        table.birthDate,
+        value,
+      );
+
+  _is.ColumnValue<String, String> street(String? value) => _is.ColumnValue(
+    table.street,
+    value,
+  );
+
+  _is.ColumnValue<String, String> zip(String? value) => _is.ColumnValue(
+    table.zip,
+    value,
+  );
+
+  _is.ColumnValue<String, String> city(String? value) => _is.ColumnValue(
+    table.city,
+    value,
+  );
+
+  _is.ColumnValue<String, String> country(String? value) => _is.ColumnValue(
+    table.country,
+    value,
+  );
+
+  _is.ColumnValue<int, int> organizationId(int? value) => _is.ColumnValue(
+    table.organizationId,
+    value,
+  );
+
+  _is.ColumnValue<String, String> notes(String? value) => _is.ColumnValue(
+    table.notes,
+    value,
+  );
+
+  _is.ColumnValue<DateTime, DateTime> privacyConsentAt(DateTime? value) =>
+      _is.ColumnValue(
+        table.privacyConsentAt,
+        value,
+      );
 }
 
 class ContactTable extends _is.Table<int?> {
@@ -226,6 +398,38 @@ class ContactTable extends _is.Table<int?> {
       'phone',
       this,
     );
+    birthDate = _is.ColumnDateTime(
+      'birthDate',
+      this,
+    );
+    street = _is.ColumnString(
+      'street',
+      this,
+    );
+    zip = _is.ColumnString(
+      'zip',
+      this,
+    );
+    city = _is.ColumnString(
+      'city',
+      this,
+    );
+    country = _is.ColumnString(
+      'country',
+      this,
+    );
+    organizationId = _is.ColumnInt(
+      'organizationId',
+      this,
+    );
+    notes = _is.ColumnString(
+      'notes',
+      this,
+    );
+    privacyConsentAt = _is.ColumnDateTime(
+      'privacyConsentAt',
+      this,
+    );
   }
 
   late final ContactUpdateTable updateTable;
@@ -240,6 +444,37 @@ class ContactTable extends _is.Table<int?> {
 
   late final _is.ColumnString phone;
 
+  late final _is.ColumnDateTime birthDate;
+
+  late final _is.ColumnString street;
+
+  late final _is.ColumnString zip;
+
+  late final _is.ColumnString city;
+
+  late final _is.ColumnString country;
+
+  late final _is.ColumnInt organizationId;
+
+  _i0w1hmpk.OrganizationTable? _organization;
+
+  late final _is.ColumnString notes;
+
+  late final _is.ColumnDateTime privacyConsentAt;
+
+  _i0w1hmpk.OrganizationTable get organization {
+    if (_organization != null) return _organization!;
+    _organization = _is.createRelationTable(
+      relationFieldName: 'organization',
+      field: Contact.t.organizationId,
+      foreignField: _i0w1hmpk.Organization.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i0w1hmpk.OrganizationTable(tableRelation: foreignTableRelation),
+    );
+    return _organization!;
+  }
+
   @override
   List<_is.Column> get columns => [
     id,
@@ -248,14 +483,34 @@ class ContactTable extends _is.Table<int?> {
     lastName,
     mail,
     phone,
+    birthDate,
+    street,
+    zip,
+    city,
+    country,
+    organizationId,
+    notes,
+    privacyConsentAt,
   ];
+
+  @override
+  _is.Table? getRelationTable(String relationField) {
+    if (relationField == 'organization') {
+      return organization;
+    }
+    return null;
+  }
 }
 
 class ContactInclude extends _is.IncludeObject {
-  ContactInclude._();
+  ContactInclude._({_i0w1hmpk.OrganizationInclude? organization}) {
+    _organization = organization;
+  }
+
+  _i0w1hmpk.OrganizationInclude? _organization;
 
   @override
-  Map<String, _is.Include?> get includes => {};
+  Map<String, _is.Include?> get includes => {'organization': _organization};
 
   @override
   _is.Table<int?> get table => Contact.t;
@@ -282,6 +537,10 @@ class ContactIncludeList extends _is.IncludeList {
 
 class ContactRepository {
   const ContactRepository._();
+
+  final attachRow = const ContactAttachRowRepository._();
+
+  final detachRow = const ContactDetachRowRepository._();
 
   /// Returns a list of [Contact]s matching the given query parameters.
   ///
@@ -313,6 +572,7 @@ class ContactRepository {
     _is.OrderByBuilder<ContactTable>? orderBy,
     _is.OrderByListBuilder<ContactTable>? orderByList,
     _is.Transaction? transaction,
+    ContactInclude? include,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
@@ -323,6 +583,7 @@ class ContactRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -352,6 +613,7 @@ class ContactRepository {
     _is.OrderByBuilder<ContactTable>? orderBy,
     _is.OrderByListBuilder<ContactTable>? orderByList,
     _is.Transaction? transaction,
+    ContactInclude? include,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
@@ -361,6 +623,7 @@ class ContactRepository {
       orderByList: orderByList?.call(Contact.t),
       offset: offset,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -371,12 +634,14 @@ class ContactRepository {
     _is.DatabaseSession session,
     int id, {
     _is.Transaction? transaction,
+    ContactInclude? include,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Contact>(
       id,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -670,6 +935,59 @@ class ContactRepository {
       where: where(Contact.t),
       lockMode: lockMode,
       lockBehavior: lockBehavior,
+      transaction: transaction,
+    );
+  }
+}
+
+class ContactAttachRowRepository {
+  const ContactAttachRowRepository._();
+
+  /// Creates a relation between the given [Contact] and [Organization]
+  /// by setting the [Contact]'s foreign key `organizationId` to refer to the [Organization].
+  Future<void> organization(
+    _is.DatabaseSession session,
+    Contact contact,
+    _i0w1hmpk.Organization organization, {
+    _is.Transaction? transaction,
+  }) async {
+    if (contact.id == null) {
+      throw ArgumentError.notNull('contact.id');
+    }
+    if (organization.id == null) {
+      throw ArgumentError.notNull('organization.id');
+    }
+
+    var $contact = contact.copyWith(organizationId: organization.id);
+    await session.db.updateRow<Contact>(
+      $contact,
+      columns: [Contact.t.organizationId],
+      transaction: transaction,
+    );
+  }
+}
+
+class ContactDetachRowRepository {
+  const ContactDetachRowRepository._();
+
+  /// Detaches the relation between this [Contact] and the [Organization] set in `organization`
+  /// by setting the [Contact]'s foreign key `organizationId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> organization(
+    _is.DatabaseSession session,
+    Contact contact, {
+    _is.Transaction? transaction,
+  }) async {
+    if (contact.id == null) {
+      throw ArgumentError.notNull('contact.id');
+    }
+
+    var $contact = contact.copyWith(organizationId: null);
+    await session.db.updateRow<Contact>(
+      $contact,
+      columns: [Contact.t.organizationId],
       transaction: transaction,
     );
   }

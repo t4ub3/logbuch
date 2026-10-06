@@ -1,0 +1,9 @@
+class: Fee
+table: fees
+fields:
+  name: String
+  amount: int
+  unit: FeeUnit
+  ageGroupId: int?, relation(parent=age_groups, onDelete=Restrict)
+  taxRate: int, default=0
+  autoApply: bool, default=false

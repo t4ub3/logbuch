@@ -1,0 +1,5 @@
+enum: DonationSource
+serialized: byName
+values:
+  - overpayment
+  - direct

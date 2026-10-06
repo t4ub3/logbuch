@@ -10,7 +10,9 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:logbuch_client/src/protocol/protocol.dart' as _i7rf0d0e;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import '../contacts/organization.dart' as _i0w1hmpk;
 
 abstract class Contact
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
@@ -21,6 +23,15 @@ abstract class Contact
     required this.lastName,
     this.mail,
     this.phone,
+    this.birthDate,
+    this.street,
+    this.zip,
+    this.city,
+    this.country,
+    this.organizationId,
+    this.organization,
+    this.notes,
+    this.privacyConsentAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory Contact({
@@ -30,6 +41,15 @@ abstract class Contact
     required String lastName,
     String? mail,
     String? phone,
+    DateTime? birthDate,
+    String? street,
+    String? zip,
+    String? city,
+    String? country,
+    int? organizationId,
+    _i0w1hmpk.Organization? organization,
+    String? notes,
+    DateTime? privacyConsentAt,
   }) = _ContactImpl;
 
   factory Contact.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -42,6 +62,25 @@ abstract class Contact
       lastName: jsonSerialization['lastName'] as String,
       mail: jsonSerialization['mail'] as String?,
       phone: jsonSerialization['phone'] as String?,
+      birthDate: jsonSerialization['birthDate'] == null
+          ? null
+          : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['birthDate']),
+      street: jsonSerialization['street'] as String?,
+      zip: jsonSerialization['zip'] as String?,
+      city: jsonSerialization['city'] as String?,
+      country: jsonSerialization['country'] as String?,
+      organizationId: jsonSerialization['organizationId'] as int?,
+      organization: jsonSerialization['organization'] == null
+          ? null
+          : _i7rf0d0e.Protocol().deserialize<_i0w1hmpk.Organization>(
+              jsonSerialization['organization'],
+            ),
+      notes: jsonSerialization['notes'] as String?,
+      privacyConsentAt: jsonSerialization['privacyConsentAt'] == null
+          ? null
+          : _isc.DateTimeJsonExtension.fromJson(
+              jsonSerialization['privacyConsentAt'],
+            ),
     );
   }
 
@@ -60,6 +99,24 @@ abstract class Contact
 
   String? phone;
 
+  DateTime? birthDate;
+
+  String? street;
+
+  String? zip;
+
+  String? city;
+
+  String? country;
+
+  int? organizationId;
+
+  _i0w1hmpk.Organization? organization;
+
+  String? notes;
+
+  DateTime? privacyConsentAt;
+
   /// Returns a shallow copy of this [Contact]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -70,6 +127,15 @@ abstract class Contact
     String? lastName,
     String? mail,
     String? phone,
+    DateTime? birthDate,
+    String? street,
+    String? zip,
+    String? city,
+    String? country,
+    int? organizationId,
+    _i0w1hmpk.Organization? organization,
+    String? notes,
+    DateTime? privacyConsentAt,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -81,6 +147,16 @@ abstract class Contact
       'lastName': lastName,
       if (mail != null) 'mail': mail,
       if (phone != null) 'phone': phone,
+      if (birthDate != null) 'birthDate': birthDate?.toJson(),
+      if (street != null) 'street': street,
+      if (zip != null) 'zip': zip,
+      if (city != null) 'city': city,
+      if (country != null) 'country': country,
+      if (organizationId != null) 'organizationId': organizationId,
+      if (organization != null) 'organization': organization?.toJson(),
+      if (notes != null) 'notes': notes,
+      if (privacyConsentAt != null)
+        'privacyConsentAt': privacyConsentAt?.toJson(),
     };
   }
 
@@ -94,6 +170,17 @@ abstract class Contact
       'lastName': lastName,
       if (mail != null) 'mail': mail,
       if (phone != null) 'phone': phone,
+      if (birthDate != null) 'birthDate': birthDate?.toJson(),
+      if (street != null) 'street': street,
+      if (zip != null) 'zip': zip,
+      if (city != null) 'city': city,
+      if (country != null) 'country': country,
+      if (organizationId != null) 'organizationId': organizationId,
+      if (organization != null)
+        'organization': organization?.toJsonForProtocol(),
+      if (notes != null) 'notes': notes,
+      if (privacyConsentAt != null)
+        'privacyConsentAt': privacyConsentAt?.toJson(),
     };
   }
 
@@ -113,6 +200,15 @@ class _ContactImpl extends Contact {
     required String lastName,
     String? mail,
     String? phone,
+    DateTime? birthDate,
+    String? street,
+    String? zip,
+    String? city,
+    String? country,
+    int? organizationId,
+    _i0w1hmpk.Organization? organization,
+    String? notes,
+    DateTime? privacyConsentAt,
   }) : super._(
          id: id,
          createdAt: createdAt,
@@ -120,6 +216,15 @@ class _ContactImpl extends Contact {
          lastName: lastName,
          mail: mail,
          phone: phone,
+         birthDate: birthDate,
+         street: street,
+         zip: zip,
+         city: city,
+         country: country,
+         organizationId: organizationId,
+         organization: organization,
+         notes: notes,
+         privacyConsentAt: privacyConsentAt,
        );
 
   /// Returns a shallow copy of this [Contact]
@@ -133,6 +238,15 @@ class _ContactImpl extends Contact {
     String? lastName,
     Object? mail = _Undefined,
     Object? phone = _Undefined,
+    Object? birthDate = _Undefined,
+    Object? street = _Undefined,
+    Object? zip = _Undefined,
+    Object? city = _Undefined,
+    Object? country = _Undefined,
+    Object? organizationId = _Undefined,
+    Object? organization = _Undefined,
+    Object? notes = _Undefined,
+    Object? privacyConsentAt = _Undefined,
   }) {
     return Contact(
       id: id is int? ? id : this.id,
@@ -141,6 +255,21 @@ class _ContactImpl extends Contact {
       lastName: lastName ?? this.lastName,
       mail: mail is String? ? mail : this.mail,
       phone: phone is String? ? phone : this.phone,
+      birthDate: birthDate is DateTime? ? birthDate : this.birthDate,
+      street: street is String? ? street : this.street,
+      zip: zip is String? ? zip : this.zip,
+      city: city is String? ? city : this.city,
+      country: country is String? ? country : this.country,
+      organizationId: organizationId is int?
+          ? organizationId
+          : this.organizationId,
+      organization: organization is _i0w1hmpk.Organization?
+          ? organization
+          : this.organization?.copyWith(),
+      notes: notes is String? ? notes : this.notes,
+      privacyConsentAt: privacyConsentAt is DateTime?
+          ? privacyConsentAt
+          : this.privacyConsentAt,
     );
   }
 }

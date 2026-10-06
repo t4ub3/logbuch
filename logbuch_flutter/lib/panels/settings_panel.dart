@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
+import 'package:logbuch_flutter/panels/admin/users_section.dart';
+import 'package:logbuch_flutter/providers/client_provider.dart';
+import 'package:logbuch_flutter/providers/current_user_provider.dart';
 import 'package:logbuch_flutter/providers/settings_provider.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:yaru/yaru.dart';
 
 class SettingsPanel extends ConsumerWidget {
@@ -33,6 +37,7 @@ class SettingsPanel extends ConsumerWidget {
             headline: Text(t.title),
             child: Column(
               children: [
+                const _AccountTile(),
                 YaruListTile(
                   hasFocusBorder: false,
                   title: Text(t.language),
@@ -129,6 +134,28 @@ class SettingsPanel extends ConsumerWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The signed-in user and their role, with a button to sign out.
+class _AccountTile extends ConsumerWidget {
+  const _AccountTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(currentUserProvider).value;
+
+    return YaruListTile(
+      hasFocusBorder: false,
+      title: Text(context.t.auth.account),
+      subtitle: Text(
+        [?user?.email, if (user != null) user.role.label(context)].join(' · '),
+      ),
+      trailing: OutlinedButton(
+        onPressed: () => ref.read(serverpodClientProvider).auth.signOutDevice(),
+        child: Text(context.t.common.signOut),
       ),
     );
   }

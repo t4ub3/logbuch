@@ -5,6 +5,8 @@ import 'package:logbuch_flutter/client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/providers/settings_provider.dart';
 import 'package:logbuch_flutter/screens/main_screen.dart';
+import 'package:logbuch_flutter/screens/role_gate.dart';
+import 'package:logbuch_flutter/screens/sign_in_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yaru/yaru.dart';
 
@@ -51,7 +53,7 @@ class MyApp extends ConsumerWidget {
         locale: TranslationProvider.of(context).flutterLocale,
         supportedLocales: AppLocaleUtils.supportedLocales,
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
-        home: const MainScreen(),
+        home: const SignInScreen(child: RoleGate(child: MainScreen())),
       ),
     );
   }

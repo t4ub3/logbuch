@@ -1,0 +1,8 @@
+class: Organization
+table: organizations
+fields:
+  name: String
+  street: String?
+  zip: String?
+  city: String?
+  country: String?

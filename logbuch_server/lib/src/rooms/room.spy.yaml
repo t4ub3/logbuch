@@ -3,3 +3,9 @@ table: rooms
 fields:
   roomNumber: String
   bedAmount: int
+  building: String?
+  floor: String?
+  priceCategory: PriceCategory?, relation(onDelete=Restrict)
+  cribPossible: bool, default=false
+  active: bool, default=true
+  notes: String?

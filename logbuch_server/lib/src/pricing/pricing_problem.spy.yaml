@@ -1,0 +1,7 @@
+### Something that keeps a part of a booking from being priced.
+class: PricingProblem
+fields:
+  reason: PricingProblemReason
+  guestId: int?
+  ### What is missing: a night, or the names a rate is missing for.
+  detail: String?

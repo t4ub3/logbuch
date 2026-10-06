@@ -1,0 +1,16 @@
+### A contact staying with a booking, in one of the rooms it holds.
+class: Guest
+table: guests
+fields:
+  group: GuestGroup?, relation(name=group_guests, onDelete=Cascade)
+  contact: Contact?, relation(onDelete=Restrict)
+  ### Null while the guest is not assigned to a room yet.
+  bookingRoom: BookingRoom?, relation(optional, onDelete=SetNull)
+  needsCrib: bool, default=false
+  ### Used instead of the age from the birth date of the contact.
+  ageGroupOverride: AgeGroup?, relation(optional, onDelete=Restrict)
+  ### Set for the rare guest who arrives later or departs earlier than the
+  ### booking.
+  arrivalOverride: DateTime?
+  departureOverride: DateTime?
+  dietaryNotes: String?

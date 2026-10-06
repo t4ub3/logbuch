@@ -1,0 +1,4 @@
+exception: ValidationException
+fields:
+  reason: ValidationError
+  detail: String?

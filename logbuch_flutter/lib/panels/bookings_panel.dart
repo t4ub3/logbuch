@@ -5,8 +5,10 @@ import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/panels/bookings/bookings_agenda_view.dart';
 import 'package:logbuch_flutter/panels/bookings/bookings_month_view.dart';
+import 'package:logbuch_flutter/panels/bookings/bookings_occupancy_view.dart';
 import 'package:logbuch_flutter/panels/bookings/bookings_year_view.dart';
 import 'package:logbuch_flutter/providers/bookings_view_provider.dart';
+import 'package:logbuch_flutter/providers/current_user_provider.dart';
 import 'package:yaru/yaru.dart';
 
 class BookingsPanel extends ConsumerWidget {
@@ -42,6 +44,11 @@ class BookingsPanel extends ConsumerWidget {
                       label: Text(context.t.bookings.year),
                       icon: const Icon(Icons.calendar_today),
                     ),
+                    ButtonSegment(
+                      value: BookingsView.occupancy,
+                      label: Text(context.t.bookings.occupancy),
+                      icon: const Icon(Icons.bed),
+                    ),
                   ],
                   selected: {view},
                   showSelectedIcon: false,
@@ -51,14 +58,15 @@ class BookingsPanel extends ConsumerWidget {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton.icon(
-                icon: Icon(YaruIcons.plus),
-                onPressed: () => openBookingTab(context),
-                label: Text(context.t.bookings.newBooking),
+            if (ref.watch(canEditProvider))
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton.icon(
+                  icon: Icon(YaruIcons.plus),
+                  onPressed: () => openBookingTab(context),
+                  label: Text(context.t.bookings.newBooking),
+                ),
               ),
-            ),
           ],
         ),
         const InsetDivider(),
@@ -67,6 +75,7 @@ class BookingsPanel extends ConsumerWidget {
             BookingsView.agenda => const BookingsAgendaView(),
             BookingsView.month => const BookingsMonthView(),
             BookingsView.year => const BookingsYearView(),
+            BookingsView.occupancy => const BookingsOccupancyView(),
           },
         ),
       ],

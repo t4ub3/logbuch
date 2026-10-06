@@ -1,0 +1,11 @@
+### Money received for a folio, or paid back if the amount is negative.
+class: Payment
+table: payments
+fields:
+  folio: Folio?, relation(name=folio_payments, onDelete=Restrict)
+  payer: Contact?, relation(onDelete=Restrict)
+  amount: int
+  date: DateTime
+  method: PaymentMethod
+  reference: String?
+  donations: List<Donation>?, relation(name=payment_donations)

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_client/logbuch_client.dart';
+import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
+import 'package:logbuch_flutter/panels/contacts/contacts_section.dart';
 
 const _bookingColors = [
   Color(0xFF1E88E5), // blue
@@ -14,17 +16,18 @@ const _bookingColors = [
 ];
 
 extension BookingX on Booking {
-  /// First day of the booking (local, date only), or null if undated.
-  DateTime? get startDay {
-    final start = from ?? to;
-    return start == null ? null : DateUtils.dateOnly(start.toLocal());
-  }
+  /// Day of arrival (local, date only), or null if undated.
+  DateTime? get startDay => switch (arrival) {
+    final arrival? => toLocalDate(arrival),
+    null => null,
+  };
 
-  /// Last day of the booking (local, date only), or null if undated.
-  DateTime? get endDay {
-    final end = to ?? from;
-    return end == null ? null : DateUtils.dateOnly(end.toLocal());
-  }
+  /// Day of departure (local, date only), or null if undated. Calendars
+  /// show the booking up to and including this day.
+  DateTime? get endDay => switch (departure) {
+    final departure? => toLocalDate(departure),
+    null => null,
+  };
 
   /// Whether the booking covers the given [day].
   bool coversDay(DateTime day) {
@@ -38,7 +41,7 @@ extension BookingX on Booking {
   /// A stable color per booking, used to tell bookings apart in calendars.
   Color get color => _bookingColors[(id ?? 0) % _bookingColors.length];
 
-  String get leadName => '${lead.firstName} ${lead.lastName}';
+  String get leadName => lead?.fullName ?? '';
 
   String leadLabel(BuildContext context) =>
       context.t.bookings.lead(name: leadName);
@@ -90,10 +93,28 @@ extension BookingStatusX on BookingStatus {
   String label(BuildContext context) {
     final t = context.t.bookings.statuses;
     return switch (this) {
-      BookingStatus.requested => t.requested,
-      BookingStatus.booked => t.booked,
-      BookingStatus.billed => t.billed,
-      BookingStatus.paid => t.paid,
+      BookingStatus.inquiry => t.inquiry,
+      BookingStatus.option => t.option,
+      BookingStatus.confirmed => t.confirmed,
+      BookingStatus.checkedIn => t.checkedIn,
+      BookingStatus.completed => t.completed,
+      BookingStatus.cancelled => t.cancelled,
+    };
+  }
+
+  /// Whether the booking is not agreed on yet. Such bookings hold their
+  /// rooms, but are drawn hatched.
+  bool get isTentative =>
+      this == BookingStatus.inquiry || this == BookingStatus.option;
+}
+
+extension BillingModeX on BillingMode {
+  String label(BuildContext context) {
+    final t = context.t.bookings.billingModes;
+    return switch (this) {
+      BillingMode.single => t.single,
+      BillingMode.perGroup => t.perGroup,
+      BillingMode.perGuest => t.perGuest,
     };
   }
 }

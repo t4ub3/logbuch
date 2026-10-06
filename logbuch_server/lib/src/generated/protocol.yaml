@@ -9,18 +9,85 @@ emailIdp:
   - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
+user:
+  - me:
+  - getAll:
+  - setRole:
+billing:
+  - getFolios:
+  - addCharge:
+  - deleteCharge:
+  - invoice:
+  - addPayment:
+  - deletePayment:
+  - donate:
+  - deleteDonation:
 booking:
   - getAll:
   - getById:
   - add:
   - update:
+  - availableRooms:
+  - setRooms:
 contact:
   - getAll:
   - getById:
   - add:
+  - update:
+  - delete:
+organization:
+  - getAll:
+  - add:
+  - update:
+  - delete:
 greeting:
   - hello:
+guest:
+  - getByBooking:
+  - addGroup:
+  - updateGroup:
+  - deleteGroup:
+  - addGuest:
+  - addNewGuest:
+  - updateGuest:
+  - deleteGuest:
+  - assign:
+ageGroup:
+  - getAll:
+  - add:
+  - update:
+  - delete:
+fee:
+  - getAll:
+  - add:
+  - update:
+  - delete:
+mealPlan:
+  - getAll:
+  - add:
+  - update:
+  - delete:
+mealRate:
+  - getBySeason:
+  - saveForSeason:
+priceCategory:
+  - getAll:
+  - add:
+  - update:
+  - delete:
+pricing:
+  - calculate:
+roomRate:
+  - getBySeason:
+  - saveForSeason:
+season:
+  - getAll:
+  - add:
+  - update:
+  - delete:
 room:
   - getAll:
   - getById:
   - add:
+  - update:
+  - delete:

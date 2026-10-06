@@ -1,0 +1,10 @@
+### Guests of a booking who belong together, such as a family.
+class: GuestGroup
+table: guest_groups
+fields:
+  booking: Booking?, relation(onDelete=Cascade)
+  name: String
+  ### Pays for the group if the booking is billed per group.
+  payer: Contact?, relation(optional, onDelete=SetNull)
+  sortOrder: int, default=0
+  guests: List<Guest>?, relation(name=group_guests)

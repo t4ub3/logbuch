@@ -5,10 +5,10 @@
 ///
 ///   serverpod run seed
 ///
-/// Does nothing if contacts, rooms or bookings already exist.
+/// Does nothing if contacts, price categories, rooms or bookings already
+/// exist.
 library;
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:logbuch_server/src/generated/protocol.dart';
@@ -31,7 +31,7 @@ Future<void> main() async {
     settings: ConnectionSettings(sslMode: SslMode.disable),
   );
 
-  for (final t in ['contacts', 'rooms', 'bookings']) {
+  for (final t in ['contacts', 'price_categories', 'rooms', 'bookings']) {
     final r = await conn.execute('SELECT count(*) FROM $t');
     if ((r.first[0] as int) > 0) {
       print('Table $t is not empty, skipping seed.');
@@ -68,15 +68,21 @@ Future<void> main() async {
       );
     }
 
+    final category = await tx.execute(
+      "INSERT INTO price_categories (name) VALUES ('Standard') RETURNING id",
+    );
+
     for (var floor = 1; floor <= 3; floor++) {
       for (var n = 1; n <= 5; n++) {
         await tx.execute(
           Sql.named(
-            'INSERT INTO rooms ("roomNumber", "bedAmount") VALUES (@r, @b)',
+            'INSERT INTO rooms ("roomNumber", "bedAmount", "priceCategoryId") '
+            'VALUES (@r, @b, @c)',
           ),
           parameters: {
             'r': '$floor${n.toString().padLeft(2, '0')}',
             'b': n % 4 + 1,
+            'c': category.first[0],
           },
         );
       }
@@ -104,14 +110,14 @@ Future<void> main() async {
     ]) {
       await tx.execute(
         Sql.named(
-          'INSERT INTO bookings (title, "from", "to", lead) '
-          'VALUES (@t, @from, @to, @lead::json)',
+          'INSERT INTO bookings (title, arrival, departure, "leadId") '
+          'VALUES (@t, @arrival, @departure, @lead)',
         ),
         parameters: {
           't': b.$1,
-          'from': b.$2,
-          'to': b.$3,
-          'lead': jsonEncode(b.$4.toJson()),
+          'arrival': b.$2,
+          'departure': b.$3,
+          'lead': b.$4.id,
         },
       );
     }

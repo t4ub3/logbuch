@@ -1,0 +1,6 @@
+class: AgeGroup
+table: age_groups
+fields:
+  name: String
+  minAge: int
+  maxAge: int?

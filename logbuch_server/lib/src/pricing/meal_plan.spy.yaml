@@ -1,0 +1,4 @@
+class: MealPlan
+table: meal_plans
+fields:
+  name: String

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/components/inset_divider.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
+import 'package:logbuch_flutter/panels/admin_panel.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_extensions.dart';
 import 'package:logbuch_flutter/panels/bookings_panel.dart';
 import 'package:logbuch_flutter/panels/contacts_panel.dart';
-import 'package:logbuch_flutter/panels/rooms_panel.dart';
 import 'package:logbuch_flutter/panels/settings_panel.dart';
 import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:logbuch_flutter/theme/dimmed_accent.dart';
@@ -14,7 +14,7 @@ import 'package:yaru/yaru.dart';
 enum MenuItem {
   calendar(BookingsPanel()),
   contacts(ContactsPanel()),
-  rooms(RoomsPanel()),
+  admin(AdminPanel()),
   settings(SettingsPanel());
 
   const MenuItem(this.panel);
@@ -24,7 +24,7 @@ enum MenuItem {
   String title(Translations t) => switch (this) {
     calendar => t.menu.calendar,
     contacts => t.menu.contacts,
-    rooms => t.menu.rooms,
+    admin => t.menu.admin,
     settings => t.menu.settings,
   };
 
@@ -32,7 +32,7 @@ enum MenuItem {
     calendar => selected ? YaruIcons.calendar_filled : YaruIcons.calendar,
     contacts =>
       selected ? YaruIcons.address_book_filled : YaruIcons.address_book,
-    rooms => selected ? YaruIcons.key_filled : YaruIcons.key,
+    admin => selected ? YaruIcons.wrench_filled : YaruIcons.wrench,
     settings => selected ? YaruIcons.gear_filled : YaruIcons.gear,
   };
 }

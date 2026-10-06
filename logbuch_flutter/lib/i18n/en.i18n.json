@@ -2,7 +2,20 @@
     "common": {
         "loadFailed": "Failed to load: {error}",
         "retry": "Retry",
-        "noEntries": "No entries"
+        "noEntries": "No entries",
+        "edit": "Edit",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "save": "Save",
+        "discard": "Discard",
+        "required": "Required",
+        "name": "Name",
+        "saveFailed": "Saving failed: {error}",
+        "deleteFailed": "Deleting failed: {error}",
+        "none": "None",
+        "search": "Search",
+        "signOut": "Sign out",
+        "clear": "Clear"
     },
     "tabs": {
         "close": "Close tab"
@@ -10,7 +23,7 @@
     "menu": {
         "calendar": "Calendar",
         "contacts": "Contacts",
-        "rooms": "Rooms",
+        "admin": "Admin",
         "settings": "Settings"
     },
     "bookings": {
@@ -32,10 +45,12 @@
         "phone": "Phone",
         "status": "Status",
         "statuses": {
-            "requested": "Requested",
-            "booked": "Booked",
-            "billed": "Billed",
-            "paid": "Paid"
+            "inquiry": "Inquiry",
+            "option": "Option",
+            "confirmed": "Confirmed",
+            "checkedIn": "Checked in",
+            "completed": "Completed",
+            "cancelled": "Cancelled"
         },
         "editBooking": "Edit booking",
         "titleField": "Title",
@@ -46,10 +61,152 @@
         "required": "Required",
         "cancel": "Cancel",
         "save": "Save",
-        "saveFailed": "Saving failed: {error}"
+        "saveFailed": "Saving failed: {error}",
+        "occupancy": "Occupancy",
+        "overview": "Overview",
+        "rooms": "Rooms",
+        "organization": "Organization",
+        "mealPlan": "Meal plan",
+        "billingMode": "Invoices",
+        "billingModes": {
+            "single": "One invoice for the booking",
+            "perGroup": "One invoice per group",
+            "perGuest": "One invoice per guest"
+        },
+        "expectedGuests": "Expected guests",
+        "optionExpiresAt": "Option valid until",
+        "notes": "Notes",
+        "roomsNeedDates": "Set the dates of the booking to choose its rooms.",
+        "noFreeRooms": "No rooms are free for these dates.",
+        "selectedBeds": {
+            "one": "{n} bed selected",
+            "other": "{n} beds selected"
+        },
+        "guestsExpected": {
+            "one": "{n} guest expected",
+            "other": "{n} guests expected"
+        },
+        "roomsSaved": "Rooms saved",
+        "guests": "Guests",
+        "assignment": "Assignment",
+        "price": "Price",
+        "noGroups": "No guests yet. Start with a group, such as a family.",
+        "addGroup": "New group",
+        "editGroup": "Edit group",
+        "payer": "Pays for the group",
+        "deleteGroupHint": "Its guests are removed from the booking. Their contacts stay.",
+        "addGuest": "Add guest",
+        "editGuest": "Edit guest",
+        "removeGuestHint": "The guest is removed from the booking. The contact stays.",
+        "existingContact": "Existing contact",
+        "newContact": "New contact",
+        "contact": "Contact",
+        "needsCrib": "Sleeps in a crib",
+        "crib": "Crib",
+        "ageGroup": "Age group",
+        "ageByBirthDate": "By date of birth",
+        "ageUnknown": "Age unknown",
+        "dietaryNotes": "Dietary needs",
+        "arrivalOverride": "Arrives later, on",
+        "departureOverride": "Departs earlier, on",
+        "guestCount": {
+            "one": "{n} guest",
+            "other": "{n} guests"
+        },
+        "unassigned": "Without a room",
+        "everybodyAssigned": "Everybody has a room.",
+        "noRoomsHeld": "The booking holds no rooms yet. Choose them under Rooms.",
+        "moveTo": "Move to",
+        "bedsUsed": "{used} of {beds} beds",
+        "roomFull": "Full",
+        "freeBeds": {
+            "one": "{n} free bed",
+            "other": "{n} free beds"
+        },
+        "roomOverfull": "More guests than beds",
+        "roomNoCrib": "No crib can be set up here",
+        "total": "Total",
+        "inclTax": "All prices include tax.",
+        "nothingToPrice": "Nothing to price yet.",
+        "wholeBooking": "Whole booking",
+        "chargeTypes": {
+            "lodging": "Lodging",
+            "meal": "Meals",
+            "fee": "Fee",
+            "discount": "Discount",
+            "manual": "Other"
+        },
+        "pricingProblems": {
+            "datesMissing": "The booking has no dates.",
+            "ageUnknown": "{name}: the age is not known. Enter a date of birth or choose an age group.",
+            "roomMissing": "{name}: has no room yet.",
+            "seasonMissing": "No season covers {date}.",
+            "roomRateMissing": "No lodging price for {detail}.",
+            "mealRateMissing": "No meal price for {detail}."
+        },
+        "billing": "Billing",
+        "noFolios": "Nothing to bill yet. Add guests and give them rooms first.",
+        "folioOpen": "Not invoiced yet",
+        "folioInvoiced": "Invoice {number} of {date}",
+        "stillToPay": "Still to pay",
+        "paidInFull": "Paid in full",
+        "overpaid": "Overpaid",
+        "decide": "Decide",
+        "recordPayment": "Record payment",
+        "addCharge": "Add charge",
+        "createInvoice": "Create invoice",
+        "createInvoiceHint": "The folio gets the next invoice number, and its charges can no longer change after that.",
+        "payment": "Payment",
+        "refund": "Refund",
+        "donation": "Donation",
+        "amount": "Amount",
+        "date": "Date",
+        "paymentMethod": "Paid by",
+        "paymentMethods": {
+            "cash": "Cash",
+            "bankTransfer": "Bank transfer",
+            "card": "Card",
+            "other": "Other"
+        },
+        "reference": "Reference",
+        "overpaidTitle": "{amount} overpaid",
+        "overpaidText": "What happens with this money? Only record a donation if {name} said to keep it as one.",
+        "asDonation": "Record as donation",
+        "asRefund": "Refund",
+        "asCredit": "Keep as credit",
+        "removePaymentHint": "Only remove a payment that was recorded by mistake.",
+        "removeDonationHint": "The money counts as overpaid again.",
+        "description": "Description",
+        "quantity": "Quantity",
+        "unitPrice": "Price each",
+        "isDiscount": "This is a discount",
+        "taxRate": "Tax rate"
     },
     "contacts": {
-        "empty": "No contacts"
+        "empty": "No contacts",
+        "people": "People",
+        "organizations": "Organizations",
+        "add": "New contact",
+        "edit": "Edit contact",
+        "searchHint": "Search contacts",
+        "noMatches": "No matching contacts",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "nameRequired": "Enter a first or a last name",
+        "birthDate": "Date of birth",
+        "email": "Email",
+        "phone": "Phone",
+        "street": "Street",
+        "zip": "Postal code",
+        "city": "City",
+        "country": "Country",
+        "organization": "Organization",
+        "notes": "Notes",
+        "privacyConsent": "Consented to the storing of their data",
+        "noOrganizations": "No organizations",
+        "addOrganization": "New organization",
+        "editOrganization": "Edit organization",
+        "deleteOrganizationHint": "Its contacts stay, without an organization."
     },
     "rooms": {
         "empty": "No rooms",
@@ -57,6 +214,145 @@
         "beds": {
             "one": "{n} bed",
             "other": "{n} beds"
+        }
+    },
+    "admin": {
+        "sections": {
+            "rooms": "Rooms",
+            "priceCategories": "Price categories",
+            "ageGroups": "Age groups",
+            "seasons": "Seasons",
+            "mealPlans": "Meal plans",
+            "rates": "Prices",
+            "fees": "Fees",
+            "users": "Users"
+        },
+        "deleteTitle": "Delete “{name}”?",
+        "invalidNumber": "Enter a whole number",
+        "invalidAmount": "Enter an amount such as 12.50",
+        "errors": {
+            "nameRequired": "A name is required.",
+            "invalidDate": "The date is not valid.",
+            "invalidDateRange": "The end must not be before the start.",
+            "seasonOverlap": "The period overlaps with the season “{name}”.",
+            "invalidAgeRange": "The maximum age must not be below the minimum age.",
+            "ageGroupOverlap": "The ages overlap with the age group “{name}”.",
+            "invalidAmount": "Amounts must not be negative.",
+            "invalidTaxRate": "The tax rate must be between 0 and 100 %.",
+            "invalidBedAmount": "The number of beds must not be negative.",
+            "duplicateRate": "A price was entered twice.",
+            "inUse": "This entry is still in use and cannot be deleted.",
+            "invalidGuestCount": "The number of guests must not be negative.",
+            "notFound": "This entry no longer exists.",
+            "datesRequired": "A booking that holds rooms needs dates.",
+            "roomUnavailable": "Not free for these dates: room {name}.",
+            "adminRequired": "Only admins can change data.",
+            "ownRole": "You cannot change your own role.",
+            "roomNotHeld": "The booking does not hold this room.",
+            "alreadyInvoiced": "This is invoiced and can no longer be changed.",
+            "nothingToInvoice": "There is nothing to invoice.",
+            "pricingIncomplete": "Parts of the booking cannot be priced yet. See the Price tab for what is missing.",
+            "notOverpaid": "This is more than was overpaid."
+        },
+        "rooms": {
+            "add": "New room",
+            "edit": "Edit room",
+            "number": "Room number",
+            "beds": "Beds",
+            "priceCategory": "Price category",
+            "noPriceCategories": "Create a price category first.",
+            "building": "Building",
+            "floor": "Floor",
+            "cribPossible": "A crib can be set up",
+            "crib": "Crib possible",
+            "active": "Active",
+            "activeHint": "Inactive rooms stay in past bookings but can no longer be booked.",
+            "inactive": "Inactive",
+            "notes": "Notes"
+        },
+        "priceCategories": {
+            "empty": "No price categories",
+            "add": "New price category",
+            "edit": "Edit price category",
+            "sortOrder": "Position in lists",
+            "deleteHint": "The prices of this category are deleted as well."
+        },
+        "ageGroups": {
+            "empty": "No age groups",
+            "add": "New age group",
+            "edit": "Edit age group",
+            "minAge": "From age",
+            "maxAge": "To age",
+            "maxAgeHint": "Empty for no upper limit",
+            "range": "{min} to {max} years",
+            "singleAge": {
+                "one": "{n} year",
+                "other": "{n} years"
+            },
+            "openRange": "{min} years and older",
+            "deleteHint": "The prices of this age group are deleted as well."
+        },
+        "seasons": {
+            "empty": "No seasons",
+            "add": "New season",
+            "edit": "Edit season",
+            "period": "Period",
+            "gap": "No season covers {from} – {to}. Stays in this period cannot be priced.",
+            "deleteHint": "The prices of this season are deleted as well."
+        },
+        "mealPlans": {
+            "empty": "No meal plans",
+            "add": "New meal plan",
+            "edit": "Edit meal plan",
+            "deleteHint": "The prices of this meal plan are deleted as well."
+        },
+        "rates": {
+            "lodging": "Lodging",
+            "meals": "Meals",
+            "priceCategory": "Price category",
+            "mealPlan": "Meal plan",
+            "missingLodging": "Prices need at least one season, one age group and one price category.",
+            "missingMeals": "Prices need at least one season, one age group and one meal plan.",
+            "hint": "Prices per person and night in euros. An empty field has no price.",
+            "invalid": "Enter amounts such as 12.50.",
+            "saved": "Prices saved"
+        },
+        "fees": {
+            "empty": "No fees",
+            "add": "New fee",
+            "edit": "Edit fee",
+            "amount": "Amount",
+            "unit": "Charged",
+            "units": {
+                "perBooking": "per booking",
+                "perPerson": "per person",
+                "perPersonNight": "per person and night",
+                "perRoom": "per room",
+                "perRoomNight": "per room and night"
+            },
+            "ageGroup": "Applies to",
+            "allAges": "All ages",
+            "taxRate": "Tax rate",
+            "tax": "{rate} % tax",
+            "autoApply": "Add to every booking",
+            "autoApplyHint": "Otherwise the fee is added to a booking by hand.",
+            "auto": "every booking"
+        },
+        "users": {
+            "empty": "No users",
+            "unknownEmail": "No email address",
+            "you": "you"
+        }
+    },
+    "auth": {
+        "waitingTitle": "Waiting for access",
+        "waitingText": "Your account {email} has no role yet. An admin has to give you access.",
+        "checkAgain": "Check again",
+        "account": "Account",
+        "roles": {
+            "admin": "Admin",
+            "viewer": "View only",
+            "none": "No access"
         }
     },
     "settings": {

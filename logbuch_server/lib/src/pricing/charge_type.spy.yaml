@@ -1,0 +1,8 @@
+enum: ChargeType
+serialized: byName
+values:
+  - lodging
+  - meal
+  - fee
+  - discount
+  - manual

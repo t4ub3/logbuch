@@ -1,0 +1,6 @@
+enum: BillingMode
+serialized: byName
+values:
+  - single
+  - perGroup
+  - perGuest

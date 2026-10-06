@@ -40,7 +40,7 @@ final class TabsProvider extends $NotifierProvider<Tabs, OpenTabs> {
   }
 }
 
-String _$tabsHash() => r'ff38c1c99d9a9975c9372c6fe856f8289248a05e';
+String _$tabsHash() => r'f700656aadb7a5cd7f17509d335323edd3e79cad';
 
 abstract class _$Tabs extends $Notifier<OpenTabs> {
   OpenTabs build();

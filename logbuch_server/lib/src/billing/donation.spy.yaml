@@ -1,0 +1,11 @@
+### Money a contact gave without getting something for it. Only recorded
+### when the donor said so, never worked out from what was overpaid.
+class: Donation
+table: donations
+fields:
+  contact: Contact?, relation(onDelete=Restrict)
+  amount: int
+  date: DateTime
+  ### The payment the donation was part of, if it was left over from one.
+  payment: Payment?, relation(name=payment_donations, optional, onDelete=Restrict)
+  source: DonationSource

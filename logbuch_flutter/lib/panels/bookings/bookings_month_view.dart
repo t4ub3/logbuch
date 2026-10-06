@@ -24,7 +24,7 @@ class BookingsMonthView extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _MonthHeader(month: month),
+        MonthHeader(month: month),
         Expanded(
           child: switch (bookings) {
             AsyncData(:final value) => _MonthGrid(
@@ -43,8 +43,9 @@ class BookingsMonthView extends ConsumerWidget {
   }
 }
 
-class _MonthHeader extends ConsumerWidget {
-  const _MonthHeader({required this.month});
+/// The displayed month with buttons to move through the months.
+class MonthHeader extends ConsumerWidget {
+  const MonthHeader({super.key, required this.month});
 
   final DateTime month;
 

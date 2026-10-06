@@ -1,8 +1,10 @@
 enum: BookingStatus
 serialized: byName
-default: requested
+default: inquiry
 values:
-  - requested
-  - booked
-  - billed
-  - paid
+  - inquiry
+  - option
+  - confirmed
+  - checkedIn
+  - completed
+  - cancelled

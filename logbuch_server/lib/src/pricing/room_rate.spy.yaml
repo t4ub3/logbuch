@@ -1,0 +1,11 @@
+class: RoomRate
+table: room_rates
+fields:
+  seasonId: int, relation(parent=seasons, onDelete=Cascade)
+  priceCategoryId: int, relation(parent=price_categories, onDelete=Cascade)
+  ageGroupId: int, relation(parent=age_groups, onDelete=Cascade)
+  pricePerNight: int
+indexes:
+  room_rates_unique_idx:
+    fields: seasonId, priceCategoryId, ageGroupId
+    unique: true

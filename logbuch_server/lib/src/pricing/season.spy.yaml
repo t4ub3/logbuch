@@ -1,0 +1,6 @@
+class: Season
+table: seasons
+fields:
+  name: String
+  validFrom: DateTime
+  validTo: DateTime

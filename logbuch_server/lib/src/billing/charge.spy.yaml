@@ -1,0 +1,18 @@
+### A position on a folio. It keeps the price it was charged with, whatever
+### happens to the rates later. Amounts are in cents and include the tax.
+class: Charge
+table: charges
+fields:
+  folio: Folio?, relation(name=folio_charges, onDelete=Cascade)
+  ### Null for what is charged per booking or per room, and for charges
+  ### added by hand.
+  guest: Guest?, relation(optional, onDelete=SetNull)
+  type: ChargeType
+  description: String
+  quantity: int
+  unitPrice: int
+  total: int
+  ### In basis points.
+  taxRate: int
+  periodFrom: DateTime?
+  periodTo: DateTime?

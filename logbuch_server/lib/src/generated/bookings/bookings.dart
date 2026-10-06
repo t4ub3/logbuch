@@ -8,12 +8,17 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
+// ignore_for_file: dead_code, unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:logbuch_server/src/generated/protocol.dart' as _iil9w69f;
 import 'package:serverpod/serverpod.dart' as _is;
+import '../bookings/billing_mode.dart' as _ikjlxdwh;
+import '../bookings/booking_room.dart' as _icgf4f53;
 import '../bookings/booking_status.dart' as _ilk1qg37;
 import '../contacts/contact.dart' as _imbxrfja;
+import '../contacts/organization.dart' as _i0w1hmpk;
+import '../pricing/meal_plan.dart' as _iqp4km0h;
 
 abstract class Booking
     implements _is.TableRow<int?>, _is.ProtocolSerialization {
@@ -21,21 +26,42 @@ abstract class Booking
     this.id,
     DateTime? createdAt,
     required this.title,
-    this.from,
-    this.to,
-    required this.lead,
+    this.arrival,
+    this.departure,
+    required this.leadId,
+    this.lead,
+    this.organizationId,
+    this.organization,
     _ilk1qg37.BookingStatus? status,
+    this.optionExpiresAt,
+    this.mealPlanId,
+    this.mealPlan,
+    _ikjlxdwh.BillingMode? billingMode,
+    this.expectedGuestCount,
+    this.notes,
+    this.rooms,
   }) : createdAt = createdAt ?? DateTime.now(),
-       status = status ?? _ilk1qg37.BookingStatus.requested;
+       status = status ?? _ilk1qg37.BookingStatus.inquiry,
+       billingMode = billingMode ?? _ikjlxdwh.BillingMode.single;
 
   factory Booking({
     int? id,
     DateTime? createdAt,
     required String title,
-    DateTime? from,
-    DateTime? to,
-    required _imbxrfja.Contact lead,
+    DateTime? arrival,
+    DateTime? departure,
+    required int leadId,
+    _imbxrfja.Contact? lead,
+    int? organizationId,
+    _i0w1hmpk.Organization? organization,
     _ilk1qg37.BookingStatus? status,
+    DateTime? optionExpiresAt,
+    int? mealPlanId,
+    _iqp4km0h.MealPlan? mealPlan,
+    _ikjlxdwh.BillingMode? billingMode,
+    int? expectedGuestCount,
+    String? notes,
+    List<_icgf4f53.BookingRoom>? rooms,
   }) = _BookingImpl;
 
   factory Booking.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -45,19 +71,51 @@ abstract class Booking
           ? null
           : _is.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
       title: jsonSerialization['title'] as String,
-      from: jsonSerialization['from'] == null
+      arrival: jsonSerialization['arrival'] == null
           ? null
-          : _is.DateTimeJsonExtension.fromJson(jsonSerialization['from']),
-      to: jsonSerialization['to'] == null
+          : _is.DateTimeJsonExtension.fromJson(jsonSerialization['arrival']),
+      departure: jsonSerialization['departure'] == null
           ? null
-          : _is.DateTimeJsonExtension.fromJson(jsonSerialization['to']),
-      lead: _iil9w69f.Protocol().deserialize<_imbxrfja.Contact>(
-        jsonSerialization['lead'],
-      ),
+          : _is.DateTimeJsonExtension.fromJson(jsonSerialization['departure']),
+      leadId: jsonSerialization['leadId'] as int,
+      lead: jsonSerialization['lead'] == null
+          ? null
+          : _iil9w69f.Protocol().deserialize<_imbxrfja.Contact>(
+              jsonSerialization['lead'],
+            ),
+      organizationId: jsonSerialization['organizationId'] as int?,
+      organization: jsonSerialization['organization'] == null
+          ? null
+          : _iil9w69f.Protocol().deserialize<_i0w1hmpk.Organization>(
+              jsonSerialization['organization'],
+            ),
       status: jsonSerialization['status'] == null
           ? null
           : _ilk1qg37.BookingStatus.fromJson(
               (jsonSerialization['status'] as String),
+            ),
+      optionExpiresAt: jsonSerialization['optionExpiresAt'] == null
+          ? null
+          : _is.DateTimeJsonExtension.fromJson(
+              jsonSerialization['optionExpiresAt'],
+            ),
+      mealPlanId: jsonSerialization['mealPlanId'] as int?,
+      mealPlan: jsonSerialization['mealPlan'] == null
+          ? null
+          : _iil9w69f.Protocol().deserialize<_iqp4km0h.MealPlan>(
+              jsonSerialization['mealPlan'],
+            ),
+      billingMode: jsonSerialization['billingMode'] == null
+          ? null
+          : _ikjlxdwh.BillingMode.fromJson(
+              (jsonSerialization['billingMode'] as String),
+            ),
+      expectedGuestCount: jsonSerialization['expectedGuestCount'] as int?,
+      notes: jsonSerialization['notes'] as String?,
+      rooms: jsonSerialization['rooms'] == null
+          ? null
+          : _iil9w69f.Protocol().deserialize<List<_icgf4f53.BookingRoom>>(
+              jsonSerialization['rooms'],
             ),
     );
   }
@@ -73,13 +131,33 @@ abstract class Booking
 
   String title;
 
-  DateTime? from;
+  DateTime? arrival;
 
-  DateTime? to;
+  DateTime? departure;
 
-  _imbxrfja.Contact lead;
+  int leadId;
+
+  _imbxrfja.Contact? lead;
+
+  int? organizationId;
+
+  _i0w1hmpk.Organization? organization;
 
   _ilk1qg37.BookingStatus status;
+
+  DateTime? optionExpiresAt;
+
+  int? mealPlanId;
+
+  _iqp4km0h.MealPlan? mealPlan;
+
+  _ikjlxdwh.BillingMode billingMode;
+
+  int? expectedGuestCount;
+
+  String? notes;
+
+  List<_icgf4f53.BookingRoom>? rooms;
 
   @override
   _is.Table<int?> get table => t;
@@ -91,10 +169,20 @@ abstract class Booking
     int? id,
     DateTime? createdAt,
     String? title,
-    DateTime? from,
-    DateTime? to,
+    DateTime? arrival,
+    DateTime? departure,
+    int? leadId,
     _imbxrfja.Contact? lead,
+    int? organizationId,
+    _i0w1hmpk.Organization? organization,
     _ilk1qg37.BookingStatus? status,
+    DateTime? optionExpiresAt,
+    int? mealPlanId,
+    _iqp4km0h.MealPlan? mealPlan,
+    _ikjlxdwh.BillingMode? billingMode,
+    int? expectedGuestCount,
+    String? notes,
+    List<_icgf4f53.BookingRoom>? rooms,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -103,10 +191,20 @@ abstract class Booking
       if (id != null) 'id': id,
       'createdAt': createdAt.toJson(),
       'title': title,
-      if (from != null) 'from': from?.toJson(),
-      if (to != null) 'to': to?.toJson(),
-      'lead': lead.toJson(),
+      if (arrival != null) 'arrival': arrival?.toJson(),
+      if (departure != null) 'departure': departure?.toJson(),
+      'leadId': leadId,
+      if (lead != null) 'lead': lead?.toJson(),
+      if (organizationId != null) 'organizationId': organizationId,
+      if (organization != null) 'organization': organization?.toJson(),
       'status': status.toJson(),
+      if (optionExpiresAt != null) 'optionExpiresAt': optionExpiresAt?.toJson(),
+      if (mealPlanId != null) 'mealPlanId': mealPlanId,
+      if (mealPlan != null) 'mealPlan': mealPlan?.toJson(),
+      'billingMode': billingMode.toJson(),
+      if (expectedGuestCount != null) 'expectedGuestCount': expectedGuestCount,
+      if (notes != null) 'notes': notes,
+      if (rooms != null) 'rooms': rooms?.toJson(valueToJson: (v) => v.toJson()),
     };
   }
 
@@ -117,15 +215,37 @@ abstract class Booking
       if (id != null) 'id': id,
       'createdAt': createdAt.toJson(),
       'title': title,
-      if (from != null) 'from': from?.toJson(),
-      if (to != null) 'to': to?.toJson(),
-      'lead': lead.toJsonForProtocol(),
+      if (arrival != null) 'arrival': arrival?.toJson(),
+      if (departure != null) 'departure': departure?.toJson(),
+      'leadId': leadId,
+      if (lead != null) 'lead': lead?.toJsonForProtocol(),
+      if (organizationId != null) 'organizationId': organizationId,
+      if (organization != null)
+        'organization': organization?.toJsonForProtocol(),
       'status': status.toJson(),
+      if (optionExpiresAt != null) 'optionExpiresAt': optionExpiresAt?.toJson(),
+      if (mealPlanId != null) 'mealPlanId': mealPlanId,
+      if (mealPlan != null) 'mealPlan': mealPlan?.toJsonForProtocol(),
+      'billingMode': billingMode.toJson(),
+      if (expectedGuestCount != null) 'expectedGuestCount': expectedGuestCount,
+      if (notes != null) 'notes': notes,
+      if (rooms != null)
+        'rooms': rooms?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
     };
   }
 
-  static BookingInclude include() {
-    return BookingInclude._();
+  static BookingInclude include({
+    _imbxrfja.ContactInclude? lead,
+    _i0w1hmpk.OrganizationInclude? organization,
+    _iqp4km0h.MealPlanInclude? mealPlan,
+    _icgf4f53.BookingRoomIncludeList? rooms,
+  }) {
+    return BookingInclude._(
+      lead: lead,
+      organization: organization,
+      mealPlan: mealPlan,
+      rooms: rooms,
+    );
   }
 
   static BookingIncludeList includeList({
@@ -159,18 +279,38 @@ class _BookingImpl extends Booking {
     int? id,
     DateTime? createdAt,
     required String title,
-    DateTime? from,
-    DateTime? to,
-    required _imbxrfja.Contact lead,
+    DateTime? arrival,
+    DateTime? departure,
+    required int leadId,
+    _imbxrfja.Contact? lead,
+    int? organizationId,
+    _i0w1hmpk.Organization? organization,
     _ilk1qg37.BookingStatus? status,
+    DateTime? optionExpiresAt,
+    int? mealPlanId,
+    _iqp4km0h.MealPlan? mealPlan,
+    _ikjlxdwh.BillingMode? billingMode,
+    int? expectedGuestCount,
+    String? notes,
+    List<_icgf4f53.BookingRoom>? rooms,
   }) : super._(
          id: id,
          createdAt: createdAt,
          title: title,
-         from: from,
-         to: to,
+         arrival: arrival,
+         departure: departure,
+         leadId: leadId,
          lead: lead,
+         organizationId: organizationId,
+         organization: organization,
          status: status,
+         optionExpiresAt: optionExpiresAt,
+         mealPlanId: mealPlanId,
+         mealPlan: mealPlan,
+         billingMode: billingMode,
+         expectedGuestCount: expectedGuestCount,
+         notes: notes,
+         rooms: rooms,
        );
 
   /// Returns a shallow copy of this [Booking]
@@ -181,19 +321,51 @@ class _BookingImpl extends Booking {
     Object? id = _Undefined,
     DateTime? createdAt,
     String? title,
-    Object? from = _Undefined,
-    Object? to = _Undefined,
-    _imbxrfja.Contact? lead,
+    Object? arrival = _Undefined,
+    Object? departure = _Undefined,
+    int? leadId,
+    Object? lead = _Undefined,
+    Object? organizationId = _Undefined,
+    Object? organization = _Undefined,
     _ilk1qg37.BookingStatus? status,
+    Object? optionExpiresAt = _Undefined,
+    Object? mealPlanId = _Undefined,
+    Object? mealPlan = _Undefined,
+    _ikjlxdwh.BillingMode? billingMode,
+    Object? expectedGuestCount = _Undefined,
+    Object? notes = _Undefined,
+    Object? rooms = _Undefined,
   }) {
     return Booking(
       id: id is int? ? id : this.id,
       createdAt: createdAt ?? this.createdAt,
       title: title ?? this.title,
-      from: from is DateTime? ? from : this.from,
-      to: to is DateTime? ? to : this.to,
-      lead: lead ?? this.lead.copyWith(),
+      arrival: arrival is DateTime? ? arrival : this.arrival,
+      departure: departure is DateTime? ? departure : this.departure,
+      leadId: leadId ?? this.leadId,
+      lead: lead is _imbxrfja.Contact? ? lead : this.lead?.copyWith(),
+      organizationId: organizationId is int?
+          ? organizationId
+          : this.organizationId,
+      organization: organization is _i0w1hmpk.Organization?
+          ? organization
+          : this.organization?.copyWith(),
       status: status ?? this.status,
+      optionExpiresAt: optionExpiresAt is DateTime?
+          ? optionExpiresAt
+          : this.optionExpiresAt,
+      mealPlanId: mealPlanId is int? ? mealPlanId : this.mealPlanId,
+      mealPlan: mealPlan is _iqp4km0h.MealPlan?
+          ? mealPlan
+          : this.mealPlan?.copyWith(),
+      billingMode: billingMode ?? this.billingMode,
+      expectedGuestCount: expectedGuestCount is int?
+          ? expectedGuestCount
+          : this.expectedGuestCount,
+      notes: notes is String? ? notes : this.notes,
+      rooms: rooms is List<_icgf4f53.BookingRoom>?
+          ? rooms
+          : this.rooms?.map((e0) => e0.copyWith()).toList(),
     );
   }
 }
@@ -212,20 +384,25 @@ class BookingUpdateTable extends _is.UpdateTable<BookingTable> {
     value,
   );
 
-  _is.ColumnValue<DateTime, DateTime> from(DateTime? value) => _is.ColumnValue(
-    table.from,
+  _is.ColumnValue<DateTime, DateTime> arrival(DateTime? value) =>
+      _is.ColumnValue(
+        table.arrival,
+        value,
+      );
+
+  _is.ColumnValue<DateTime, DateTime> departure(DateTime? value) =>
+      _is.ColumnValue(
+        table.departure,
+        value,
+      );
+
+  _is.ColumnValue<int, int> leadId(int value) => _is.ColumnValue(
+    table.leadId,
     value,
   );
 
-  _is.ColumnValue<DateTime, DateTime> to(DateTime? value) => _is.ColumnValue(
-    table.to,
-    value,
-  );
-
-  _is.ColumnValue<_imbxrfja.Contact, _imbxrfja.Contact> lead(
-    _imbxrfja.Contact value,
-  ) => _is.ColumnValue(
-    table.lead,
+  _is.ColumnValue<int, int> organizationId(int? value) => _is.ColumnValue(
+    table.organizationId,
     value,
   );
 
@@ -233,6 +410,34 @@ class BookingUpdateTable extends _is.UpdateTable<BookingTable> {
     _ilk1qg37.BookingStatus value,
   ) => _is.ColumnValue(
     table.status,
+    value,
+  );
+
+  _is.ColumnValue<DateTime, DateTime> optionExpiresAt(DateTime? value) =>
+      _is.ColumnValue(
+        table.optionExpiresAt,
+        value,
+      );
+
+  _is.ColumnValue<int, int> mealPlanId(int? value) => _is.ColumnValue(
+    table.mealPlanId,
+    value,
+  );
+
+  _is.ColumnValue<_ikjlxdwh.BillingMode, _ikjlxdwh.BillingMode> billingMode(
+    _ikjlxdwh.BillingMode value,
+  ) => _is.ColumnValue(
+    table.billingMode,
+    value,
+  );
+
+  _is.ColumnValue<int, int> expectedGuestCount(int? value) => _is.ColumnValue(
+    table.expectedGuestCount,
+    value,
+  );
+
+  _is.ColumnValue<String, String> notes(String? value) => _is.ColumnValue(
+    table.notes,
     value,
   );
 }
@@ -249,16 +454,20 @@ class BookingTable extends _is.Table<int?> {
       'title',
       this,
     );
-    from = _is.ColumnDateTime(
-      'from',
+    arrival = _is.ColumnDateTime(
+      'arrival',
       this,
     );
-    to = _is.ColumnDateTime(
-      'to',
+    departure = _is.ColumnDateTime(
+      'departure',
       this,
     );
-    lead = _is.ColumnSerializable<_imbxrfja.Contact>(
-      'lead',
+    leadId = _is.ColumnInt(
+      'leadId',
+      this,
+    );
+    organizationId = _is.ColumnInt(
+      'organizationId',
       this,
     );
     status = _is.ColumnEnum(
@@ -266,6 +475,28 @@ class BookingTable extends _is.Table<int?> {
       this,
       _is.EnumSerialization.byName,
       hasDefault: true,
+    );
+    optionExpiresAt = _is.ColumnDateTime(
+      'optionExpiresAt',
+      this,
+    );
+    mealPlanId = _is.ColumnInt(
+      'mealPlanId',
+      this,
+    );
+    billingMode = _is.ColumnEnum(
+      'billingMode',
+      this,
+      _is.EnumSerialization.byName,
+      hasDefault: true,
+    );
+    expectedGuestCount = _is.ColumnInt(
+      'expectedGuestCount',
+      this,
+    );
+    notes = _is.ColumnString(
+      'notes',
+      this,
     );
   }
 
@@ -275,31 +506,170 @@ class BookingTable extends _is.Table<int?> {
 
   late final _is.ColumnString title;
 
-  late final _is.ColumnDateTime from;
+  late final _is.ColumnDateTime arrival;
 
-  late final _is.ColumnDateTime to;
+  late final _is.ColumnDateTime departure;
 
-  late final _is.ColumnSerializable<_imbxrfja.Contact> lead;
+  late final _is.ColumnInt leadId;
+
+  _imbxrfja.ContactTable? _lead;
+
+  late final _is.ColumnInt organizationId;
+
+  _i0w1hmpk.OrganizationTable? _organization;
 
   late final _is.ColumnEnum<_ilk1qg37.BookingStatus> status;
+
+  late final _is.ColumnDateTime optionExpiresAt;
+
+  late final _is.ColumnInt mealPlanId;
+
+  _iqp4km0h.MealPlanTable? _mealPlan;
+
+  late final _is.ColumnEnum<_ikjlxdwh.BillingMode> billingMode;
+
+  late final _is.ColumnInt expectedGuestCount;
+
+  late final _is.ColumnString notes;
+
+  _icgf4f53.BookingRoomTable? ___rooms;
+
+  _is.ManyRelation<_icgf4f53.BookingRoomTable>? _rooms;
+
+  _imbxrfja.ContactTable get lead {
+    if (_lead != null) return _lead!;
+    _lead = _is.createRelationTable(
+      relationFieldName: 'lead',
+      field: Booking.t.leadId,
+      foreignField: _imbxrfja.Contact.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _imbxrfja.ContactTable(tableRelation: foreignTableRelation),
+    );
+    return _lead!;
+  }
+
+  _i0w1hmpk.OrganizationTable get organization {
+    if (_organization != null) return _organization!;
+    _organization = _is.createRelationTable(
+      relationFieldName: 'organization',
+      field: Booking.t.organizationId,
+      foreignField: _i0w1hmpk.Organization.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i0w1hmpk.OrganizationTable(tableRelation: foreignTableRelation),
+    );
+    return _organization!;
+  }
+
+  _iqp4km0h.MealPlanTable get mealPlan {
+    if (_mealPlan != null) return _mealPlan!;
+    _mealPlan = _is.createRelationTable(
+      relationFieldName: 'mealPlan',
+      field: Booking.t.mealPlanId,
+      foreignField: _iqp4km0h.MealPlan.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _iqp4km0h.MealPlanTable(tableRelation: foreignTableRelation),
+    );
+    return _mealPlan!;
+  }
+
+  _icgf4f53.BookingRoomTable get __rooms {
+    if (___rooms != null) return ___rooms!;
+    ___rooms = _is.createRelationTable(
+      relationFieldName: '__rooms',
+      field: Booking.t.id,
+      foreignField: _icgf4f53.BookingRoom.t.bookingId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _icgf4f53.BookingRoomTable(tableRelation: foreignTableRelation),
+    );
+    return ___rooms!;
+  }
+
+  _is.ManyRelation<_icgf4f53.BookingRoomTable> get rooms {
+    if (_rooms != null) return _rooms!;
+    var relationTable = _is.createRelationTable(
+      relationFieldName: 'rooms',
+      field: Booking.t.id,
+      foreignField: _icgf4f53.BookingRoom.t.bookingId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _icgf4f53.BookingRoomTable(tableRelation: foreignTableRelation),
+    );
+    _rooms = _is.ManyRelation<_icgf4f53.BookingRoomTable>(
+      tableWithRelations: relationTable,
+      table: _icgf4f53.BookingRoomTable(
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
+    );
+    return _rooms!;
+  }
 
   @override
   List<_is.Column> get columns => [
     id,
     createdAt,
     title,
-    from,
-    to,
-    lead,
+    arrival,
+    departure,
+    leadId,
+    organizationId,
     status,
+    optionExpiresAt,
+    mealPlanId,
+    billingMode,
+    expectedGuestCount,
+    notes,
   ];
+
+  @override
+  _is.Table? getRelationTable(String relationField) {
+    if (relationField == 'lead') {
+      return lead;
+    }
+    if (relationField == 'organization') {
+      return organization;
+    }
+    if (relationField == 'mealPlan') {
+      return mealPlan;
+    }
+    if (relationField == 'rooms') {
+      return __rooms;
+    }
+    return null;
+  }
 }
 
 class BookingInclude extends _is.IncludeObject {
-  BookingInclude._();
+  BookingInclude._({
+    _imbxrfja.ContactInclude? lead,
+    _i0w1hmpk.OrganizationInclude? organization,
+    _iqp4km0h.MealPlanInclude? mealPlan,
+    _icgf4f53.BookingRoomIncludeList? rooms,
+  }) {
+    _lead = lead;
+    _organization = organization;
+    _mealPlan = mealPlan;
+    _rooms = rooms;
+  }
+
+  _imbxrfja.ContactInclude? _lead;
+
+  _i0w1hmpk.OrganizationInclude? _organization;
+
+  _iqp4km0h.MealPlanInclude? _mealPlan;
+
+  _icgf4f53.BookingRoomIncludeList? _rooms;
 
   @override
-  Map<String, _is.Include?> get includes => {};
+  Map<String, _is.Include?> get includes => {
+    'lead': _lead,
+    'organization': _organization,
+    'mealPlan': _mealPlan,
+    'rooms': _rooms,
+  };
 
   @override
   _is.Table<int?> get table => Booking.t;
@@ -326,6 +696,12 @@ class BookingIncludeList extends _is.IncludeList {
 
 class BookingRepository {
   const BookingRepository._();
+
+  final attach = const BookingAttachRepository._();
+
+  final attachRow = const BookingAttachRowRepository._();
+
+  final detachRow = const BookingDetachRowRepository._();
 
   /// Returns a list of [Booking]s matching the given query parameters.
   ///
@@ -357,6 +733,7 @@ class BookingRepository {
     _is.OrderByBuilder<BookingTable>? orderBy,
     _is.OrderByListBuilder<BookingTable>? orderByList,
     _is.Transaction? transaction,
+    BookingInclude? include,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
@@ -367,6 +744,7 @@ class BookingRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -396,6 +774,7 @@ class BookingRepository {
     _is.OrderByBuilder<BookingTable>? orderBy,
     _is.OrderByListBuilder<BookingTable>? orderByList,
     _is.Transaction? transaction,
+    BookingInclude? include,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
@@ -405,6 +784,7 @@ class BookingRepository {
       orderByList: orderByList?.call(Booking.t),
       offset: offset,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -415,12 +795,14 @@ class BookingRepository {
     _is.DatabaseSession session,
     int id, {
     _is.Transaction? transaction,
+    BookingInclude? include,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Booking>(
       id,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -714,6 +1096,179 @@ class BookingRepository {
       where: where(Booking.t),
       lockMode: lockMode,
       lockBehavior: lockBehavior,
+      transaction: transaction,
+    );
+  }
+}
+
+class BookingAttachRepository {
+  const BookingAttachRepository._();
+
+  /// Creates a relation between this [Booking] and the given [BookingRoom]s
+  /// by setting each [BookingRoom]'s foreign key `bookingId` to refer to this [Booking].
+  Future<void> rooms(
+    _is.DatabaseSession session,
+    Booking booking,
+    List<_icgf4f53.BookingRoom> bookingRoom, {
+    _is.Transaction? transaction,
+  }) async {
+    if (bookingRoom.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('bookingRoom.id');
+    }
+    if (booking.id == null) {
+      throw ArgumentError.notNull('booking.id');
+    }
+
+    var $bookingRoom = bookingRoom
+        .map((e) => e.copyWith(bookingId: booking.id))
+        .toList();
+    await session.db.update<_icgf4f53.BookingRoom>(
+      $bookingRoom,
+      columns: [_icgf4f53.BookingRoom.t.bookingId],
+      transaction: transaction,
+    );
+  }
+}
+
+class BookingAttachRowRepository {
+  const BookingAttachRowRepository._();
+
+  /// Creates a relation between the given [Booking] and [Contact]
+  /// by setting the [Booking]'s foreign key `leadId` to refer to the [Contact].
+  Future<void> lead(
+    _is.DatabaseSession session,
+    Booking booking,
+    _imbxrfja.Contact lead, {
+    _is.Transaction? transaction,
+  }) async {
+    if (booking.id == null) {
+      throw ArgumentError.notNull('booking.id');
+    }
+    if (lead.id == null) {
+      throw ArgumentError.notNull('lead.id');
+    }
+
+    var $booking = booking.copyWith(leadId: lead.id);
+    await session.db.updateRow<Booking>(
+      $booking,
+      columns: [Booking.t.leadId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between the given [Booking] and [Organization]
+  /// by setting the [Booking]'s foreign key `organizationId` to refer to the [Organization].
+  Future<void> organization(
+    _is.DatabaseSession session,
+    Booking booking,
+    _i0w1hmpk.Organization organization, {
+    _is.Transaction? transaction,
+  }) async {
+    if (booking.id == null) {
+      throw ArgumentError.notNull('booking.id');
+    }
+    if (organization.id == null) {
+      throw ArgumentError.notNull('organization.id');
+    }
+
+    var $booking = booking.copyWith(organizationId: organization.id);
+    await session.db.updateRow<Booking>(
+      $booking,
+      columns: [Booking.t.organizationId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between the given [Booking] and [MealPlan]
+  /// by setting the [Booking]'s foreign key `mealPlanId` to refer to the [MealPlan].
+  Future<void> mealPlan(
+    _is.DatabaseSession session,
+    Booking booking,
+    _iqp4km0h.MealPlan mealPlan, {
+    _is.Transaction? transaction,
+  }) async {
+    if (booking.id == null) {
+      throw ArgumentError.notNull('booking.id');
+    }
+    if (mealPlan.id == null) {
+      throw ArgumentError.notNull('mealPlan.id');
+    }
+
+    var $booking = booking.copyWith(mealPlanId: mealPlan.id);
+    await session.db.updateRow<Booking>(
+      $booking,
+      columns: [Booking.t.mealPlanId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between this [Booking] and the given [BookingRoom]
+  /// by setting the [BookingRoom]'s foreign key `bookingId` to refer to this [Booking].
+  Future<void> rooms(
+    _is.DatabaseSession session,
+    Booking booking,
+    _icgf4f53.BookingRoom bookingRoom, {
+    _is.Transaction? transaction,
+  }) async {
+    if (bookingRoom.id == null) {
+      throw ArgumentError.notNull('bookingRoom.id');
+    }
+    if (booking.id == null) {
+      throw ArgumentError.notNull('booking.id');
+    }
+
+    var $bookingRoom = bookingRoom.copyWith(bookingId: booking.id);
+    await session.db.updateRow<_icgf4f53.BookingRoom>(
+      $bookingRoom,
+      columns: [_icgf4f53.BookingRoom.t.bookingId],
+      transaction: transaction,
+    );
+  }
+}
+
+class BookingDetachRowRepository {
+  const BookingDetachRowRepository._();
+
+  /// Detaches the relation between this [Booking] and the [Organization] set in `organization`
+  /// by setting the [Booking]'s foreign key `organizationId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> organization(
+    _is.DatabaseSession session,
+    Booking booking, {
+    _is.Transaction? transaction,
+  }) async {
+    if (booking.id == null) {
+      throw ArgumentError.notNull('booking.id');
+    }
+
+    var $booking = booking.copyWith(organizationId: null);
+    await session.db.updateRow<Booking>(
+      $booking,
+      columns: [Booking.t.organizationId],
+      transaction: transaction,
+    );
+  }
+
+  /// Detaches the relation between this [Booking] and the [MealPlan] set in `mealPlan`
+  /// by setting the [Booking]'s foreign key `mealPlanId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> mealPlan(
+    _is.DatabaseSession session,
+    Booking booking, {
+    _is.Transaction? transaction,
+  }) async {
+    if (booking.id == null) {
+      throw ArgumentError.notNull('booking.id');
+    }
+
+    var $booking = booking.copyWith(mealPlanId: null);
+    await session.db.updateRow<Booking>(
+      $booking,
+      columns: [Booking.t.mealPlanId],
       transaction: transaction,
     );
   }

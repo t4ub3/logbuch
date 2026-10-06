@@ -2,7 +2,20 @@
     "common": {
         "loadFailed": "Laden fehlgeschlagen: {error}",
         "retry": "Erneut versuchen",
-        "noEntries": "Keine Einträge"
+        "noEntries": "Keine Einträge",
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "cancel": "Abbrechen",
+        "save": "Speichern",
+        "discard": "Verwerfen",
+        "required": "Pflichtfeld",
+        "name": "Name",
+        "saveFailed": "Speichern fehlgeschlagen: {error}",
+        "deleteFailed": "Löschen fehlgeschlagen: {error}",
+        "none": "Keine Angabe",
+        "search": "Suchen",
+        "signOut": "Abmelden",
+        "clear": "Entfernen"
     },
     "tabs": {
         "close": "Tab schließen"
@@ -10,7 +23,7 @@
     "menu": {
         "calendar": "Kalender",
         "contacts": "Kontakte",
-        "rooms": "Zimmer",
+        "admin": "Verwaltung",
         "settings": "Einstellungen"
     },
     "bookings": {
@@ -32,10 +45,12 @@
         "phone": "Telefon",
         "status": "Status",
         "statuses": {
-            "requested": "Angefragt",
-            "booked": "Gebucht",
-            "billed": "Abgerechnet",
-            "paid": "Bezahlt"
+            "inquiry": "Anfrage",
+            "option": "Option",
+            "confirmed": "Bestätigt",
+            "checkedIn": "Angereist",
+            "completed": "Abgeschlossen",
+            "cancelled": "Storniert"
         },
         "editBooking": "Buchung bearbeiten",
         "titleField": "Titel",
@@ -46,10 +61,152 @@
         "required": "Pflichtfeld",
         "cancel": "Abbrechen",
         "save": "Speichern",
-        "saveFailed": "Speichern fehlgeschlagen: {error}"
+        "saveFailed": "Speichern fehlgeschlagen: {error}",
+        "occupancy": "Belegung",
+        "overview": "Übersicht",
+        "rooms": "Zimmer",
+        "organization": "Organisation",
+        "mealPlan": "Verpflegung",
+        "billingMode": "Rechnungen",
+        "billingModes": {
+            "single": "Eine Rechnung für die Buchung",
+            "perGroup": "Eine Rechnung pro Gruppe",
+            "perGuest": "Eine Rechnung pro Gast"
+        },
+        "expectedGuests": "Erwartete Gäste",
+        "optionExpiresAt": "Option gültig bis",
+        "notes": "Notizen",
+        "roomsNeedDates": "Bitte zuerst den Zeitraum der Buchung festlegen, um Zimmer auszuwählen.",
+        "noFreeRooms": "In diesem Zeitraum sind keine Zimmer frei.",
+        "selectedBeds": {
+            "one": "{n} Bett ausgewählt",
+            "other": "{n} Betten ausgewählt"
+        },
+        "guestsExpected": {
+            "one": "{n} Gast erwartet",
+            "other": "{n} Gäste erwartet"
+        },
+        "roomsSaved": "Zimmer gespeichert",
+        "guests": "Gäste",
+        "assignment": "Verteilung",
+        "price": "Preis",
+        "noGroups": "Noch keine Gäste. Beginnen Sie mit einer Gruppe, zum Beispiel einer Familie.",
+        "addGroup": "Neue Gruppe",
+        "editGroup": "Gruppe bearbeiten",
+        "payer": "Zahlt für die Gruppe",
+        "deleteGroupHint": "Ihre Gäste werden aus der Buchung entfernt. Die Kontakte bleiben erhalten.",
+        "addGuest": "Gast hinzufügen",
+        "editGuest": "Gast bearbeiten",
+        "removeGuestHint": "Der Gast wird aus der Buchung entfernt. Der Kontakt bleibt erhalten.",
+        "existingContact": "Vorhandener Kontakt",
+        "newContact": "Neuer Kontakt",
+        "contact": "Kontakt",
+        "needsCrib": "Schläft im Kinderbett",
+        "crib": "Kinderbett",
+        "ageGroup": "Altersgruppe",
+        "ageByBirthDate": "Nach Geburtsdatum",
+        "ageUnknown": "Alter unbekannt",
+        "dietaryNotes": "Ernährungshinweise",
+        "arrivalOverride": "Reist später an, am",
+        "departureOverride": "Reist früher ab, am",
+        "guestCount": {
+            "one": "{n} Gast",
+            "other": "{n} Gäste"
+        },
+        "unassigned": "Ohne Zimmer",
+        "everybodyAssigned": "Alle haben ein Zimmer.",
+        "noRoomsHeld": "Die Buchung hat noch keine Zimmer. Bitte unter Zimmer auswählen.",
+        "moveTo": "Verschieben nach",
+        "bedsUsed": "{used} von {beds} Betten",
+        "roomFull": "Voll",
+        "freeBeds": {
+            "one": "{n} freies Bett",
+            "other": "{n} freie Betten"
+        },
+        "roomOverfull": "Mehr Gäste als Betten",
+        "roomNoCrib": "Hier kann kein Kinderbett aufgestellt werden",
+        "total": "Gesamt",
+        "inclTax": "Alle Preise enthalten die Steuer.",
+        "nothingToPrice": "Noch nichts zu berechnen.",
+        "wholeBooking": "Gesamte Buchung",
+        "chargeTypes": {
+            "lodging": "Übernachtung",
+            "meal": "Verpflegung",
+            "fee": "Gebühr",
+            "discount": "Rabatt",
+            "manual": "Sonstiges"
+        },
+        "pricingProblems": {
+            "datesMissing": "Die Buchung hat keinen Zeitraum.",
+            "ageUnknown": "{name}: Das Alter ist nicht bekannt. Bitte Geburtsdatum eintragen oder Altersgruppe wählen.",
+            "roomMissing": "{name}: hat noch kein Zimmer.",
+            "seasonMissing": "Für den {date} gibt es keine Saison.",
+            "roomRateMissing": "Kein Übernachtungspreis für {detail}.",
+            "mealRateMissing": "Kein Verpflegungspreis für {detail}."
+        },
+        "billing": "Abrechnung",
+        "noFolios": "Noch nichts abzurechnen. Bitte zuerst Gäste hinzufügen und auf Zimmer verteilen.",
+        "folioOpen": "Noch keine Rechnung",
+        "folioInvoiced": "Rechnung {number} vom {date}",
+        "stillToPay": "Noch zu zahlen",
+        "paidInFull": "Vollständig bezahlt",
+        "overpaid": "Überzahlt",
+        "decide": "Entscheiden",
+        "recordPayment": "Zahlung erfassen",
+        "addCharge": "Position hinzufügen",
+        "createInvoice": "Rechnung erstellen",
+        "createInvoiceHint": "Die Abrechnung erhält die nächste Rechnungsnummer. Ihre Positionen können danach nicht mehr geändert werden.",
+        "payment": "Zahlung",
+        "refund": "Erstattung",
+        "donation": "Spende",
+        "amount": "Betrag",
+        "date": "Datum",
+        "paymentMethod": "Bezahlt per",
+        "paymentMethods": {
+            "cash": "Bar",
+            "bankTransfer": "Überweisung",
+            "card": "Karte",
+            "other": "Sonstiges"
+        },
+        "reference": "Verwendungszweck",
+        "overpaidTitle": "{amount} überzahlt",
+        "overpaidText": "Was soll mit diesem Geld geschehen? Eine Spende bitte nur erfassen, wenn {name} das Geld ausdrücklich als Spende überlässt.",
+        "asDonation": "Als Spende erfassen",
+        "asRefund": "Erstatten",
+        "asCredit": "Als Guthaben behalten",
+        "removePaymentHint": "Bitte nur Zahlungen entfernen, die versehentlich erfasst wurden.",
+        "removeDonationHint": "Das Geld gilt dann wieder als überzahlt.",
+        "description": "Beschreibung",
+        "quantity": "Anzahl",
+        "unitPrice": "Einzelpreis",
+        "isDiscount": "Das ist ein Rabatt",
+        "taxRate": "Steuersatz"
     },
     "contacts": {
-        "empty": "Keine Kontakte"
+        "empty": "Keine Kontakte",
+        "people": "Personen",
+        "organizations": "Organisationen",
+        "add": "Neuer Kontakt",
+        "edit": "Kontakt bearbeiten",
+        "searchHint": "Kontakte suchen",
+        "noMatches": "Keine passenden Kontakte",
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "nameRequired": "Bitte Vor- oder Nachnamen angeben",
+        "birthDate": "Geburtsdatum",
+        "email": "E-Mail",
+        "phone": "Telefon",
+        "street": "Straße",
+        "zip": "Postleitzahl",
+        "city": "Ort",
+        "country": "Land",
+        "organization": "Organisation",
+        "notes": "Notizen",
+        "privacyConsent": "Hat der Speicherung der Daten zugestimmt",
+        "noOrganizations": "Keine Organisationen",
+        "addOrganization": "Neue Organisation",
+        "editOrganization": "Organisation bearbeiten",
+        "deleteOrganizationHint": "Ihre Kontakte bleiben erhalten, ohne Organisation."
     },
     "rooms": {
         "empty": "Keine Zimmer",
@@ -57,6 +214,145 @@
         "beds": {
             "one": "{n} Bett",
             "other": "{n} Betten"
+        }
+    },
+    "admin": {
+        "sections": {
+            "rooms": "Zimmer",
+            "priceCategories": "Preiskategorien",
+            "ageGroups": "Altersgruppen",
+            "seasons": "Saisons",
+            "mealPlans": "Verpflegung",
+            "rates": "Preise",
+            "fees": "Gebühren",
+            "users": "Benutzer"
+        },
+        "deleteTitle": "„{name}“ löschen?",
+        "invalidNumber": "Bitte eine ganze Zahl eingeben",
+        "invalidAmount": "Bitte einen Betrag wie 12,50 eingeben",
+        "errors": {
+            "nameRequired": "Ein Name ist erforderlich.",
+            "invalidDate": "Das Datum ist ungültig.",
+            "invalidDateRange": "Das Ende darf nicht vor dem Beginn liegen.",
+            "seasonOverlap": "Der Zeitraum überschneidet sich mit der Saison „{name}“.",
+            "invalidAgeRange": "Das Höchstalter darf nicht unter dem Mindestalter liegen.",
+            "ageGroupOverlap": "Die Altersangaben überschneiden sich mit der Altersgruppe „{name}“.",
+            "invalidAmount": "Beträge dürfen nicht negativ sein.",
+            "invalidTaxRate": "Der Steuersatz muss zwischen 0 und 100 % liegen.",
+            "invalidBedAmount": "Die Bettenzahl darf nicht negativ sein.",
+            "duplicateRate": "Ein Preis wurde doppelt angegeben.",
+            "inUse": "Dieser Eintrag wird noch verwendet und kann nicht gelöscht werden.",
+            "invalidGuestCount": "Die Gästezahl darf nicht negativ sein.",
+            "notFound": "Dieser Eintrag existiert nicht mehr.",
+            "datesRequired": "Eine Buchung mit Zimmern braucht einen Zeitraum.",
+            "roomUnavailable": "In diesem Zeitraum nicht frei: Zimmer {name}.",
+            "adminRequired": "Nur Admins können Daten ändern.",
+            "ownRole": "Die eigene Rolle kann nicht geändert werden.",
+            "roomNotHeld": "Die Buchung hat dieses Zimmer nicht.",
+            "alreadyInvoiced": "Das ist bereits in Rechnung gestellt und kann nicht mehr geändert werden.",
+            "nothingToInvoice": "Es gibt nichts abzurechnen.",
+            "pricingIncomplete": "Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht unter Preis.",
+            "notOverpaid": "Das ist mehr, als überzahlt wurde."
+        },
+        "rooms": {
+            "add": "Neues Zimmer",
+            "edit": "Zimmer bearbeiten",
+            "number": "Zimmernummer",
+            "beds": "Betten",
+            "priceCategory": "Preiskategorie",
+            "noPriceCategories": "Bitte zuerst eine Preiskategorie anlegen.",
+            "building": "Gebäude",
+            "floor": "Etage",
+            "cribPossible": "Ein Kinderbett kann aufgestellt werden",
+            "crib": "Kinderbett möglich",
+            "active": "Aktiv",
+            "activeHint": "Inaktive Zimmer bleiben in früheren Buchungen erhalten, können aber nicht mehr gebucht werden.",
+            "inactive": "Inaktiv",
+            "notes": "Notizen"
+        },
+        "priceCategories": {
+            "empty": "Keine Preiskategorien",
+            "add": "Neue Preiskategorie",
+            "edit": "Preiskategorie bearbeiten",
+            "sortOrder": "Position in Listen",
+            "deleteHint": "Die Preise dieser Kategorie werden ebenfalls gelöscht."
+        },
+        "ageGroups": {
+            "empty": "Keine Altersgruppen",
+            "add": "Neue Altersgruppe",
+            "edit": "Altersgruppe bearbeiten",
+            "minAge": "Ab Alter",
+            "maxAge": "Bis Alter",
+            "maxAgeHint": "Leer für keine Obergrenze",
+            "range": "{min} bis {max} Jahre",
+            "singleAge": {
+                "one": "{n} Jahr",
+                "other": "{n} Jahre"
+            },
+            "openRange": "ab {min} Jahren",
+            "deleteHint": "Die Preise dieser Altersgruppe werden ebenfalls gelöscht."
+        },
+        "seasons": {
+            "empty": "Keine Saisons",
+            "add": "Neue Saison",
+            "edit": "Saison bearbeiten",
+            "period": "Zeitraum",
+            "gap": "Für {from} – {to} gibt es keine Saison. Aufenthalte in diesem Zeitraum können nicht berechnet werden.",
+            "deleteHint": "Die Preise dieser Saison werden ebenfalls gelöscht."
+        },
+        "mealPlans": {
+            "empty": "Keine Verpflegungsarten",
+            "add": "Neue Verpflegungsart",
+            "edit": "Verpflegungsart bearbeiten",
+            "deleteHint": "Die Preise dieser Verpflegungsart werden ebenfalls gelöscht."
+        },
+        "rates": {
+            "lodging": "Übernachtung",
+            "meals": "Verpflegung",
+            "priceCategory": "Preiskategorie",
+            "mealPlan": "Verpflegung",
+            "missingLodging": "Für Preise werden mindestens eine Saison, eine Altersgruppe und eine Preiskategorie benötigt.",
+            "missingMeals": "Für Preise werden mindestens eine Saison, eine Altersgruppe und eine Verpflegungsart benötigt.",
+            "hint": "Preise pro Person und Nacht in Euro. Ein leeres Feld hat keinen Preis.",
+            "invalid": "Bitte Beträge wie 12,50 eingeben.",
+            "saved": "Preise gespeichert"
+        },
+        "fees": {
+            "empty": "Keine Gebühren",
+            "add": "Neue Gebühr",
+            "edit": "Gebühr bearbeiten",
+            "amount": "Betrag",
+            "unit": "Berechnung",
+            "units": {
+                "perBooking": "pro Buchung",
+                "perPerson": "pro Person",
+                "perPersonNight": "pro Person und Nacht",
+                "perRoom": "pro Zimmer",
+                "perRoomNight": "pro Zimmer und Nacht"
+            },
+            "ageGroup": "Gilt für",
+            "allAges": "Alle Altersgruppen",
+            "taxRate": "Steuersatz",
+            "tax": "{rate} % Steuer",
+            "autoApply": "Zu jeder Buchung hinzufügen",
+            "autoApplyHint": "Andernfalls wird die Gebühr einer Buchung von Hand hinzugefügt.",
+            "auto": "jede Buchung"
+        },
+        "users": {
+            "empty": "Keine Benutzer",
+            "unknownEmail": "Keine E-Mail-Adresse",
+            "you": "Sie"
+        }
+    },
+    "auth": {
+        "waitingTitle": "Warten auf Freigabe",
+        "waitingText": "Ihr Konto {email} hat noch keine Rolle. Ein Admin muss den Zugriff freigeben.",
+        "checkAgain": "Erneut prüfen",
+        "account": "Konto",
+        "roles": {
+            "admin": "Admin",
+            "viewer": "Nur ansehen",
+            "none": "Kein Zugriff"
         }
     },
     "settings": {

@@ -13,23 +13,29 @@
 import 'package:serverpod/serverpod.dart' as _is;
 
 enum BookingStatus implements _is.SerializableModel {
-  requested,
-  booked,
-  billed,
-  paid;
+  inquiry,
+  option,
+  confirmed,
+  checkedIn,
+  completed,
+  cancelled;
 
   static BookingStatus fromJson(String name) {
     switch (name) {
-      case 'requested':
-        return BookingStatus.requested;
-      case 'booked':
-        return BookingStatus.booked;
-      case 'billed':
-        return BookingStatus.billed;
-      case 'paid':
-        return BookingStatus.paid;
+      case 'inquiry':
+        return BookingStatus.inquiry;
+      case 'option':
+        return BookingStatus.option;
+      case 'confirmed':
+        return BookingStatus.confirmed;
+      case 'checkedIn':
+        return BookingStatus.checkedIn;
+      case 'completed':
+        return BookingStatus.completed;
+      case 'cancelled':
+        return BookingStatus.cancelled;
       default:
-        return BookingStatus.requested;
+        return BookingStatus.inquiry;
     }
   }
 

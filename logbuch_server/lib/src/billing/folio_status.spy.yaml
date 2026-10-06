@@ -1,0 +1,6 @@
+enum: FolioStatus
+serialized: byName
+values:
+  - open
+  - invoiced
+  - settled

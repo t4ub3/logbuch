@@ -1,0 +1,9 @@
+enum: PricingProblemReason
+serialized: byName
+values:
+  - datesMissing
+  - ageUnknown
+  - roomMissing
+  - seasonMissing
+  - roomRateMissing
+  - mealRateMissing

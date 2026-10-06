@@ -1,0 +1,8 @@
+enum: FeeUnit
+serialized: byName
+values:
+  - perBooking
+  - perPerson
+  - perPersonNight
+  - perRoom
+  - perRoomNight

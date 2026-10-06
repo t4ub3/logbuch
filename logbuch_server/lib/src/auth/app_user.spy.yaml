@@ -1,0 +1,7 @@
+### A user account with its role in the app. Without a role the user is
+### signed in but cannot see anything yet.
+class: AppUser
+fields:
+  authUserId: UuidValue
+  email: String?
+  role: UserRole?

@@ -8,21 +8,39 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
+// ignore_for_file: dead_code, unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:logbuch_server/src/generated/protocol.dart' as _iil9w69f;
 import 'package:serverpod/serverpod.dart' as _is;
+import '../pricing/price_category.dart' as _io5akotj;
 
 abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
   Room._({
     this.id,
     required this.roomNumber,
     required this.bedAmount,
-  });
+    this.building,
+    this.floor,
+    required this.priceCategoryId,
+    this.priceCategory,
+    bool? cribPossible,
+    bool? active,
+    this.notes,
+  }) : cribPossible = cribPossible ?? false,
+       active = active ?? true;
 
   factory Room({
     int? id,
     required String roomNumber,
     required int bedAmount,
+    String? building,
+    String? floor,
+    required int priceCategoryId,
+    _io5akotj.PriceCategory? priceCategory,
+    bool? cribPossible,
+    bool? active,
+    String? notes,
   }) = _RoomImpl;
 
   factory Room.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -30,6 +48,21 @@ abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
       id: jsonSerialization['id'] as int?,
       roomNumber: jsonSerialization['roomNumber'] as String,
       bedAmount: jsonSerialization['bedAmount'] as int,
+      building: jsonSerialization['building'] as String?,
+      floor: jsonSerialization['floor'] as String?,
+      priceCategoryId: jsonSerialization['priceCategoryId'] as int,
+      priceCategory: jsonSerialization['priceCategory'] == null
+          ? null
+          : _iil9w69f.Protocol().deserialize<_io5akotj.PriceCategory>(
+              jsonSerialization['priceCategory'],
+            ),
+      cribPossible: jsonSerialization['cribPossible'] == null
+          ? null
+          : _is.BoolJsonExtension.fromJson(jsonSerialization['cribPossible']),
+      active: jsonSerialization['active'] == null
+          ? null
+          : _is.BoolJsonExtension.fromJson(jsonSerialization['active']),
+      notes: jsonSerialization['notes'] as String?,
     );
   }
 
@@ -44,6 +77,20 @@ abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
 
   int bedAmount;
 
+  String? building;
+
+  String? floor;
+
+  int priceCategoryId;
+
+  _io5akotj.PriceCategory? priceCategory;
+
+  bool cribPossible;
+
+  bool active;
+
+  String? notes;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -54,6 +101,13 @@ abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
     int? id,
     String? roomNumber,
     int? bedAmount,
+    String? building,
+    String? floor,
+    int? priceCategoryId,
+    _io5akotj.PriceCategory? priceCategory,
+    bool? cribPossible,
+    bool? active,
+    String? notes,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -62,6 +116,13 @@ abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
       if (id != null) 'id': id,
       'roomNumber': roomNumber,
       'bedAmount': bedAmount,
+      if (building != null) 'building': building,
+      if (floor != null) 'floor': floor,
+      'priceCategoryId': priceCategoryId,
+      if (priceCategory != null) 'priceCategory': priceCategory?.toJson(),
+      'cribPossible': cribPossible,
+      'active': active,
+      if (notes != null) 'notes': notes,
     };
   }
 
@@ -72,11 +133,19 @@ abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
       if (id != null) 'id': id,
       'roomNumber': roomNumber,
       'bedAmount': bedAmount,
+      if (building != null) 'building': building,
+      if (floor != null) 'floor': floor,
+      'priceCategoryId': priceCategoryId,
+      if (priceCategory != null)
+        'priceCategory': priceCategory?.toJsonForProtocol(),
+      'cribPossible': cribPossible,
+      'active': active,
+      if (notes != null) 'notes': notes,
     };
   }
 
-  static RoomInclude include() {
-    return RoomInclude._();
+  static RoomInclude include({_io5akotj.PriceCategoryInclude? priceCategory}) {
+    return RoomInclude._(priceCategory: priceCategory);
   }
 
   static RoomIncludeList includeList({
@@ -110,10 +179,24 @@ class _RoomImpl extends Room {
     int? id,
     required String roomNumber,
     required int bedAmount,
+    String? building,
+    String? floor,
+    required int priceCategoryId,
+    _io5akotj.PriceCategory? priceCategory,
+    bool? cribPossible,
+    bool? active,
+    String? notes,
   }) : super._(
          id: id,
          roomNumber: roomNumber,
          bedAmount: bedAmount,
+         building: building,
+         floor: floor,
+         priceCategoryId: priceCategoryId,
+         priceCategory: priceCategory,
+         cribPossible: cribPossible,
+         active: active,
+         notes: notes,
        );
 
   /// Returns a shallow copy of this [Room]
@@ -124,11 +207,27 @@ class _RoomImpl extends Room {
     Object? id = _Undefined,
     String? roomNumber,
     int? bedAmount,
+    Object? building = _Undefined,
+    Object? floor = _Undefined,
+    int? priceCategoryId,
+    Object? priceCategory = _Undefined,
+    bool? cribPossible,
+    bool? active,
+    Object? notes = _Undefined,
   }) {
     return Room(
       id: id is int? ? id : this.id,
       roomNumber: roomNumber ?? this.roomNumber,
       bedAmount: bedAmount ?? this.bedAmount,
+      building: building is String? ? building : this.building,
+      floor: floor is String? ? floor : this.floor,
+      priceCategoryId: priceCategoryId ?? this.priceCategoryId,
+      priceCategory: priceCategory is _io5akotj.PriceCategory?
+          ? priceCategory
+          : this.priceCategory?.copyWith(),
+      cribPossible: cribPossible ?? this.cribPossible,
+      active: active ?? this.active,
+      notes: notes is String? ? notes : this.notes,
     );
   }
 }
@@ -145,6 +244,36 @@ class RoomUpdateTable extends _is.UpdateTable<RoomTable> {
     table.bedAmount,
     value,
   );
+
+  _is.ColumnValue<String, String> building(String? value) => _is.ColumnValue(
+    table.building,
+    value,
+  );
+
+  _is.ColumnValue<String, String> floor(String? value) => _is.ColumnValue(
+    table.floor,
+    value,
+  );
+
+  _is.ColumnValue<int, int> priceCategoryId(int value) => _is.ColumnValue(
+    table.priceCategoryId,
+    value,
+  );
+
+  _is.ColumnValue<bool, bool> cribPossible(bool value) => _is.ColumnValue(
+    table.cribPossible,
+    value,
+  );
+
+  _is.ColumnValue<bool, bool> active(bool value) => _is.ColumnValue(
+    table.active,
+    value,
+  );
+
+  _is.ColumnValue<String, String> notes(String? value) => _is.ColumnValue(
+    table.notes,
+    value,
+  );
 }
 
 class RoomTable extends _is.Table<int?> {
@@ -158,6 +287,32 @@ class RoomTable extends _is.Table<int?> {
       'bedAmount',
       this,
     );
+    building = _is.ColumnString(
+      'building',
+      this,
+    );
+    floor = _is.ColumnString(
+      'floor',
+      this,
+    );
+    priceCategoryId = _is.ColumnInt(
+      'priceCategoryId',
+      this,
+    );
+    cribPossible = _is.ColumnBool(
+      'cribPossible',
+      this,
+      hasDefault: true,
+    );
+    active = _is.ColumnBool(
+      'active',
+      this,
+      hasDefault: true,
+    );
+    notes = _is.ColumnString(
+      'notes',
+      this,
+    );
   }
 
   late final RoomUpdateTable updateTable;
@@ -166,19 +321,64 @@ class RoomTable extends _is.Table<int?> {
 
   late final _is.ColumnInt bedAmount;
 
+  late final _is.ColumnString building;
+
+  late final _is.ColumnString floor;
+
+  late final _is.ColumnInt priceCategoryId;
+
+  _io5akotj.PriceCategoryTable? _priceCategory;
+
+  late final _is.ColumnBool cribPossible;
+
+  late final _is.ColumnBool active;
+
+  late final _is.ColumnString notes;
+
+  _io5akotj.PriceCategoryTable get priceCategory {
+    if (_priceCategory != null) return _priceCategory!;
+    _priceCategory = _is.createRelationTable(
+      relationFieldName: 'priceCategory',
+      field: Room.t.priceCategoryId,
+      foreignField: _io5akotj.PriceCategory.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _io5akotj.PriceCategoryTable(tableRelation: foreignTableRelation),
+    );
+    return _priceCategory!;
+  }
+
   @override
   List<_is.Column> get columns => [
     id,
     roomNumber,
     bedAmount,
+    building,
+    floor,
+    priceCategoryId,
+    cribPossible,
+    active,
+    notes,
   ];
+
+  @override
+  _is.Table? getRelationTable(String relationField) {
+    if (relationField == 'priceCategory') {
+      return priceCategory;
+    }
+    return null;
+  }
 }
 
 class RoomInclude extends _is.IncludeObject {
-  RoomInclude._();
+  RoomInclude._({_io5akotj.PriceCategoryInclude? priceCategory}) {
+    _priceCategory = priceCategory;
+  }
+
+  _io5akotj.PriceCategoryInclude? _priceCategory;
 
   @override
-  Map<String, _is.Include?> get includes => {};
+  Map<String, _is.Include?> get includes => {'priceCategory': _priceCategory};
 
   @override
   _is.Table<int?> get table => Room.t;
@@ -205,6 +405,8 @@ class RoomIncludeList extends _is.IncludeList {
 
 class RoomRepository {
   const RoomRepository._();
+
+  final attachRow = const RoomAttachRowRepository._();
 
   /// Returns a list of [Room]s matching the given query parameters.
   ///
@@ -236,6 +438,7 @@ class RoomRepository {
     _is.OrderByBuilder<RoomTable>? orderBy,
     _is.OrderByListBuilder<RoomTable>? orderByList,
     _is.Transaction? transaction,
+    RoomInclude? include,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
@@ -246,6 +449,7 @@ class RoomRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -275,6 +479,7 @@ class RoomRepository {
     _is.OrderByBuilder<RoomTable>? orderBy,
     _is.OrderByListBuilder<RoomTable>? orderByList,
     _is.Transaction? transaction,
+    RoomInclude? include,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
@@ -284,6 +489,7 @@ class RoomRepository {
       orderByList: orderByList?.call(Room.t),
       offset: offset,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -294,12 +500,14 @@ class RoomRepository {
     _is.DatabaseSession session,
     int id, {
     _is.Transaction? transaction,
+    RoomInclude? include,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Room>(
       id,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -593,6 +801,33 @@ class RoomRepository {
       where: where(Room.t),
       lockMode: lockMode,
       lockBehavior: lockBehavior,
+      transaction: transaction,
+    );
+  }
+}
+
+class RoomAttachRowRepository {
+  const RoomAttachRowRepository._();
+
+  /// Creates a relation between the given [Room] and [PriceCategory]
+  /// by setting the [Room]'s foreign key `priceCategoryId` to refer to the [PriceCategory].
+  Future<void> priceCategory(
+    _is.DatabaseSession session,
+    Room room,
+    _io5akotj.PriceCategory priceCategory, {
+    _is.Transaction? transaction,
+  }) async {
+    if (room.id == null) {
+      throw ArgumentError.notNull('room.id');
+    }
+    if (priceCategory.id == null) {
+      throw ArgumentError.notNull('priceCategory.id');
+    }
+
+    var $room = room.copyWith(priceCategoryId: priceCategory.id);
+    await session.db.updateRow<Room>(
+      $room,
+      columns: [Room.t.priceCategoryId],
       transaction: transaction,
     );
   }

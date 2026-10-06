@@ -6,3 +6,11 @@ fields:
   lastName: String
   mail: String?
   phone: String?
+  birthDate: DateTime?
+  street: String?
+  zip: String?
+  city: String?
+  country: String?
+  organization: Organization?, relation(optional, onDelete=SetNull)
+  notes: String?
+  privacyConsentAt: DateTime?

@@ -1,0 +1,10 @@
+### A room that a booking holds for all of its nights.
+class: BookingRoom
+table: booking_rooms
+fields:
+  booking: Booking?, relation(name=booking_rooms, onDelete=Cascade)
+  room: Room?, relation(onDelete=Restrict)
+indexes:
+  booking_rooms_unique_idx:
+    fields: bookingId, roomId
+    unique: true

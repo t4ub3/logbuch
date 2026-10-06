@@ -1,0 +1,25 @@
+enum: ValidationError
+serialized: byName
+values:
+  - nameRequired
+  - invalidDate
+  - invalidDateRange
+  - seasonOverlap
+  - invalidAgeRange
+  - ageGroupOverlap
+  - invalidAmount
+  - invalidTaxRate
+  - invalidBedAmount
+  - invalidGuestCount
+  - duplicateRate
+  - inUse
+  - notFound
+  - datesRequired
+  - roomUnavailable
+  - roomNotHeld
+  - adminRequired
+  - ownRole
+  - alreadyInvoiced
+  - nothingToInvoice
+  - pricingIncomplete
+  - notOverpaid

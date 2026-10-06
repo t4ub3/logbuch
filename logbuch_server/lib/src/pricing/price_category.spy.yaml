@@ -1,0 +1,5 @@
+class: PriceCategory
+table: price_categories
+fields:
+  name: String
+  sortOrder: int, default=0

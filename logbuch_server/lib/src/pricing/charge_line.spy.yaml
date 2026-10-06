@@ -1,0 +1,16 @@
+### One position of what a booking costs. Amounts are in cents and include
+### the tax.
+class: ChargeLine
+fields:
+  ### Null for fees that are charged per booking or per room.
+  guestId: int?
+  type: ChargeType
+  description: String
+  quantity: int
+  unitPrice: int
+  total: int
+  ### In basis points.
+  taxRate: int
+  ### First night and day after the last night of a line charged per night.
+  periodFrom: DateTime?
+  periodTo: DateTime?

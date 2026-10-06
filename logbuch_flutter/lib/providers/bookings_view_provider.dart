@@ -2,7 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'bookings_view_provider.g.dart';
 
-enum BookingsView { agenda, month, year }
+enum BookingsView { agenda, month, year, occupancy }
 
 /// The view currently shown in the bookings panel.
 @Riverpod(keepAlive: true)
