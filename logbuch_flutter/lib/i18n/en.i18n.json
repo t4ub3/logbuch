@@ -70,6 +70,8 @@
         "overview": "Overview",
         "rooms": "Rooms",
         "organization": "Organization",
+        "category": "Category",
+        "newCategory": "New category",
         "mealPlan": "Meal plan",
         "billingMode": "Invoices",
         "billingModes": {
@@ -249,6 +251,7 @@
             "mealPlans": "Meal plans",
             "rates": "Prices",
             "fees": "Fees",
+            "bookingCategories": "Booking categories",
             "users": "Users",
             "operator": "Operator"
         },
@@ -328,6 +331,13 @@
             "period": "Period",
             "gap": "No season covers {from} – {to}. Stays in this period cannot be priced.",
             "deleteHint": "The prices of this season are deleted as well."
+        },
+        "bookingCategories": {
+            "empty": "No booking categories",
+            "add": "New booking category",
+            "edit": "Edit booking category",
+            "icon": "Icon",
+            "color": "Color"
         },
         "mealPlans": {
             "empty": "No meal plans",

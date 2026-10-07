@@ -10,6 +10,7 @@ enum AdminSection {
   mealPlans,
   rates,
   fees,
+  bookingCategories,
   operator,
   users,
 }

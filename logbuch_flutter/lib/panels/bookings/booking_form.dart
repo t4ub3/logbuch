@@ -4,8 +4,10 @@ import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
 import 'package:logbuch_flutter/panels/admin/admin_widgets.dart';
+import 'package:logbuch_flutter/panels/admin/booking_categories_section.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_extensions.dart';
 import 'package:logbuch_flutter/panels/contacts/contacts_section.dart';
+import 'package:logbuch_flutter/providers/booking_categories_provider.dart';
 import 'package:logbuch_flutter/providers/bookings_provider.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/contacts_provider.dart';
@@ -32,6 +34,7 @@ mixin _BookingForm<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   late DateTimeRange? _dates = _initialDates();
   late Contact? _lead = booking?.lead;
   late int? _organizationId = booking?.organizationId;
+  late int? _categoryId = booking?.categoryId;
   late BookingStatus _status = booking?.status ?? BookingStatus.inquiry;
   late DateTime? _optionExpiresAt = switch (booking?.optionExpiresAt) {
     final expiry? => toLocalDate(expiry),
@@ -60,6 +63,7 @@ mixin _BookingForm<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     final t = context.t.bookings;
     final organizations = ref.watch(organizationsProvider).value ?? [];
     final mealPlans = ref.watch(mealPlansProvider).value ?? [];
+    final categories = ref.watch(bookingCategoriesProvider).value ?? [];
 
     return [
       TextFormField(
@@ -76,6 +80,54 @@ mixin _BookingForm<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       _LeadField(
         lead: _lead,
         onChanged: (lead) => setState(() => _lead = lead),
+      ),
+      Row(
+        children: [
+          Expanded(
+            child: DropdownButtonFormField<int?>(
+              // Built anew to show a category that was just created.
+              key: ValueKey((_categoryId, categories.length)),
+              isExpanded: true,
+              initialValue: categories.any((c) => c.id == _categoryId)
+                  ? _categoryId
+                  : null,
+              decoration: InputDecoration(labelText: t.category),
+              items: [
+                DropdownMenuItem(
+                  value: null,
+                  child: Text(context.t.common.none),
+                ),
+                for (final category in categories)
+                  DropdownMenuItem(
+                    value: category.id,
+                    child: Row(
+                      children: [
+                        Icon(
+                          category.icon.data,
+                          size: 20,
+                          color: category.color.color,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            category.name,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+              onChanged: (id) => setState(() => _categoryId = id),
+            ),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            tooltip: t.newCategory,
+            icon: const Icon(YaruIcons.plus),
+            onPressed: _addCategory,
+          ),
+        ],
       ),
       // "None" is the null entry.
       DropdownButtonFormField<int?>(
@@ -148,6 +200,19 @@ mixin _BookingForm<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     ];
   }
 
+  /// Lets the user create a category, which the booking then has.
+  Future<void> _addCategory() async {
+    await showAdminDialog(
+      context,
+      BookingCategoryDialog(
+        onSaved: (category) {
+          ref.invalidate(bookingCategoriesProvider);
+          if (mounted) setState(() => _categoryId = category.id);
+        },
+      ),
+    );
+  }
+
   /// Saves the booking as the form has it, which must be valid, and returns
   /// it as the server stored it.
   Future<Booking> submit() async {
@@ -162,6 +227,7 @@ mixin _BookingForm<T extends ConsumerStatefulWidget> on ConsumerState<T> {
       departure: dates == null ? null : toUtcDate(dates.end),
       leadId: _lead!.id!,
       organizationId: _organizationId,
+      categoryId: _categoryId,
       status: _status,
       // Only an option can run out.
       optionExpiresAt: _status == BookingStatus.option && expiry != null

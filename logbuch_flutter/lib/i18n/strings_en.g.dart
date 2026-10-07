@@ -260,6 +260,12 @@ class Translations$bookings$en {
 	/// en: 'Organization'
 	String get organization => 'Organization';
 
+	/// en: 'Category'
+	String get category => 'Category';
+
+	/// en: 'New category'
+	String get newCategory => 'New category';
+
 	/// en: 'Meal plan'
 	String get mealPlan => 'Meal plan';
 
@@ -696,6 +702,7 @@ class Translations$admin$en {
 	late final Translations$admin$priceCategories$en priceCategories = Translations$admin$priceCategories$en.internal(_root);
 	late final Translations$admin$ageGroups$en ageGroups = Translations$admin$ageGroups$en.internal(_root);
 	late final Translations$admin$seasons$en seasons = Translations$admin$seasons$en.internal(_root);
+	late final Translations$admin$bookingCategories$en bookingCategories = Translations$admin$bookingCategories$en.internal(_root);
 	late final Translations$admin$mealPlans$en mealPlans = Translations$admin$mealPlans$en.internal(_root);
 	late final Translations$admin$rates$en rates = Translations$admin$rates$en.internal(_root);
 	late final Translations$admin$fees$en fees = Translations$admin$fees$en.internal(_root);
@@ -1078,6 +1085,9 @@ class Translations$admin$sections$en {
 	/// en: 'Fees'
 	String get fees => 'Fees';
 
+	/// en: 'Booking categories'
+	String get bookingCategories => 'Booking categories';
+
 	/// en: 'Users'
 	String get users => 'Users';
 
@@ -1314,6 +1324,30 @@ class Translations$admin$seasons$en {
 
 	/// en: 'The prices of this season are deleted as well.'
 	String get deleteHint => 'The prices of this season are deleted as well.';
+}
+
+// Path: admin.bookingCategories
+class Translations$admin$bookingCategories$en {
+	Translations$admin$bookingCategories$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'No booking categories'
+	String get empty => 'No booking categories';
+
+	/// en: 'New booking category'
+	String get add => 'New booking category';
+
+	/// en: 'Edit booking category'
+	String get edit => 'Edit booking category';
+
+	/// en: 'Icon'
+	String get icon => 'Icon';
+
+	/// en: 'Color'
+	String get color => 'Color';
 }
 
 // Path: admin.mealPlans
@@ -1637,6 +1671,8 @@ extension on Translations {
 			'bookings.overview' => 'Overview',
 			'bookings.rooms' => 'Rooms',
 			'bookings.organization' => 'Organization',
+			'bookings.category' => 'Category',
+			'bookings.newCategory' => 'New category',
 			'bookings.mealPlan' => 'Meal plan',
 			'bookings.billingMode' => 'Invoices',
 			'bookings.billingModes.single' => 'One invoice for the booking',
@@ -1786,6 +1822,7 @@ extension on Translations {
 			'admin.sections.mealPlans' => 'Meal plans',
 			'admin.sections.rates' => 'Prices',
 			'admin.sections.fees' => 'Fees',
+			'admin.sections.bookingCategories' => 'Booking categories',
 			'admin.sections.users' => 'Users',
 			'admin.sections.operator' => 'Operator',
 			'admin.deleteTitle' => ({required Object name}) => 'Delete “${name}”?',
@@ -1852,6 +1889,11 @@ extension on Translations {
 			'admin.seasons.period' => 'Period',
 			'admin.seasons.gap' => ({required Object from, required Object to}) => 'No season covers ${from} – ${to}. Stays in this period cannot be priced.',
 			'admin.seasons.deleteHint' => 'The prices of this season are deleted as well.',
+			'admin.bookingCategories.empty' => 'No booking categories',
+			'admin.bookingCategories.add' => 'New booking category',
+			'admin.bookingCategories.edit' => 'Edit booking category',
+			'admin.bookingCategories.icon' => 'Icon',
+			'admin.bookingCategories.color' => 'Color',
 			'admin.mealPlans.empty' => 'No meal plans',
 			'admin.mealPlans.add' => 'New meal plan',
 			'admin.mealPlans.edit' => 'Edit meal plan',

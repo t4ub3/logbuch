@@ -3,17 +3,36 @@ import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
 import 'package:logbuch_flutter/panels/contacts/contacts_section.dart';
+import 'package:yaru/yaru.dart';
 
-const _bookingColors = [
-  Color(0xFF1E88E5), // blue
-  Color(0xFF00897B), // teal
-  Color(0xFFF4511E), // deep orange
-  Color(0xFF8E24AA), // purple
-  Color(0xFF43A047), // green
-  Color(0xFFD81B60), // pink
-  Color(0xFF3949AB), // indigo
-  Color(0xFFFF8F00), // amber
-];
+/// The color of a booking that has no category.
+const _noCategoryColor = Color(0xFF8E8E8E);
+
+extension BookingCategoryColorX on BookingCategoryColor {
+  /// The Yaru accent color of the same name.
+  Color get color => YaruVariant.values.byName(name).color;
+}
+
+extension BookingCategoryIconX on BookingCategoryIcon {
+  IconData get data => switch (this) {
+    BookingCategoryIcon.calendar => YaruIcons.calendar,
+    BookingCategoryIcon.users => YaruIcons.users,
+    BookingCategoryIcon.family => YaruIcons.familly,
+    BookingCategoryIcon.education => YaruIcons.education,
+    BookingCategoryIcon.book => YaruIcons.book,
+    BookingCategoryIcon.presentation => YaruIcons.office_presentation,
+    BookingCategoryIcon.music => YaruIcons.music_note,
+    BookingCategoryIcon.sport => YaruIcons.basketball,
+    BookingCategoryIcon.tree => YaruIcons.tree,
+    BookingCategoryIcon.compass => YaruIcons.compass,
+    BookingCategoryIcon.sun => YaruIcons.sun,
+    BookingCategoryIcon.heart => YaruIcons.heart,
+    BookingCategoryIcon.star => YaruIcons.star,
+    BookingCategoryIcon.home => YaruIcons.home,
+    BookingCategoryIcon.puzzle => YaruIcons.puzzle_piece,
+    BookingCategoryIcon.flag => YaruIcons.flag,
+  };
+}
 
 extension BookingX on Booking {
   /// Day of arrival (local, date only), or null if undated.
@@ -38,8 +57,12 @@ extension BookingX on Booking {
     return !d.isBefore(start) && !d.isAfter(end);
   }
 
-  /// A stable color per booking, used to tell bookings apart in calendars.
-  Color get color => _bookingColors[(id ?? 0) % _bookingColors.length];
+  /// The color of the category of the booking, which tells bookings apart
+  /// in calendars. Without a category it is grey.
+  Color get color => category?.color.color ?? _noCategoryColor;
+
+  /// The icon of the category of the booking.
+  IconData get icon => category?.icon.data ?? YaruIcons.calendar;
 
   String get leadName => lead?.fullName ?? '';
 

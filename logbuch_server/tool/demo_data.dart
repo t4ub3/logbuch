@@ -181,6 +181,41 @@ String _fullName(Contact contact) =>
 /// Rooms of a price category that a booking wants to hold.
 typedef _Wish = ({String category, int count, int minBeds});
 
+/// The categories of bookings, each with its icon, its color and the words
+/// in the title of a booking that put it into the category.
+const _bookingCategories = [
+  (
+    'Familien',
+    BookingCategoryIcon.family,
+    BookingCategoryColor.sage,
+    ['Familien'],
+  ),
+  (
+    'Schule und Jugend',
+    BookingCategoryIcon.education,
+    BookingCategoryColor.blue,
+    ['Klassenfahrt', 'Sommerlager'],
+  ),
+  (
+    'Musik',
+    BookingCategoryIcon.music,
+    BookingCategoryColor.purple,
+    ['Probenwochenende', 'Orchester'],
+  ),
+  (
+    'Seminare und Klausuren',
+    BookingCategoryIcon.presentation,
+    BookingCategoryColor.orange,
+    ['Seminar', 'Teamtage', 'Firmenklausur', 'Retreat'],
+  ),
+  (
+    'Sport und Freizeit',
+    BookingCategoryIcon.compass,
+    BookingCategoryColor.viridian,
+    ['Wanderwochenende', 'Ausflug'],
+  ),
+];
+
 /// Demo data for showing the app: a house with rooms in every price
 /// category and prices for them, contacts, organizations and households,
 /// and bookings in every stage around [today], some of them invoiced and
@@ -211,6 +246,7 @@ class DemoData {
   final _organizations = <String, Organization>{};
   final _households = <String, Household>{};
   final _mealPlans = <String, MealPlan>{};
+  final _categories = <String, BookingCategory>{};
   var _ageGroups = <AgeGroup>[];
   var _titles = <String>{};
   var _people = 0;
@@ -306,6 +342,16 @@ class DemoData {
     }
     for (final name in _mealPrices.keys) {
       _mealPlans[name] ??= await e.mealPlan.add(session, MealPlan(name: name));
+    }
+
+    for (final category in await e.bookingCategory.getAll(session)) {
+      _categories[category.name] = category;
+    }
+    for (final (name, icon, color, _) in _bookingCategories) {
+      _categories[name] ??= await e.bookingCategory.add(
+        session,
+        BookingCategory(name: name, icon: icon, color: color),
+      );
     }
 
     final fees = await e.fee.getAll(session);
@@ -639,13 +685,24 @@ class DemoData {
 
   /// Creates [booking], unless a booking with its title exists: then that
   /// is left as it is and null is returned.
+  /// The category whose words are in the title of a booking.
+  BookingCategory? _categoryOf(String title) {
+    for (final (name, _, _, words) in _bookingCategories) {
+      if (words.any(title.contains)) return _categories[name];
+    }
+    return null;
+  }
+
   Future<Booking?> _book(Booking booking) async {
     if (!_titles.add(booking.title)) {
       log('· ${booking.title} is there already');
       return null;
     }
     log('+ ${booking.title}');
-    return endpoints.booking.add(session, booking);
+    return endpoints.booking.add(
+      session,
+      booking.copyWith(categoryId: _categoryOf(booking.title)?.id),
+    );
   }
 
   /// Lets [booking] hold rooms that are free during its nights: for each of

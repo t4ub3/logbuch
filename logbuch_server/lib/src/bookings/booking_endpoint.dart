@@ -299,6 +299,7 @@ class BookingEndpoint extends AppEndpoint {
 BookingInclude _details() => Booking.include(
   lead: Contact.include(),
   organization: Organization.include(),
+  category: BookingCategory.include(),
   mealPlan: MealPlan.include(),
   rooms: BookingRoom.includeList(
     include: BookingRoom.include(

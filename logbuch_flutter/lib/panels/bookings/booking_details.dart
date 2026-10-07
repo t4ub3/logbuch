@@ -64,7 +64,7 @@ class BookingDetails extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.circle, size: 16, color: booking.color),
+                    Icon(booking.icon, color: booking.color),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -189,6 +189,12 @@ class _OverviewCard extends ConsumerWidget {
                   icon: YaruIcons.call_incoming,
                   label: t.phone,
                   text: phone,
+                ),
+              if (booking.category case final category?)
+                _Fact(
+                  icon: category.icon.data,
+                  label: t.category,
+                  text: category.name,
                 ),
               if (booking.organization case final organization?)
                 _Fact(

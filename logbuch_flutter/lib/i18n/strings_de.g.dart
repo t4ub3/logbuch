@@ -144,6 +144,8 @@ class _Translations$bookings$de extends Translations$bookings$en {
 	@override String get overview => 'Übersicht';
 	@override String get rooms => 'Zimmer';
 	@override String get organization => 'Organisation';
+	@override String get category => 'Kategorie';
+	@override String get newCategory => 'Neue Kategorie';
 	@override String get mealPlan => 'Verpflegung';
 	@override String get billingMode => 'Rechnungen';
 	@override late final _Translations$bookings$billingModes$de billingModes = _Translations$bookings$billingModes$de._(_root);
@@ -323,6 +325,7 @@ class _Translations$admin$de extends Translations$admin$en {
 	@override late final _Translations$admin$priceCategories$de priceCategories = _Translations$admin$priceCategories$de._(_root);
 	@override late final _Translations$admin$ageGroups$de ageGroups = _Translations$admin$ageGroups$de._(_root);
 	@override late final _Translations$admin$seasons$de seasons = _Translations$admin$seasons$de._(_root);
+	@override late final _Translations$admin$bookingCategories$de bookingCategories = _Translations$admin$bookingCategories$de._(_root);
 	@override late final _Translations$admin$mealPlans$de mealPlans = _Translations$admin$mealPlans$de._(_root);
 	@override late final _Translations$admin$rates$de rates = _Translations$admin$rates$de._(_root);
 	@override late final _Translations$admin$fees$de fees = _Translations$admin$fees$de._(_root);
@@ -529,6 +532,7 @@ class _Translations$admin$sections$de extends Translations$admin$sections$en {
 	@override String get mealPlans => 'Verpflegung';
 	@override String get rates => 'Preise';
 	@override String get fees => 'Gebühren';
+	@override String get bookingCategories => 'Buchungskategorien';
 	@override String get users => 'Benutzer';
 	@override String get operator => 'Träger';
 }
@@ -640,6 +644,20 @@ class _Translations$admin$seasons$de extends Translations$admin$seasons$en {
 	@override String get period => 'Zeitraum';
 	@override String gap({required Object from, required Object to}) => 'Für ${from} – ${to} gibt es keine Saison. Aufenthalte in diesem Zeitraum können nicht berechnet werden.';
 	@override String get deleteHint => 'Die Preise dieser Saison werden ebenfalls gelöscht.';
+}
+
+// Path: admin.bookingCategories
+class _Translations$admin$bookingCategories$de extends Translations$admin$bookingCategories$en {
+	_Translations$admin$bookingCategories$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => 'Keine Buchungskategorien';
+	@override String get add => 'Neue Buchungskategorie';
+	@override String get edit => 'Buchungskategorie bearbeiten';
+	@override String get icon => 'Symbol';
+	@override String get color => 'Farbe';
 }
 
 // Path: admin.mealPlans
@@ -838,6 +856,8 @@ extension on TranslationsDe {
 			'bookings.overview' => 'Übersicht',
 			'bookings.rooms' => 'Zimmer',
 			'bookings.organization' => 'Organisation',
+			'bookings.category' => 'Kategorie',
+			'bookings.newCategory' => 'Neue Kategorie',
 			'bookings.mealPlan' => 'Verpflegung',
 			'bookings.billingMode' => 'Rechnungen',
 			'bookings.billingModes.single' => 'Eine Rechnung für die Buchung',
@@ -987,6 +1007,7 @@ extension on TranslationsDe {
 			'admin.sections.mealPlans' => 'Verpflegung',
 			'admin.sections.rates' => 'Preise',
 			'admin.sections.fees' => 'Gebühren',
+			'admin.sections.bookingCategories' => 'Buchungskategorien',
 			'admin.sections.users' => 'Benutzer',
 			'admin.sections.operator' => 'Träger',
 			'admin.deleteTitle' => ({required Object name}) => '„${name}“ löschen?',
@@ -1053,6 +1074,11 @@ extension on TranslationsDe {
 			'admin.seasons.period' => 'Zeitraum',
 			'admin.seasons.gap' => ({required Object from, required Object to}) => 'Für ${from} – ${to} gibt es keine Saison. Aufenthalte in diesem Zeitraum können nicht berechnet werden.',
 			'admin.seasons.deleteHint' => 'Die Preise dieser Saison werden ebenfalls gelöscht.',
+			'admin.bookingCategories.empty' => 'Keine Buchungskategorien',
+			'admin.bookingCategories.add' => 'Neue Buchungskategorie',
+			'admin.bookingCategories.edit' => 'Buchungskategorie bearbeiten',
+			'admin.bookingCategories.icon' => 'Symbol',
+			'admin.bookingCategories.color' => 'Farbe',
 			'admin.mealPlans.empty' => 'Keine Verpflegungsarten',
 			'admin.mealPlans.add' => 'Neue Verpflegungsart',
 			'admin.mealPlans.edit' => 'Verpflegungsart bearbeiten',

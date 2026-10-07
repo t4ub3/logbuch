@@ -81,6 +81,22 @@ void main() {
       );
     });
 
+    test('then every booking has a category that comes with it', () async {
+      final bookings = await endpoints.booking.getAll(sessionBuilder);
+      final categories = await endpoints.bookingCategory.getAll(sessionBuilder);
+
+      expect(categories, hasLength(5));
+      for (final booking in bookings) {
+        expect(booking.category, isNotNull, reason: booking.title);
+      }
+      expect(
+        {for (final booking in bookings) booking.categoryId},
+        {
+          for (final category in categories) category.id,
+        },
+      );
+    });
+
     test('then the families in the house can all be priced', () async {
       final retreat = await booking('Familienfreizeit St. Marien');
       final price = await endpoints.pricing.calculate(

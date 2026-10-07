@@ -7,6 +7,7 @@ fields:
   departure: DateTime?
   lead: Contact?, relation(onDelete=Restrict)
   organization: Organization?, relation(optional, onDelete=Restrict)
+  category: BookingCategory?, relation(optional, onDelete=Restrict)
   status: BookingStatus, default=inquiry
   optionExpiresAt: DateTime?
   mealPlan: MealPlan?, relation(optional, onDelete=Restrict)

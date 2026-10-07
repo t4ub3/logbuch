@@ -13,6 +13,7 @@
 import 'package:logbuch_client/src/protocol/protocol.dart' as _i7rf0d0e;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import '../bookings/billing_mode.dart' as _ikjlxdwh;
+import '../bookings/booking_category.dart' as _i1nxuzrq;
 import '../bookings/booking_room.dart' as _icgf4f53;
 import '../bookings/booking_status.dart' as _ilk1qg37;
 import '../contacts/contact.dart' as _imbxrfja;
@@ -31,6 +32,8 @@ abstract class Booking
     this.lead,
     this.organizationId,
     this.organization,
+    this.categoryId,
+    this.category,
     _ilk1qg37.BookingStatus? status,
     this.optionExpiresAt,
     this.mealPlanId,
@@ -53,6 +56,8 @@ abstract class Booking
     _imbxrfja.Contact? lead,
     int? organizationId,
     _i0w1hmpk.Organization? organization,
+    int? categoryId,
+    _i1nxuzrq.BookingCategory? category,
     _ilk1qg37.BookingStatus? status,
     DateTime? optionExpiresAt,
     int? mealPlanId,
@@ -87,6 +92,12 @@ abstract class Booking
           ? null
           : _i7rf0d0e.Protocol().deserialize<_i0w1hmpk.Organization>(
               jsonSerialization['organization'],
+            ),
+      categoryId: jsonSerialization['categoryId'] as int?,
+      category: jsonSerialization['category'] == null
+          ? null
+          : _i7rf0d0e.Protocol().deserialize<_i1nxuzrq.BookingCategory>(
+              jsonSerialization['category'],
             ),
       status: jsonSerialization['status'] == null
           ? null
@@ -140,6 +151,10 @@ abstract class Booking
 
   _i0w1hmpk.Organization? organization;
 
+  int? categoryId;
+
+  _i1nxuzrq.BookingCategory? category;
+
   _ilk1qg37.BookingStatus status;
 
   DateTime? optionExpiresAt;
@@ -169,6 +184,8 @@ abstract class Booking
     _imbxrfja.Contact? lead,
     int? organizationId,
     _i0w1hmpk.Organization? organization,
+    int? categoryId,
+    _i1nxuzrq.BookingCategory? category,
     _ilk1qg37.BookingStatus? status,
     DateTime? optionExpiresAt,
     int? mealPlanId,
@@ -191,6 +208,8 @@ abstract class Booking
       if (lead != null) 'lead': lead?.toJson(),
       if (organizationId != null) 'organizationId': organizationId,
       if (organization != null) 'organization': organization?.toJson(),
+      if (categoryId != null) 'categoryId': categoryId,
+      if (category != null) 'category': category?.toJson(),
       'status': status.toJson(),
       if (optionExpiresAt != null) 'optionExpiresAt': optionExpiresAt?.toJson(),
       if (mealPlanId != null) 'mealPlanId': mealPlanId,
@@ -216,6 +235,8 @@ abstract class Booking
       if (organizationId != null) 'organizationId': organizationId,
       if (organization != null)
         'organization': organization?.toJsonForProtocol(),
+      if (categoryId != null) 'categoryId': categoryId,
+      if (category != null) 'category': category?.toJsonForProtocol(),
       'status': status.toJson(),
       if (optionExpiresAt != null) 'optionExpiresAt': optionExpiresAt?.toJson(),
       if (mealPlanId != null) 'mealPlanId': mealPlanId,
@@ -247,6 +268,8 @@ class _BookingImpl extends Booking {
     _imbxrfja.Contact? lead,
     int? organizationId,
     _i0w1hmpk.Organization? organization,
+    int? categoryId,
+    _i1nxuzrq.BookingCategory? category,
     _ilk1qg37.BookingStatus? status,
     DateTime? optionExpiresAt,
     int? mealPlanId,
@@ -265,6 +288,8 @@ class _BookingImpl extends Booking {
          lead: lead,
          organizationId: organizationId,
          organization: organization,
+         categoryId: categoryId,
+         category: category,
          status: status,
          optionExpiresAt: optionExpiresAt,
          mealPlanId: mealPlanId,
@@ -289,6 +314,8 @@ class _BookingImpl extends Booking {
     Object? lead = _Undefined,
     Object? organizationId = _Undefined,
     Object? organization = _Undefined,
+    Object? categoryId = _Undefined,
+    Object? category = _Undefined,
     _ilk1qg37.BookingStatus? status,
     Object? optionExpiresAt = _Undefined,
     Object? mealPlanId = _Undefined,
@@ -312,6 +339,10 @@ class _BookingImpl extends Booking {
       organization: organization is _i0w1hmpk.Organization?
           ? organization
           : this.organization?.copyWith(),
+      categoryId: categoryId is int? ? categoryId : this.categoryId,
+      category: category is _i1nxuzrq.BookingCategory?
+          ? category
+          : this.category?.copyWith(),
       status: status ?? this.status,
       optionExpiresAt: optionExpiresAt is DateTime?
           ? optionExpiresAt

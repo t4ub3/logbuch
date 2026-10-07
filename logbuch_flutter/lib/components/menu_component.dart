@@ -149,7 +149,7 @@ class _BookingTabTile extends ConsumerWidget {
     return YaruMasterTile(
       padding: const EdgeInsets.all(8),
       leading: Icon(
-        booking == null ? YaruIcons.plus : Icons.event,
+        booking?.icon ?? YaruIcons.plus,
         color: booking?.color,
       ),
       title: Text(

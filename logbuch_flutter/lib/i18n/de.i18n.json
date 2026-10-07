@@ -70,6 +70,8 @@
         "overview": "Übersicht",
         "rooms": "Zimmer",
         "organization": "Organisation",
+        "category": "Kategorie",
+        "newCategory": "Neue Kategorie",
         "mealPlan": "Verpflegung",
         "billingMode": "Rechnungen",
         "billingModes": {
@@ -249,6 +251,7 @@
             "mealPlans": "Verpflegung",
             "rates": "Preise",
             "fees": "Gebühren",
+            "bookingCategories": "Buchungskategorien",
             "users": "Benutzer",
             "operator": "Träger"
         },
@@ -328,6 +331,13 @@
             "period": "Zeitraum",
             "gap": "Für {from} – {to} gibt es keine Saison. Aufenthalte in diesem Zeitraum können nicht berechnet werden.",
             "deleteHint": "Die Preise dieser Saison werden ebenfalls gelöscht."
+        },
+        "bookingCategories": {
+            "empty": "Keine Buchungskategorien",
+            "add": "Neue Buchungskategorie",
+            "edit": "Buchungskategorie bearbeiten",
+            "icon": "Symbol",
+            "color": "Farbe"
         },
         "mealPlans": {
             "empty": "Keine Verpflegungsarten",

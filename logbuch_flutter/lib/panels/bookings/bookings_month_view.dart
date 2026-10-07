@@ -27,10 +27,13 @@ class BookingsMonthView extends ConsumerWidget {
         MonthHeader(month: month),
         Expanded(
           child: switch (bookings) {
-            AsyncData(:final value) => _MonthGrid(
-              month: month,
-              firstWeekday: startOfWeek.firstDayOfWeekIndex,
-              bookings: [...value]..sort(compareByStart),
+            AsyncData(:final value) => Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+              child: _MonthGrid(
+                month: month,
+                firstWeekday: startOfWeek.firstDayOfWeekIndex,
+                bookings: [...value]..sort(compareByStart),
+              ),
             ),
             AsyncError(:final error) => Center(
               child: Text(context.t.common.loadFailed(error: error)),

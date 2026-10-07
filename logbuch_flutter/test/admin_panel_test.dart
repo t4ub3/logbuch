@@ -4,6 +4,7 @@ import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin_panel.dart';
 import 'package:logbuch_flutter/providers/status_provider.dart';
+import 'package:yaru/yaru.dart';
 
 import 'fake_client.dart';
 
@@ -351,5 +352,26 @@ void main() {
         findsOneWidget,
       );
     });
+  });
+
+  testWidgets('a booking category is changed under Admin', (tester) async {
+    final client = filledClient();
+    await _pumpAdmin(tester, client);
+    await open(tester, 'Booking categories');
+
+    expect(find.text('School'), findsOneWidget);
+    await tester.tap(find.byTooltip('Edit'));
+    await tester.pumpAndSettle();
+    await tester.enterText(field('Name'), 'Schools');
+    await tester.tap(find.byIcon(YaruIcons.book));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+    await tester.pumpAndSettle();
+
+    final category = client.bookingCategory.categories.single;
+    expect(category.name, 'Schools');
+    expect(category.icon, BookingCategoryIcon.book);
+    expect(category.color, BookingCategoryColor.blue);
+    expect(find.text('Schools'), findsOneWidget);
   });
 }

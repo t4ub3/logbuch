@@ -19,6 +19,8 @@ import 'package:logbuch_client/src/protocol/billing/charge.dart' as _is60kra1;
 import 'package:logbuch_client/src/protocol/billing/donation.dart' as _ibol987g;
 import 'package:logbuch_client/src/protocol/billing/folio.dart' as _in6c8fr8;
 import 'package:logbuch_client/src/protocol/billing/payment.dart' as _iwxc7te6;
+import 'package:logbuch_client/src/protocol/bookings/booking_category.dart'
+    as _i7p8ds8x;
 import 'package:logbuch_client/src/protocol/bookings/bookings.dart'
     as _iey0gn1f;
 import 'package:logbuch_client/src/protocol/contacts/contact.dart' as _izv2jndr;
@@ -449,6 +451,46 @@ class EndpointBilling extends EndpointApp {
   _ida.Future<void> deleteDonation(int id) => caller.callServerEndpoint<void>(
     'billing',
     'deleteDonation',
+    {'id': id},
+  );
+}
+
+/// The categories that bookings are sorted into, such as class trips. A
+/// category gives its bookings their icon and color.
+/// {@category Endpoint}
+class EndpointBookingCategory extends EndpointApp {
+  EndpointBookingCategory(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'bookingCategory';
+
+  _ida.Future<List<_i7p8ds8x.BookingCategory>> getAll() =>
+      caller.callServerEndpoint<List<_i7p8ds8x.BookingCategory>>(
+        'bookingCategory',
+        'getAll',
+        {},
+      );
+
+  _ida.Future<_i7p8ds8x.BookingCategory> add(
+    _i7p8ds8x.BookingCategory category,
+  ) => caller.callServerEndpoint<_i7p8ds8x.BookingCategory>(
+    'bookingCategory',
+    'add',
+    {'category': category},
+  );
+
+  _ida.Future<_i7p8ds8x.BookingCategory> update(
+    _i7p8ds8x.BookingCategory category,
+  ) => caller.callServerEndpoint<_i7p8ds8x.BookingCategory>(
+    'bookingCategory',
+    'update',
+    {'category': category},
+  );
+
+  /// A category that a booking has cannot be deleted.
+  _ida.Future<void> delete(int id) => caller.callServerEndpoint<void>(
+    'bookingCategory',
+    'delete',
     {'id': id},
   );
 }
@@ -1249,6 +1291,7 @@ class Client extends _isc.ServerpodClientShared {
     jwtRefresh = EndpointJwtRefresh(this);
     user = EndpointUser(this);
     billing = EndpointBilling(this);
+    bookingCategory = EndpointBookingCategory(this);
     booking = EndpointBooking(this);
     contact = EndpointContact(this);
     household = EndpointHousehold(this);
@@ -1277,6 +1320,8 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointUser user;
 
   late final EndpointBilling billing;
+
+  late final EndpointBookingCategory bookingCategory;
 
   late final EndpointBooking booking;
 
@@ -1322,6 +1367,7 @@ class Client extends _isc.ServerpodClientShared {
     'jwtRefresh': jwtRefresh,
     'user': user,
     'billing': billing,
+    'bookingCategory': bookingCategory,
     'booking': booking,
     'contact': contact,
     'household': household,

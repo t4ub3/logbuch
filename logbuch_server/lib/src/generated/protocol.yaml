@@ -24,6 +24,11 @@ billing:
   - deletePayment:
   - donate:
   - deleteDonation:
+bookingCategory:
+  - getAll:
+  - add:
+  - update:
+  - delete:
 booking:
   - getAll:
   - getById:

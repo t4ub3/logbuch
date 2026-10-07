@@ -7,10 +7,12 @@ import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/components/open_file.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_details.dart';
+import 'package:logbuch_flutter/panels/bookings/booking_extensions.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_form.dart';
 import 'package:logbuch_flutter/panels/bookings_panel.dart';
 import 'package:logbuch_flutter/providers/bookings_view_provider.dart';
 import 'package:logbuch_flutter/providers/tabs_provider.dart';
+import 'package:yaru/yaru.dart';
 
 import 'fake_client.dart';
 
@@ -372,6 +374,69 @@ void main() {
     expect(added.arrival, isNull);
     expect(find.byType(BookingDetails), findsOneWidget);
     expect(find.text('Retreat'), findsOneWidget);
+  });
+
+  testWidgets('a booking gets a category, which can be created on the way', (
+    tester,
+  ) async {
+    final client = filledClient();
+    await _openTab(tester, client);
+
+    await tester.enterText(field('Title'), 'Choir');
+    await tester.tap(find.byType(DropdownMenu<Contact>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Marie Weber').last);
+    await tester.pumpAndSettle();
+
+    // The categories that are there can be chosen.
+    await tester.tap(find.byType(DropdownButtonFormField<int?>).first);
+    await tester.pumpAndSettle();
+    expect(find.text('School'), findsWidgets);
+    await tester.tap(find.text('School').last);
+    await tester.pumpAndSettle();
+
+    // A new one needs a name and comes with an icon and a color.
+    await tester.tap(find.byTooltip('New category'));
+    await tester.pumpAndSettle();
+    expect(find.text('New booking category'), findsOneWidget);
+    await tester.enterText(field('Name'), 'Music');
+    await tester.tap(find.byIcon(YaruIcons.music_note));
+    await tester.tap(find.byType(YaruColorDisk).at(7));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save').last);
+    await tester.pumpAndSettle();
+
+    final music = client.bookingCategory.categories.last;
+    expect(music.name, 'Music');
+    expect(music.icon, BookingCategoryIcon.music);
+    expect(music.color, BookingCategoryColor.purple);
+    // The form has it chosen.
+    expect(find.text('Music'), findsOneWidget);
+
+    await tester.ensureVisible(find.widgetWithText(ElevatedButton, 'Save'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+    await tester.pumpAndSettle();
+
+    expect(client.booking.added.single.categoryId, music.id);
+  });
+
+  testWidgets('a booking has the icon and color of its category', (
+    tester,
+  ) async {
+    final client = filledClient();
+    final bookings = client.booking.bookings;
+    await pumpApp(
+      tester,
+      BookingDetails(tab: BookingTab(booking: bookings.first)),
+      client,
+    );
+
+    expect(inCard('Overview', find.text('School')), findsOneWidget);
+    expect(bookings.first.icon, YaruIcons.education);
+    expect(bookings.first.color, YaruVariant.blue.color);
+    // Without a category a booking is grey.
+    expect(bookings.last.icon, YaruIcons.calendar);
+    expect(bookings.last.color, const Color(0xFF8E8E8E));
   });
 
   group('bookings panel', () {

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/components/inset_divider.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/age_groups_section.dart';
+import 'package:logbuch_flutter/panels/admin/booking_categories_section.dart';
 import 'package:logbuch_flutter/panels/admin/fees_section.dart';
 import 'package:logbuch_flutter/panels/admin/meal_plans_section.dart';
 import 'package:logbuch_flutter/panels/admin/operator_section.dart';
@@ -74,6 +75,11 @@ class AdminPanel extends ConsumerWidget {
                 icon: const Icon(Icons.receipt_long),
               ),
               ButtonSegment(
+                value: AdminSection.bookingCategories,
+                label: Text(t.bookingCategories),
+                icon: const Icon(YaruIcons.calendar),
+              ),
+              ButtonSegment(
                 value: AdminSection.operator,
                 label: Text(t.operator),
                 icon: const Icon(Icons.apartment),
@@ -102,6 +108,7 @@ class AdminPanel extends ConsumerWidget {
             AdminSection.mealPlans => const MealPlansSection(),
             AdminSection.rates => const RatesSection(),
             AdminSection.fees => const FeesSection(),
+            AdminSection.bookingCategories => const BookingCategoriesSection(),
             AdminSection.operator => const OperatorSection(),
             AdminSection.users => const UsersSection(),
           },

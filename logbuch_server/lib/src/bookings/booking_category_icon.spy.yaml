@@ -1,0 +1,19 @@
+enum: BookingCategoryIcon
+serialized: byName
+values:
+  - calendar
+  - users
+  - family
+  - education
+  - book
+  - presentation
+  - music
+  - sport
+  - tree
+  - compass
+  - sun
+  - heart
+  - star
+  - home
+  - puzzle
+  - flag

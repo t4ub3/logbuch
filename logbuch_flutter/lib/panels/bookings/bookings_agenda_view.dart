@@ -23,7 +23,7 @@ class BookingsAgendaView extends ConsumerWidget {
       onRetry: () => ref.refresh(bookingsProvider.future),
       emptyText: context.t.bookings.noUpcoming,
       itemBuilder: (context, booking) => YaruListTile(
-        leading: Icon(Icons.event, color: booking.color),
+        leading: Icon(booking.icon, color: booking.color),
         titleText: booking.title,
         subtitleText: [
           booking.dateRangeLabel(context),

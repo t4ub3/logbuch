@@ -45,6 +45,8 @@ class FakeClient extends Fake implements Client {
   @override
   late final FakeBookings booking = FakeBookings(room);
   @override
+  final FakeBookingCategories bookingCategory = FakeBookingCategories();
+  @override
   final FakeGuests guest = FakeGuests();
   @override
   final FakePricing pricing = FakePricing();
@@ -290,6 +292,29 @@ class FakeBookings extends Fake implements EndpointBooking {
       for (final booking in bookings) booking.id == bookingId ? saved : booking,
     ];
     return saved;
+  }
+}
+
+class FakeBookingCategories extends Fake implements EndpointBookingCategory {
+  var categories = <BookingCategory>[];
+
+  @override
+  Future<List<BookingCategory>> getAll() async => categories;
+
+  @override
+  Future<BookingCategory> add(BookingCategory category) async {
+    final added = category.copyWith(id: 300 + categories.length);
+    categories = [...categories, added];
+    return added;
+  }
+
+  @override
+  Future<BookingCategory> update(BookingCategory category) async {
+    categories = [
+      for (final other in categories)
+        other.id == category.id ? category : other,
+    ];
+    return category;
   }
 }
 
@@ -654,20 +679,32 @@ FakeClient filledClient({UserRole? role = UserRole.admin}) {
     ),
   ];
 
-  final school = Organization(id: 1, name: 'Lindenschule', city: 'Kassel');
-  client.organization.organizations = [school];
+  final lindenschule = Organization(
+    id: 1,
+    name: 'Lindenschule',
+    city: 'Kassel',
+  );
+  client.organization.organizations = [lindenschule];
   final teacher = Contact(
     id: 1,
     firstName: 'Marie',
     lastName: 'Weber',
     mail: 'marie.weber@example.com',
     organizationId: 1,
-    organization: school,
+    organization: lindenschule,
   );
   client.contact.contacts = [
     Contact(id: 2, firstName: 'Felix', lastName: 'Wagner', city: 'Erfurt'),
     teacher,
   ];
+
+  final school = BookingCategory(
+    id: 1,
+    name: 'School',
+    icon: BookingCategoryIcon.education,
+    color: BookingCategoryColor.blue,
+  );
+  client.bookingCategory.categories = [school];
 
   Booking booking(
     int id,
@@ -675,10 +712,13 @@ FakeClient filledClient({UserRole? role = UserRole.admin}) {
     int arrival,
     int departure,
     BookingStatus status,
-    List<Room> rooms,
-  ) => Booking(
+    List<Room> rooms, {
+    BookingCategory? category,
+  }) => Booking(
     id: id,
     title: title,
+    categoryId: category?.id,
+    category: category,
     arrival: DateTime.utc(2026, 10, arrival),
     departure: DateTime.utc(2026, 10, departure),
     leadId: 1,
@@ -696,7 +736,15 @@ FakeClient filledClient({UserRole? role = UserRole.admin}) {
     ],
   );
   client.booking.bookings = [
-    booking(1, 'Class trip', 12, 16, BookingStatus.confirmed, [room101]),
+    booking(
+      1,
+      'Class trip',
+      12,
+      16,
+      BookingStatus.confirmed,
+      [room101],
+      category: school,
+    ),
     booking(2, 'Choir weekend', 16, 18, BookingStatus.option, [room101]),
     booking(3, 'Called off', 20, 22, BookingStatus.cancelled, [room101]),
   ];

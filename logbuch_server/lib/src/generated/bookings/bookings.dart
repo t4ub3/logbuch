@@ -14,6 +14,7 @@
 import 'package:logbuch_server/src/generated/protocol.dart' as _iil9w69f;
 import 'package:serverpod/serverpod.dart' as _is;
 import '../bookings/billing_mode.dart' as _ikjlxdwh;
+import '../bookings/booking_category.dart' as _i1nxuzrq;
 import '../bookings/booking_room.dart' as _icgf4f53;
 import '../bookings/booking_status.dart' as _ilk1qg37;
 import '../contacts/contact.dart' as _imbxrfja;
@@ -32,6 +33,8 @@ abstract class Booking
     this.lead,
     this.organizationId,
     this.organization,
+    this.categoryId,
+    this.category,
     _ilk1qg37.BookingStatus? status,
     this.optionExpiresAt,
     this.mealPlanId,
@@ -54,6 +57,8 @@ abstract class Booking
     _imbxrfja.Contact? lead,
     int? organizationId,
     _i0w1hmpk.Organization? organization,
+    int? categoryId,
+    _i1nxuzrq.BookingCategory? category,
     _ilk1qg37.BookingStatus? status,
     DateTime? optionExpiresAt,
     int? mealPlanId,
@@ -88,6 +93,12 @@ abstract class Booking
           ? null
           : _iil9w69f.Protocol().deserialize<_i0w1hmpk.Organization>(
               jsonSerialization['organization'],
+            ),
+      categoryId: jsonSerialization['categoryId'] as int?,
+      category: jsonSerialization['category'] == null
+          ? null
+          : _iil9w69f.Protocol().deserialize<_i1nxuzrq.BookingCategory>(
+              jsonSerialization['category'],
             ),
       status: jsonSerialization['status'] == null
           ? null
@@ -143,6 +154,10 @@ abstract class Booking
 
   _i0w1hmpk.Organization? organization;
 
+  int? categoryId;
+
+  _i1nxuzrq.BookingCategory? category;
+
   _ilk1qg37.BookingStatus status;
 
   DateTime? optionExpiresAt;
@@ -175,6 +190,8 @@ abstract class Booking
     _imbxrfja.Contact? lead,
     int? organizationId,
     _i0w1hmpk.Organization? organization,
+    int? categoryId,
+    _i1nxuzrq.BookingCategory? category,
     _ilk1qg37.BookingStatus? status,
     DateTime? optionExpiresAt,
     int? mealPlanId,
@@ -197,6 +214,8 @@ abstract class Booking
       if (lead != null) 'lead': lead?.toJson(),
       if (organizationId != null) 'organizationId': organizationId,
       if (organization != null) 'organization': organization?.toJson(),
+      if (categoryId != null) 'categoryId': categoryId,
+      if (category != null) 'category': category?.toJson(),
       'status': status.toJson(),
       if (optionExpiresAt != null) 'optionExpiresAt': optionExpiresAt?.toJson(),
       if (mealPlanId != null) 'mealPlanId': mealPlanId,
@@ -222,6 +241,8 @@ abstract class Booking
       if (organizationId != null) 'organizationId': organizationId,
       if (organization != null)
         'organization': organization?.toJsonForProtocol(),
+      if (categoryId != null) 'categoryId': categoryId,
+      if (category != null) 'category': category?.toJsonForProtocol(),
       'status': status.toJson(),
       if (optionExpiresAt != null) 'optionExpiresAt': optionExpiresAt?.toJson(),
       if (mealPlanId != null) 'mealPlanId': mealPlanId,
@@ -237,12 +258,14 @@ abstract class Booking
   static BookingInclude include({
     _imbxrfja.ContactInclude? lead,
     _i0w1hmpk.OrganizationInclude? organization,
+    _i1nxuzrq.BookingCategoryInclude? category,
     _iqp4km0h.MealPlanInclude? mealPlan,
     _icgf4f53.BookingRoomIncludeList? rooms,
   }) {
     return BookingInclude._(
       lead: lead,
       organization: organization,
+      category: category,
       mealPlan: mealPlan,
       rooms: rooms,
     );
@@ -285,6 +308,8 @@ class _BookingImpl extends Booking {
     _imbxrfja.Contact? lead,
     int? organizationId,
     _i0w1hmpk.Organization? organization,
+    int? categoryId,
+    _i1nxuzrq.BookingCategory? category,
     _ilk1qg37.BookingStatus? status,
     DateTime? optionExpiresAt,
     int? mealPlanId,
@@ -303,6 +328,8 @@ class _BookingImpl extends Booking {
          lead: lead,
          organizationId: organizationId,
          organization: organization,
+         categoryId: categoryId,
+         category: category,
          status: status,
          optionExpiresAt: optionExpiresAt,
          mealPlanId: mealPlanId,
@@ -327,6 +354,8 @@ class _BookingImpl extends Booking {
     Object? lead = _Undefined,
     Object? organizationId = _Undefined,
     Object? organization = _Undefined,
+    Object? categoryId = _Undefined,
+    Object? category = _Undefined,
     _ilk1qg37.BookingStatus? status,
     Object? optionExpiresAt = _Undefined,
     Object? mealPlanId = _Undefined,
@@ -350,6 +379,10 @@ class _BookingImpl extends Booking {
       organization: organization is _i0w1hmpk.Organization?
           ? organization
           : this.organization?.copyWith(),
+      categoryId: categoryId is int? ? categoryId : this.categoryId,
+      category: category is _i1nxuzrq.BookingCategory?
+          ? category
+          : this.category?.copyWith(),
       status: status ?? this.status,
       optionExpiresAt: optionExpiresAt is DateTime?
           ? optionExpiresAt
@@ -403,6 +436,11 @@ class BookingUpdateTable extends _is.UpdateTable<BookingTable> {
 
   _is.ColumnValue<int, int> organizationId(int? value) => _is.ColumnValue(
     table.organizationId,
+    value,
+  );
+
+  _is.ColumnValue<int, int> categoryId(int? value) => _is.ColumnValue(
+    table.categoryId,
     value,
   );
 
@@ -470,6 +508,10 @@ class BookingTable extends _is.Table<int?> {
       'organizationId',
       this,
     );
+    categoryId = _is.ColumnInt(
+      'categoryId',
+      this,
+    );
     status = _is.ColumnEnum(
       'status',
       this,
@@ -518,6 +560,10 @@ class BookingTable extends _is.Table<int?> {
 
   _i0w1hmpk.OrganizationTable? _organization;
 
+  late final _is.ColumnInt categoryId;
+
+  _i1nxuzrq.BookingCategoryTable? _category;
+
   late final _is.ColumnEnum<_ilk1qg37.BookingStatus> status;
 
   late final _is.ColumnDateTime optionExpiresAt;
@@ -560,6 +606,19 @@ class BookingTable extends _is.Table<int?> {
           _i0w1hmpk.OrganizationTable(tableRelation: foreignTableRelation),
     );
     return _organization!;
+  }
+
+  _i1nxuzrq.BookingCategoryTable get category {
+    if (_category != null) return _category!;
+    _category = _is.createRelationTable(
+      relationFieldName: 'category',
+      field: Booking.t.categoryId,
+      foreignField: _i1nxuzrq.BookingCategory.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i1nxuzrq.BookingCategoryTable(tableRelation: foreignTableRelation),
+    );
+    return _category!;
   }
 
   _iqp4km0h.MealPlanTable get mealPlan {
@@ -616,6 +675,7 @@ class BookingTable extends _is.Table<int?> {
     departure,
     leadId,
     organizationId,
+    categoryId,
     status,
     optionExpiresAt,
     mealPlanId,
@@ -632,6 +692,9 @@ class BookingTable extends _is.Table<int?> {
     if (relationField == 'organization') {
       return organization;
     }
+    if (relationField == 'category') {
+      return category;
+    }
     if (relationField == 'mealPlan') {
       return mealPlan;
     }
@@ -646,11 +709,13 @@ class BookingInclude extends _is.IncludeObject {
   BookingInclude._({
     _imbxrfja.ContactInclude? lead,
     _i0w1hmpk.OrganizationInclude? organization,
+    _i1nxuzrq.BookingCategoryInclude? category,
     _iqp4km0h.MealPlanInclude? mealPlan,
     _icgf4f53.BookingRoomIncludeList? rooms,
   }) {
     _lead = lead;
     _organization = organization;
+    _category = category;
     _mealPlan = mealPlan;
     _rooms = rooms;
   }
@@ -658,6 +723,8 @@ class BookingInclude extends _is.IncludeObject {
   _imbxrfja.ContactInclude? _lead;
 
   _i0w1hmpk.OrganizationInclude? _organization;
+
+  _i1nxuzrq.BookingCategoryInclude? _category;
 
   _iqp4km0h.MealPlanInclude? _mealPlan;
 
@@ -667,6 +734,7 @@ class BookingInclude extends _is.IncludeObject {
   Map<String, _is.Include?> get includes => {
     'lead': _lead,
     'organization': _organization,
+    'category': _category,
     'mealPlan': _mealPlan,
     'rooms': _rooms,
   };
@@ -1179,6 +1247,29 @@ class BookingAttachRowRepository {
     );
   }
 
+  /// Creates a relation between the given [Booking] and [BookingCategory]
+  /// by setting the [Booking]'s foreign key `categoryId` to refer to the [BookingCategory].
+  Future<void> category(
+    _is.DatabaseSession session,
+    Booking booking,
+    _i1nxuzrq.BookingCategory category, {
+    _is.Transaction? transaction,
+  }) async {
+    if (booking.id == null) {
+      throw ArgumentError.notNull('booking.id');
+    }
+    if (category.id == null) {
+      throw ArgumentError.notNull('category.id');
+    }
+
+    var $booking = booking.copyWith(categoryId: category.id);
+    await session.db.updateRow<Booking>(
+      $booking,
+      columns: [Booking.t.categoryId],
+      transaction: transaction,
+    );
+  }
+
   /// Creates a relation between the given [Booking] and [MealPlan]
   /// by setting the [Booking]'s foreign key `mealPlanId` to refer to the [MealPlan].
   Future<void> mealPlan(
@@ -1247,6 +1338,28 @@ class BookingDetachRowRepository {
     await session.db.updateRow<Booking>(
       $booking,
       columns: [Booking.t.organizationId],
+      transaction: transaction,
+    );
+  }
+
+  /// Detaches the relation between this [Booking] and the [BookingCategory] set in `category`
+  /// by setting the [Booking]'s foreign key `categoryId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> category(
+    _is.DatabaseSession session,
+    Booking booking, {
+    _is.Transaction? transaction,
+  }) async {
+    if (booking.id == null) {
+      throw ArgumentError.notNull('booking.id');
+    }
+
+    var $booking = booking.copyWith(categoryId: null);
+    await session.db.updateRow<Booking>(
+      $booking,
+      columns: [Booking.t.categoryId],
       transaction: transaction,
     );
   }

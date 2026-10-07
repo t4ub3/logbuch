@@ -1,0 +1,23 @@
+enum: BookingCategoryColor
+serialized: byName
+values:
+  - orange
+  - bark
+  - sage
+  - olive
+  - viridian
+  - prussianGreen
+  - blue
+  - purple
+  - magenta
+  - red
+  - wartyBrown
+  - adwaitaBlue
+  - adwaitaTeal
+  - adwaitaGreen
+  - adwaitaYellow
+  - adwaitaOrange
+  - adwaitaRed
+  - adwaitaPink
+  - adwaitaPurple
+  - adwaitaSlate

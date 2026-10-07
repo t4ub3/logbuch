@@ -15,6 +15,8 @@ import 'package:logbuch_server/src/generated/auth/app_user.dart' as _ikienaka;
 import 'package:logbuch_server/src/generated/billing/donation.dart'
     as _imjtz2ad;
 import 'package:logbuch_server/src/generated/billing/folio.dart' as _iuuqib0o;
+import 'package:logbuch_server/src/generated/bookings/booking_category.dart'
+    as _i2rq02p1;
 import 'package:logbuch_server/src/generated/bookings/bookings.dart'
     as _iz54m678;
 import 'package:logbuch_server/src/generated/contacts/contact.dart'
@@ -59,6 +61,9 @@ import 'billing/invoice_document.dart' as _i46ek8jf;
 import 'billing/payment.dart' as _ifq0dbbu;
 import 'billing/payment_method.dart' as _irhicyww;
 import 'bookings/billing_mode.dart' as _iyrhfm9w;
+import 'bookings/booking_category.dart' as _i8gi3061;
+import 'bookings/booking_category_color.dart' as _igo3tr50;
+import 'bookings/booking_category_icon.dart' as _iso9e2pg;
 import 'bookings/booking_room.dart' as _icov2ydl;
 import 'bookings/booking_status.dart' as _iqmkyysz;
 import 'bookings/bookings.dart' as _iikb94hp;
@@ -109,6 +114,9 @@ export 'billing/invoice_document.dart';
 export 'billing/payment.dart';
 export 'billing/payment_method.dart';
 export 'bookings/billing_mode.dart';
+export 'bookings/booking_category.dart';
+export 'bookings/booking_category_color.dart';
+export 'bookings/booking_category_icon.dart';
 export 'bookings/booking_room.dart';
 export 'bookings/booking_status.dart';
 export 'bookings/bookings.dart';
@@ -187,6 +195,42 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnType: _isp.ColumnType.bigint,
           isNullable: true,
           dartType: 'int?',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'booking_categories',
+      dartName: 'BookingCategory',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'name',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'icon',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'protocol:BookingCategoryIcon',
+        ),
+        _isp.ColumnDefinition(
+          name: 'color',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'protocol:BookingCategoryColor',
         ),
       ],
       foreignKeys: [],
@@ -313,6 +357,12 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'int?',
         ),
         _isp.ColumnDefinition(
+          name: 'categoryId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _isp.ColumnDefinition(
           name: 'status',
           columnType: _isp.ColumnType.text,
           isNullable: false,
@@ -374,6 +424,16 @@ class Protocol extends _is.DatabaseSerializationManager {
         ),
         _isp.ForeignKeyDefinition(
           constraintName: 'bookings_fk_2',
+          columns: ['categoryId'],
+          referenceTable: 'booking_categories',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.restrict,
+          matchType: null,
+        ),
+        _isp.ForeignKeyDefinition(
+          constraintName: 'bookings_fk_3',
           columns: ['mealPlanId'],
           referenceTable: 'meal_plans',
           referenceTableSchema: 'public',
@@ -1926,6 +1986,15 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _iyrhfm9w.BillingMode) {
       return _iyrhfm9w.BillingMode.fromJson(data) as T;
     }
+    if (t == _i8gi3061.BookingCategory) {
+      return _i8gi3061.BookingCategory.fromJson(data) as T;
+    }
+    if (t == _igo3tr50.BookingCategoryColor) {
+      return _igo3tr50.BookingCategoryColor.fromJson(data) as T;
+    }
+    if (t == _iso9e2pg.BookingCategoryIcon) {
+      return _iso9e2pg.BookingCategoryIcon.fromJson(data) as T;
+    }
     if (t == _icov2ydl.BookingRoom) {
       return _icov2ydl.BookingRoom.fromJson(data) as T;
     }
@@ -2078,6 +2147,22 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_iyrhfm9w.BillingMode?>()) {
       return (data != null ? _iyrhfm9w.BillingMode.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i8gi3061.BookingCategory?>()) {
+      return (data != null ? _i8gi3061.BookingCategory.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_igo3tr50.BookingCategoryColor?>()) {
+      return (data != null
+              ? _igo3tr50.BookingCategoryColor.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _is.getType<_iso9e2pg.BookingCategoryIcon?>()) {
+      return (data != null
+              ? _iso9e2pg.BookingCategoryIcon.fromJson(data)
+              : null)
+          as T;
     }
     if (t == _is.getType<_icov2ydl.BookingRoom?>()) {
       return (data != null ? _icov2ydl.BookingRoom.fromJson(data) : null) as T;
@@ -2360,6 +2445,12 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data as List).map((e) => deserialize<_iuuqib0o.Folio>(e)).toList()
           as T;
     }
+    if (t == List<_i2rq02p1.BookingCategory>) {
+      return (data as List)
+              .map((e) => deserialize<_i2rq02p1.BookingCategory>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_iz54m678.Booking>) {
       return (data as List)
               .map((e) => deserialize<_iz54m678.Booking>(e))
@@ -2480,6 +2571,9 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ifq0dbbu.Payment => 'Payment',
       _irhicyww.PaymentMethod => 'PaymentMethod',
       _iyrhfm9w.BillingMode => 'BillingMode',
+      _i8gi3061.BookingCategory => 'BookingCategory',
+      _igo3tr50.BookingCategoryColor => 'BookingCategoryColor',
+      _iso9e2pg.BookingCategoryIcon => 'BookingCategoryIcon',
       _icov2ydl.BookingRoom => 'BookingRoom',
       _iqmkyysz.BookingStatus => 'BookingStatus',
       _iikb94hp.Booking => 'Booking',
@@ -2555,6 +2649,12 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'PaymentMethod';
       case _iyrhfm9w.BillingMode():
         return 'BillingMode';
+      case _i8gi3061.BookingCategory():
+        return 'BookingCategory';
+      case _igo3tr50.BookingCategoryColor():
+        return 'BookingCategoryColor';
+      case _iso9e2pg.BookingCategoryIcon():
+        return 'BookingCategoryIcon';
       case _icov2ydl.BookingRoom():
         return 'BookingRoom';
       case _iqmkyysz.BookingStatus():
@@ -2691,6 +2791,15 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'BillingMode') {
       return deserialize<_iyrhfm9w.BillingMode>(data['data']);
+    }
+    if (dataClassName == 'BookingCategory') {
+      return deserialize<_i8gi3061.BookingCategory>(data['data']);
+    }
+    if (dataClassName == 'BookingCategoryColor') {
+      return deserialize<_igo3tr50.BookingCategoryColor>(data['data']);
+    }
+    if (dataClassName == 'BookingCategoryIcon') {
+      return deserialize<_iso9e2pg.BookingCategoryIcon>(data['data']);
     }
     if (dataClassName == 'BookingRoom') {
       return deserialize<_icov2ydl.BookingRoom>(data['data']);
@@ -2860,6 +2969,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _i46ek8jf.InvoiceDocument.t;
       case _ifq0dbbu.Payment:
         return _ifq0dbbu.Payment.t;
+      case _i8gi3061.BookingCategory:
+        return _i8gi3061.BookingCategory.t;
       case _icov2ydl.BookingRoom:
         return _icov2ydl.BookingRoom.t;
       case _iikb94hp.Booking:

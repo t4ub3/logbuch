@@ -15,6 +15,8 @@ import 'package:logbuch_server/src/generated/billing/charge.dart' as _ik0w9o9c;
 import 'package:logbuch_server/src/generated/billing/donation.dart'
     as _imjtz2ad;
 import 'package:logbuch_server/src/generated/billing/payment.dart' as _ijoeqr7q;
+import 'package:logbuch_server/src/generated/bookings/booking_category.dart'
+    as _i2rq02p1;
 import 'package:logbuch_server/src/generated/bookings/bookings.dart'
     as _iz54m678;
 import 'package:logbuch_server/src/generated/contacts/contact.dart'
@@ -50,6 +52,7 @@ import '../auth/email_idp_endpoint.dart' as _iuc1hd5t;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../auth/user_endpoint.dart' as _ilyd3rgd;
 import '../billing/billing_endpoint.dart' as _irc9lmoc;
+import '../bookings/booking_category_endpoint.dart' as _i37m595y;
 import '../bookings/booking_endpoint.dart' as _i7f5j1eo;
 import '../contacts/contact_endpoint.dart' as _i468fl3m;
 import '../contacts/household_endpoint.dart' as _i2lplksh;
@@ -95,6 +98,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'billing',
+          null,
+        ),
+      'bookingCategory': _i37m595y.BookingCategoryEndpoint()
+        ..initialize(
+          server,
+          'bookingCategory',
           null,
         ),
       'booking': _i7f5j1eo.BookingEndpoint()
@@ -661,6 +670,87 @@ class Endpoints extends _is.EndpointDispatch {
                     session,
                     params['id'],
                   ),
+        ),
+      },
+    );
+    connectors['bookingCategory'] = _is.EndpointConnector(
+      name: 'bookingCategory',
+      endpoint: endpoints['bookingCategory']!,
+      methodConnectors: {
+        'getAll': _is.MethodConnector(
+          name: 'getAll',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['bookingCategory']
+                          as _i37m595y.BookingCategoryEndpoint)
+                      .getAll(session),
+        ),
+        'add': _is.MethodConnector(
+          name: 'add',
+          params: {
+            'category': _is.ParameterDescription(
+              name: 'category',
+              type: _is.getType<_i2rq02p1.BookingCategory>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['bookingCategory']
+                          as _i37m595y.BookingCategoryEndpoint)
+                      .add(
+                        session,
+                        params['category'],
+                      ),
+        ),
+        'update': _is.MethodConnector(
+          name: 'update',
+          params: {
+            'category': _is.ParameterDescription(
+              name: 'category',
+              type: _is.getType<_i2rq02p1.BookingCategory>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['bookingCategory']
+                          as _i37m595y.BookingCategoryEndpoint)
+                      .update(
+                        session,
+                        params['category'],
+                      ),
+        ),
+        'delete': _is.MethodConnector(
+          name: 'delete',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['bookingCategory']
+                          as _i37m595y.BookingCategoryEndpoint)
+                      .delete(
+                        session,
+                        params['id'],
+                      ),
         ),
       },
     );

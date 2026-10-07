@@ -1,0 +1,6 @@
+class: BookingCategory
+table: booking_categories
+fields:
+  name: String
+  icon: BookingCategoryIcon
+  color: BookingCategoryColor
