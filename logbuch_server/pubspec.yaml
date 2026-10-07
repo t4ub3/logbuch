@@ -65,9 +65,18 @@ serverpod:
   #     API_URL=https://admin.example.com
   #     FLAVOR=production
   flutter_apps:
-    logbuch:
+    logbuch-windows:
       path: ../logbuch_flutter
-      displayName: "Logbuch app"
-      auto_launch: true
+      displayName: "Log|Buch (Windows)"
       target: lib/driver.dart
       device: windows
+    logbuch-macos:
+      path: ../logbuch_flutter
+      displayName: "Log|Buch (MacOS)"
+      target: lib/driver.dart
+      device: windows
+    logbuch-web:
+      path: ../logbuch_flutter
+      displayName: "Log|Buch (Web)"
+      target: lib/driver.dart
+      device: chrome
