@@ -91,7 +91,9 @@ class MenuComponent extends ConsumerWidget {
                 const TextSpan(text: 'Buch'),
               ],
             ),
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: Theme.of(
+              context,
+            ).textTheme.headlineMedium?.copyWith(fontFamily: 'Libron'),
           ),
         ),
         const InsetDivider(),
