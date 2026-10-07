@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// The accent color of the app, which the theme is built around.
-const accentColor = Color(0xFF697391);
+const accentColor = Color(0xFF5A6790);
 
 /// The subdued version of [accentColor].
 const dimmedAccentColor = Color(0xFFACB2C3);
