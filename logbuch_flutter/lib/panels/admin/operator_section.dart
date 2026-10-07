@@ -7,6 +7,7 @@ import 'package:logbuch_flutter/panels/admin/admin_widgets.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
 import 'package:logbuch_flutter/providers/operator_provider.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 import 'package:yaru/yaru.dart';
 
 /// The details of the organisation that runs the house, as they are printed
@@ -283,10 +284,7 @@ class _OperatorFormState extends ConsumerState<_OperatorForm> {
     try {
       await ref.read(serverpodClientProvider).operator.save(operator);
       ref.invalidate(operatorProvider);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.t.admin.operator.saved)),
-      );
+      ref.read(statusProvider.notifier).saved();
     } catch (error) {
       if (mounted) setState(() => _error = error);
     } finally {

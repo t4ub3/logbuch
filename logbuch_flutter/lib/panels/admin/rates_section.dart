@@ -12,6 +12,7 @@ import 'package:logbuch_flutter/providers/meal_rates_provider.dart';
 import 'package:logbuch_flutter/providers/price_categories_provider.dart';
 import 'package:logbuch_flutter/providers/room_rates_provider.dart';
 import 'package:logbuch_flutter/providers/seasons_provider.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 import 'package:yaru/yaru.dart';
 
 /// What the prices of a [RatesSection] are for. Lodging is priced per price
@@ -237,9 +238,7 @@ class _RatesSectionState extends ConsumerState<RatesSection> {
     }
     if (!mounted) return;
     setState(() => _dirty = false);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(context.t.admin.rates.saved)));
+    ref.read(statusProvider.notifier).done(context.t.admin.rates.saved);
   }
 }
 

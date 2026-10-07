@@ -12,6 +12,7 @@ import 'package:logbuch_flutter/panels/contacts/contacts_section.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
 import 'package:logbuch_flutter/providers/folios_provider.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 import 'package:yaru/yaru.dart';
 
 extension FolioX on Folio {
@@ -432,11 +433,7 @@ class _FolioBody extends ConsumerWidget {
       final pdf = renew
           ? await billing.renewInvoicePdf(folio.id!)
           : await billing.getInvoicePdf(folio.id!);
-      await ref.read(fileOpenerProvider)(
-        'Rechnung-${folio.invoiceNumber}.pdf',
-        // The bytes may be a part of a larger buffer.
-        pdf.buffer.asUint8List(pdf.offsetInBytes, pdf.lengthInBytes),
-      );
+      await openDocument(ref, 'Rechnung-${folio.invoiceNumber}.pdf', pdf);
     } catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -484,6 +481,7 @@ class _FolioBody extends ConsumerWidget {
   ) async {
     try {
       await change();
+      ref.read(statusProvider.notifier).saved();
     } catch (error) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

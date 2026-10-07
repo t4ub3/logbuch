@@ -7,6 +7,7 @@ import 'package:logbuch_flutter/components/async_list_view.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 import 'package:yaru/yaru.dart';
 
 /// A list of records below a button to add one. Users who may not change
@@ -139,8 +140,8 @@ Future<bool> showAdminDialog(BuildContext context, Widget dialog) async {
 }
 
 /// Asks whether the record called [name] should be deleted and runs [delete]
-/// if so. Returns whether the record was deleted; a failure is shown in a
-/// snack bar.
+/// if so. Returns whether the record was deleted, which the status bar says
+/// as well; a failure is shown in a snack bar.
 Future<bool> confirmAndDelete(
   BuildContext context, {
   required String name,
@@ -164,10 +165,15 @@ Future<bool> confirmAndDelete(
       ],
     ),
   );
-  if (confirmed != true) return false;
+  if (confirmed != true || !context.mounted) return false;
 
+  final status = ProviderScope.containerOf(
+    context,
+    listen: false,
+  ).read(statusProvider.notifier);
   try {
     await delete();
+    status.deleted();
     return true;
   } catch (error) {
     if (!context.mounted) return false;
@@ -184,14 +190,14 @@ Future<bool> confirmAndDelete(
 }
 
 /// A dialog with a form made of [children]. Once the form is valid it is
-/// saved with [onSave] and the dialog closes with true; if saving fails the
-/// error is shown below the fields.
+/// saved with [onSave], the status bar says so and the dialog closes with
+/// true; if saving fails the error is shown below the fields.
 ///
 /// With [readOnly] the dialog only shows the form, whose fields the caller
 /// has to make read-only, and can only be closed, or switched to editing
 /// with [onEdit]. The cancel button closes the dialog, unless [onCancel]
 /// does something else, such as returning to the read-only form.
-class AdminFormDialog extends StatefulWidget {
+class AdminFormDialog extends ConsumerStatefulWidget {
   const AdminFormDialog({
     super.key,
     required this.title,
@@ -214,10 +220,10 @@ class AdminFormDialog extends StatefulWidget {
   final VoidCallback? onCancel;
 
   @override
-  State<AdminFormDialog> createState() => _AdminFormDialogState();
+  ConsumerState<AdminFormDialog> createState() => _AdminFormDialogState();
 }
 
-class _AdminFormDialogState extends State<AdminFormDialog> {
+class _AdminFormDialogState extends ConsumerState<AdminFormDialog> {
   var _formKey = GlobalKey<FormState>();
   bool _saving = false;
   Object? _error;
@@ -303,8 +309,10 @@ class _AdminFormDialogState extends State<AdminFormDialog> {
       _saving = true;
       _error = null;
     });
+    final status = ref.read(statusProvider.notifier);
     try {
       await widget.onSave();
+      status.saved();
       if (mounted) Navigator.pop(context, true);
     } catch (error) {
       if (!mounted) return;

@@ -390,7 +390,6 @@
             "purposesObjectHint": "Zum Beispiel: die Jugendhilfe",
             "place": "Ort der Unterschrift",
             "signatory": "Unterzeichnet von",
-            "saved": "Gespeichert",
             "bankHint": "Steht auf Rechnungen, damit klar ist, wohin und bis wann zu zahlen ist.",
             "accountHolder": "Kontoinhaber",
             "iban": "IBAN",
@@ -480,5 +479,12 @@
         "light": "Hell",
         "dark": "Dunkel",
         "accentColor": "Akzentfarbe"
+    },
+    "status": {
+        "loading": "Daten werden geladen …",
+        "loaded": "Daten geladen",
+        "saved": "Gespeichert",
+        "deleted": "Gelöscht",
+        "documentCreated": "Dokument erstellt: {name}"
     }
 }

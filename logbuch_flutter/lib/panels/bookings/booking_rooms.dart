@@ -9,6 +9,7 @@ import 'package:logbuch_flutter/providers/available_rooms_provider.dart';
 import 'package:logbuch_flutter/providers/bookings_provider.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:yaru/yaru.dart';
 
@@ -225,6 +226,7 @@ class _BookingRoomsEditorState extends ConsumerState<BookingRoomsEditor> {
           .booking
           .setRooms(_booking.id!, _selected.toList());
       ref.invalidate(bookingsProvider);
+      ref.read(statusProvider.notifier).saved();
       ref
           .read(tabsProvider.notifier)
           .update(widget.tab.copyWith(booking: saved));

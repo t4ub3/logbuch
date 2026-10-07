@@ -52,6 +52,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$donations$en donations = Translations$donations$en.internal(_root);
 	late final Translations$dashboard$en dashboard = Translations$dashboard$en.internal(_root);
 	late final Translations$settings$en settings = Translations$settings$en.internal(_root);
+	late final Translations$status$en status = Translations$status$en.internal(_root);
 }
 
 // Path: common
@@ -910,6 +911,30 @@ class Translations$settings$en {
 	String get accentColor => 'Accent color';
 }
 
+// Path: status
+class Translations$status$en {
+	Translations$status$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Loading…'
+	String get loading => 'Loading…';
+
+	/// en: 'Data loaded'
+	String get loaded => 'Data loaded';
+
+	/// en: 'Saved'
+	String get saved => 'Saved';
+
+	/// en: 'Deleted'
+	String get deleted => 'Deleted';
+
+	/// en: 'Document created: {name}'
+	String documentCreated({required Object name}) => 'Document created: ${name}';
+}
+
 // Path: bookings.statuses
 class Translations$bookings$statuses$en {
 	Translations$bookings$statuses$en.internal(this._root);
@@ -1475,9 +1500,6 @@ class Translations$admin$operator$en {
 	/// en: 'Signed by'
 	String get signatory => 'Signed by';
 
-	/// en: 'Saved'
-	String get saved => 'Saved';
-
 	/// en: 'Printed on invoices, so that payers know where and by when to pay.'
 	String get bankHint => 'Printed on invoices, so that payers know where and by when to pay.';
 
@@ -1883,7 +1905,6 @@ extension on Translations {
 			'admin.operator.purposesObjectHint' => 'In German, for example: die Jugendhilfe',
 			'admin.operator.place' => 'Place where receipts are signed',
 			'admin.operator.signatory' => 'Signed by',
-			'admin.operator.saved' => 'Saved',
 			'admin.operator.bankHint' => 'Printed on invoices, so that payers know where and by when to pay.',
 			'admin.operator.accountHolder' => 'Account holder',
 			'admin.operator.iban' => 'IBAN',
@@ -1948,6 +1969,11 @@ extension on Translations {
 			'settings.light' => 'Light',
 			'settings.dark' => 'Dark',
 			'settings.accentColor' => 'Accent color',
+			'status.loading' => 'Loading…',
+			'status.loaded' => 'Data loaded',
+			'status.saved' => 'Saved',
+			'status.deleted' => 'Deleted',
+			'status.documentCreated' => ({required Object name}) => 'Document created: ${name}',
 			_ => null,
 		};
 	}

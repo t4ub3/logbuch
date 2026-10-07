@@ -12,6 +12,7 @@ import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/contacts_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
 import 'package:logbuch_flutter/providers/donations_provider.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 import 'package:yaru/yaru.dart';
 
 /// The donations of one year and the receipts issued for them.
@@ -215,7 +216,7 @@ class _DonationsPanelState extends ConsumerState<DonationsPanel> {
       return;
     }
     _refresh();
-    if (mounted) _show(message);
+    ref.read(statusProvider.notifier).done(message);
   }
 
   Future<void> _open(DonationReceipt receipt) async {
@@ -224,11 +225,7 @@ class _DonationsPanelState extends ConsumerState<DonationsPanel> {
           .read(serverpodClientProvider)
           .donation
           .getReceiptPdf(receipt.id!);
-      await ref.read(fileOpenerProvider)(
-        '${receipt.number}.pdf',
-        // The bytes may be a part of a larger buffer.
-        pdf.buffer.asUint8List(pdf.offsetInBytes, pdf.lengthInBytes),
-      );
+      await openDocument(ref, '${receipt.number}.pdf', pdf);
     } catch (error) {
       if (mounted) _show(context.t.donations.openFailed(error: error));
     }

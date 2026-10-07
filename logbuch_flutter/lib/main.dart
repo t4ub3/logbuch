@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/providers/settings_provider.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 import 'package:logbuch_flutter/screens/main_screen.dart';
 import 'package:logbuch_flutter/screens/role_gate.dart';
 import 'package:logbuch_flutter/screens/sign_in_screen.dart';
@@ -15,6 +16,7 @@ Future<void> main() async {
   await initializeClient();
 
   final container = ProviderContainer(
+    observers: [StatusObserver()],
     overrides: [
       sharedPreferencesProvider.overrideWithValue(
         await SharedPreferences.getInstance(),

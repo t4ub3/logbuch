@@ -6,6 +6,7 @@ import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 import 'package:logbuch_flutter/providers/users_provider.dart';
 import 'package:yaru/yaru.dart';
 
@@ -83,6 +84,7 @@ class UsersSection extends ConsumerWidget {
           .read(serverpodClientProvider)
           .user
           .setRole(user.authUserId, role);
+      ref.read(statusProvider.notifier).saved();
     } catch (error) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

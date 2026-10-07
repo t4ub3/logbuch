@@ -6,6 +6,7 @@ import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/components/open_file.dart';
 import 'package:logbuch_flutter/panels/admin_panel.dart';
 import 'package:logbuch_flutter/panels/donations_panel.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 
 import 'fake_client.dart';
 
@@ -61,7 +62,10 @@ void main() {
     await tester.tap(find.widgetWithText(ElevatedButton, 'Create receipts'));
     await tester.pumpAndSettle();
 
-    expect(find.text('1 receipt created'), findsOneWidget);
+    expect(
+      statusMessage(tester),
+      isA<Done>().having((done) => done.text, 'text', '1 receipt created'),
+    );
     expect(client.donation.receipts, hasLength(2));
     expect(find.text('SB-$year-0002'), findsOneWidget);
   });
@@ -199,7 +203,7 @@ void main() {
     expect(saved.confirmationNote, 'Anreise ab 15 Uhr.');
     expect(saved.noticeType, TaxNoticeType.statutoryCompliance);
     expect(saved.noticeDate, isNull);
-    expect(find.text('Saved'), findsOneWidget);
+    expect(statusMessage(tester), isA<Saved>());
 
     await tester.ensureVisible(
       find.text('Feststellungsbescheid nach § 60a AO'),

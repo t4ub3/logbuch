@@ -13,6 +13,7 @@ import 'package:logbuch_flutter/providers/contacts_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
 import 'package:logbuch_flutter/providers/guest_groups_provider.dart';
 import 'package:logbuch_flutter/providers/households_provider.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 import 'package:yaru/yaru.dart';
 
 extension GuestX on Guest {
@@ -196,6 +197,7 @@ class BookingGuestsEditor extends ConsumerWidget {
           .read(serverpodClientProvider)
           .guest
           .addHousehold(bookingId, household.id!);
+      ref.read(statusProvider.notifier).saved();
     } catch (error) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

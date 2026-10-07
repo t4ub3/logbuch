@@ -50,6 +50,7 @@ class TranslationsDe extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$donations$de donations = _Translations$donations$de._(_root);
 	@override late final _Translations$dashboard$de dashboard = _Translations$dashboard$de._(_root);
 	@override late final _Translations$settings$de settings = _Translations$settings$de._(_root);
+	@override late final _Translations$status$de status = _Translations$status$de._(_root);
 }
 
 // Path: common
@@ -432,6 +433,20 @@ class _Translations$settings$de extends Translations$settings$en {
 	@override String get accentColor => 'Akzentfarbe';
 }
 
+// Path: status
+class _Translations$status$de extends Translations$status$en {
+	_Translations$status$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get loading => 'Daten werden geladen …';
+	@override String get loaded => 'Daten geladen';
+	@override String get saved => 'Gespeichert';
+	@override String get deleted => 'Gelöscht';
+	@override String documentCreated({required Object name}) => 'Dokument erstellt: ${name}';
+}
+
 // Path: bookings.statuses
 class _Translations$bookings$statuses$de extends Translations$bookings$statuses$en {
 	_Translations$bookings$statuses$de._(TranslationsDe root) : this._root = root, super.internal(root);
@@ -717,7 +732,6 @@ class _Translations$admin$operator$de extends Translations$admin$operator$en {
 	@override String get purposesObjectHint => 'Zum Beispiel: die Jugendhilfe';
 	@override String get place => 'Ort der Unterschrift';
 	@override String get signatory => 'Unterzeichnet von';
-	@override String get saved => 'Gespeichert';
 	@override String get bankHint => 'Steht auf Rechnungen, damit klar ist, wohin und bis wann zu zahlen ist.';
 	@override String get accountHolder => 'Kontoinhaber';
 	@override String get iban => 'IBAN';
@@ -1090,7 +1104,6 @@ extension on TranslationsDe {
 			'admin.operator.purposesObjectHint' => 'Zum Beispiel: die Jugendhilfe',
 			'admin.operator.place' => 'Ort der Unterschrift',
 			'admin.operator.signatory' => 'Unterzeichnet von',
-			'admin.operator.saved' => 'Gespeichert',
 			'admin.operator.bankHint' => 'Steht auf Rechnungen, damit klar ist, wohin und bis wann zu zahlen ist.',
 			'admin.operator.accountHolder' => 'Kontoinhaber',
 			'admin.operator.iban' => 'IBAN',
@@ -1155,6 +1168,11 @@ extension on TranslationsDe {
 			'settings.light' => 'Hell',
 			'settings.dark' => 'Dunkel',
 			'settings.accentColor' => 'Akzentfarbe',
+			'status.loading' => 'Daten werden geladen …',
+			'status.loaded' => 'Daten geladen',
+			'status.saved' => 'Gespeichert',
+			'status.deleted' => 'Gelöscht',
+			'status.documentCreated' => ({required Object name}) => 'Dokument erstellt: ${name}',
 			_ => null,
 		};
 	}

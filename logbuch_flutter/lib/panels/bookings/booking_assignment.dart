@@ -8,6 +8,7 @@ import 'package:logbuch_flutter/panels/bookings/booking_guests.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
 import 'package:logbuch_flutter/providers/guest_groups_provider.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 import 'package:yaru/yaru.dart';
 
 /// How well the guests of a room fit into it.
@@ -138,6 +139,7 @@ class BookingAssignmentEditor extends ConsumerWidget {
   ) async {
     try {
       await ref.read(serverpodClientProvider).guest.assign(guestIds, hold?.id);
+      ref.read(statusProvider.notifier).saved();
     } catch (error) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

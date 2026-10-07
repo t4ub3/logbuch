@@ -120,11 +120,7 @@ Future<void> _openConfirmation(
         .read(serverpodClientProvider)
         .booking
         .getConfirmationPdf(booking.id!);
-    await ref.read(fileOpenerProvider)(
-      'Buchungsbestaetigung-${booking.id}.pdf',
-      // The bytes may be a part of a larger buffer.
-      pdf.buffer.asUint8List(pdf.offsetInBytes, pdf.lengthInBytes),
-    );
+    await openDocument(ref, 'Buchungsbestaetigung-${booking.id}.pdf', pdf);
   } catch (error) {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(

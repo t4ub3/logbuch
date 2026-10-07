@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin_panel.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 
 import 'fake_client.dart';
 
@@ -294,7 +295,10 @@ void main() {
           (rate.priceCategoryId, rate.ageGroupId): rate.pricePerNight,
       };
       expect(saved, {(1, 1): 1250, (2, 2): 3100});
-      expect(find.text('Prices saved'), findsOneWidget);
+      expect(
+        statusMessage(tester),
+        isA<Done>().having((done) => done.text, 'text', 'Prices saved'),
+      );
       // The matrix was loaded again and has nothing left to save.
       expect(tester.widget<TextField>(cell(0)).controller!.text, '12.50');
       expect(_saveButton(tester).onPressed, isNull);

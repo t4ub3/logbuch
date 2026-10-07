@@ -11,6 +11,7 @@ import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/contacts_provider.dart';
 import 'package:logbuch_flutter/providers/meal_plans_provider.dart';
 import 'package:logbuch_flutter/providers/organizations_provider.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
 import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:yaru/yaru.dart';
 
@@ -176,6 +177,7 @@ mixin _BookingForm<T extends ConsumerStatefulWidget> on ConsumerState<T> {
         ? await endpoint.add(edited)
         : await endpoint.update(edited);
     ref.invalidate(bookingsProvider);
+    ref.read(statusProvider.notifier).saved();
     return saved;
   }
 }

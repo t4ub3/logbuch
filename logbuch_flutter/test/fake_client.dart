@@ -10,6 +10,8 @@ import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/settings_provider.dart';
+import 'package:logbuch_flutter/providers/status_provider.dart';
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yaru/yaru.dart';
 
@@ -56,6 +58,21 @@ class FakeClient extends Fake implements Client {
   final FakeHouseholds household = FakeHouseholds();
   @override
   final FakeDashboards dashboard = FakeDashboards();
+
+  /// What `client.auth` is.
+  @override
+  final FakeAuth authKeyProvider = FakeAuth();
+}
+
+class FakeAuth extends Fake implements FlutterAuthSessionManager {
+  /// How often the user signed out.
+  var signOuts = 0;
+
+  @override
+  Future<bool> signOutDevice() async {
+    signOuts++;
+    return true;
+  }
 }
 
 class FakeUsers extends Fake implements EndpointUser {
@@ -975,7 +992,8 @@ FakeClient filledClient({UserRole? role = UserRole.admin}) {
   return client;
 }
 
-/// Shows [home] in an app that talks to [client].
+/// Shows [home] in an app that talks to [client]. Without [settle] it does
+/// not wait for animations to end, which one that shows loading never does.
 Future<void> pumpApp(
   WidgetTester tester,
   Widget home,
@@ -983,6 +1001,7 @@ Future<void> pumpApp(
   Size size = const Size(1200, 800),
   AppLocale locale = AppLocale.en,
   List<Override> overrides = const [],
+  bool settle = true,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -993,6 +1012,7 @@ Future<void> pumpApp(
 
   await tester.pumpWidget(
     ProviderScope(
+      observers: [StatusObserver()],
       overrides: [
         serverpodClientProvider.overrideWithValue(client),
         sharedPreferencesProvider.overrideWithValue(preferences),
@@ -1009,8 +1029,18 @@ Future<void> pumpApp(
       ),
     ),
   );
-  await tester.pumpAndSettle();
+  if (settle) {
+    await tester.pumpAndSettle();
+  } else {
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
+  }
 }
+
+/// What the status bar says, which the panels are shown without.
+StatusMessage? statusMessage(WidgetTester tester) => ProviderScope.containerOf(
+  tester.element(find.byType(Scaffold).first),
+).read(statusProvider).message;
 
 Finder field(String label) => find.widgetWithText(TextFormField, label);
 
