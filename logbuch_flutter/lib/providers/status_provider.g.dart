@@ -46,7 +46,7 @@ final class StatusProvider extends $NotifierProvider<Status, StatusState> {
   }
 }
 
-String _$statusHash() => r'04323e62025089b84229d8f275263e36d52460bd';
+String _$statusHash() => r'12f45028d18725c03b242217567a4d13b7a91da5';
 
 /// What the status bar shows. Loading is reported by [StatusObserver]; what
 /// the user did is reported where it is done, once it has worked.

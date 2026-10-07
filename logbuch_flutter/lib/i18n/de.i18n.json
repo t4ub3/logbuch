@@ -477,8 +477,7 @@
         "theme": "Design",
         "systemTheme": "Systemstandard",
         "light": "Hell",
-        "dark": "Dunkel",
-        "accentColor": "Akzentfarbe"
+        "dark": "Dunkel"
     },
     "status": {
         "loading": "Daten werden geladen …",

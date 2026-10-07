@@ -95,7 +95,7 @@ final class SettingsProvider extends $NotifierProvider<Settings, AppSettings> {
   }
 }
 
-String _$settingsHash() => r'6dfa310cba0aa180a3ee621f6f88c2c5d0f08b01';
+String _$settingsHash() => r'c38a23422b4a0f81643d7420d71b3daaa4990638';
 
 /// User settings, persisted in [SharedPreferences].
 

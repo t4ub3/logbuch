@@ -2,7 +2,6 @@ import 'package:flutter/material.dart' show ThemeMode;
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:yaru/yaru.dart';
 
 part 'settings_provider.g.dart';
 
@@ -23,26 +22,22 @@ class AppSettings {
     required this.locale,
     required this.startOfWeek,
     required this.themeMode,
-    required this.variant,
   });
 
   /// The app language, or null to follow the device.
   final AppLocale? locale;
   final StartOfWeek startOfWeek;
   final ThemeMode themeMode;
-  final YaruVariant variant;
 
   AppSettings copyWith({
     AppLocale? Function()? locale,
     StartOfWeek? startOfWeek,
     ThemeMode? themeMode,
-    YaruVariant? variant,
   }) {
     return AppSettings(
       locale: locale != null ? locale() : this.locale,
       startOfWeek: startOfWeek ?? this.startOfWeek,
       themeMode: themeMode ?? this.themeMode,
-      variant: variant ?? this.variant,
     );
   }
 }
@@ -57,7 +52,6 @@ class Settings extends _$Settings {
   static const _localeKey = 'settings.locale';
   static const _startOfWeekKey = 'settings.startOfWeek';
   static const _themeModeKey = 'settings.themeMode';
-  static const _variantKey = 'settings.variant';
 
   SharedPreferences get _prefs => ref.read(sharedPreferencesProvider);
 
@@ -71,9 +65,6 @@ class Settings extends _$Settings {
       themeMode:
           _byName(ThemeMode.values, _prefs.getString(_themeModeKey)) ??
           ThemeMode.system,
-      variant:
-          _byName(YaruVariant.values, _prefs.getString(_variantKey)) ??
-          YaruVariant.orange,
     );
     _applyLocale(settings.locale);
     return settings;
@@ -97,11 +88,6 @@ class Settings extends _$Settings {
   Future<void> setThemeMode(ThemeMode themeMode) async {
     state = state.copyWith(themeMode: themeMode);
     await _prefs.setString(_themeModeKey, themeMode.name);
-  }
-
-  Future<void> setVariant(YaruVariant variant) async {
-    state = state.copyWith(variant: variant);
-    await _prefs.setString(_variantKey, variant.name);
   }
 
   void _applyLocale(AppLocale? locale) {

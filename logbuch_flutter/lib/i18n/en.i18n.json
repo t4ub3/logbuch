@@ -477,8 +477,7 @@
         "theme": "Theme",
         "systemTheme": "System default",
         "light": "Light",
-        "dark": "Dark",
-        "accentColor": "Accent color"
+        "dark": "Dark"
     },
     "status": {
         "loading": "Loading…",

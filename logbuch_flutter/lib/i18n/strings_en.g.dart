@@ -906,9 +906,6 @@ class Translations$settings$en {
 
 	/// en: 'Dark'
 	String get dark => 'Dark';
-
-	/// en: 'Accent color'
-	String get accentColor => 'Accent color';
 }
 
 // Path: status
@@ -1968,7 +1965,6 @@ extension on Translations {
 			'settings.systemTheme' => 'System default',
 			'settings.light' => 'Light',
 			'settings.dark' => 'Dark',
-			'settings.accentColor' => 'Accent color',
 			'status.loading' => 'Loading…',
 			'status.loaded' => 'Data loaded',
 			'status.saved' => 'Saved',

@@ -113,23 +113,6 @@ class SettingsPanel extends ConsumerWidget {
                     ],
                   ),
                 ),
-                YaruListTile(
-                  hasFocusBorder: false,
-                  title: Text(t.accentColor),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Wrap(
-                      children: [
-                        for (final variant in YaruVariant.accents)
-                          YaruColorDisk(
-                            onPressed: () => notifier.setVariant(variant),
-                            color: variant.color,
-                            selected: settings.variant == variant,
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

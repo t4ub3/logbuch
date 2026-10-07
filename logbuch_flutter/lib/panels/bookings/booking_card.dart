@@ -7,7 +7,7 @@ import 'package:logbuch_flutter/providers/guest_groups_provider.dart';
 import 'package:logbuch_flutter/providers/kitchen_overview_provider.dart';
 import 'package:yaru/yaru.dart';
 
-/// A part of a booking on its page, such as its rooms: a box with a [title]
+/// A part of a booking on its page, such as its rooms: a section with a [title]
 /// that shows the part without letting it be changed. [onEdit] adds the
 /// button that opens the overlay to change it.
 class BookingCard extends StatelessWidget {
@@ -32,51 +32,46 @@ class BookingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final onEdit = this.onEdit;
 
-    return YaruBorderContainer(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // As high as a button, so that the titles of cards with and
-          // without one line up.
-          ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: kYaruButtonHeight),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium,
-                    overflow: TextOverflow.ellipsis,
+    return YaruSection(
+      // As high as a button, so that the titles of cards with and without
+      // one line up.
+      headline: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: kYaruButtonHeight),
+        child: Row(
+          children: [
+            Expanded(child: Text(title, overflow: TextOverflow.ellipsis)),
+            for (final action in actions) ...[
+              const SizedBox(width: 8),
+              // The headline is larger than the text of a button.
+              DefaultTextStyle.merge(
+                style: Theme.of(context).textTheme.labelLarge,
+                child: action,
+              ),
+            ],
+            if (onEdit != null) ...[
+              const SizedBox(width: 8),
+              Tooltip(
+                message: context.t.common.edit,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size.square(kYaruButtonHeight),
+                    maximumSize: const Size.square(kYaruButtonHeight),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
+                  onPressed: onEdit,
+                  child: const Icon(YaruIcons.pen, size: 18),
                 ),
-                for (final action in actions) ...[
-                  const SizedBox(width: 8),
-                  action,
-                ],
-                if (onEdit != null) ...[
-                  const SizedBox(width: 8),
-                  Tooltip(
-                    message: context.t.common.edit,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: const Size.square(kYaruButtonHeight),
-                        maximumSize: const Size.square(kYaruButtonHeight),
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      onPressed: onEdit,
-                      child: const Icon(YaruIcons.pen, size: 18),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          child,
-        ],
+              ),
+            ],
+          ],
+        ),
+      ),
+      // In line with the headline, and as wide as the card.
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+        child: child,
       ),
     );
   }

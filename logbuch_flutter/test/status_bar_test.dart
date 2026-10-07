@@ -69,9 +69,9 @@ Color? _barColor(WidgetTester tester, String text) {
   return (bar.decoration as BoxDecoration?)?.color;
 }
 
-/// What a [YaruInfoBox] of [type] is filled with.
+/// What the status bar is filled with for [type].
 Color _fill(BuildContext context, YaruInfoType type) => Color.alphaBlend(
-  type.getColor(context).withValues(alpha: 0.1),
+  type.getColor(context).withValues(alpha: 0.3),
   Theme.of(context).colorScheme.surface,
 );
 

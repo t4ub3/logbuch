@@ -430,7 +430,6 @@ class _Translations$settings$de extends Translations$settings$en {
 	@override String get systemTheme => 'Systemstandard';
 	@override String get light => 'Hell';
 	@override String get dark => 'Dunkel';
-	@override String get accentColor => 'Akzentfarbe';
 }
 
 // Path: status
@@ -1167,7 +1166,6 @@ extension on TranslationsDe {
 			'settings.systemTheme' => 'Systemstandard',
 			'settings.light' => 'Hell',
 			'settings.dark' => 'Dunkel',
-			'settings.accentColor' => 'Akzentfarbe',
 			'status.loading' => 'Daten werden geladen …',
 			'status.loaded' => 'Daten geladen',
 			'status.saved' => 'Gespeichert',
