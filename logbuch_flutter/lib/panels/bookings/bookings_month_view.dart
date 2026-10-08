@@ -7,6 +7,7 @@ import 'package:logbuch_flutter/panels/bookings/booking_extensions.dart';
 import 'package:logbuch_flutter/providers/bookings_provider.dart';
 import 'package:logbuch_flutter/providers/bookings_view_provider.dart';
 import 'package:logbuch_flutter/providers/settings_provider.dart';
+import 'package:logbuch_flutter/theme/dimmed_accent.dart';
 
 /// Monthly calendar grid with each booking drawn as a colored bar on the days
 /// it covers.
@@ -318,6 +319,7 @@ class _BookingBar extends StatelessWidget {
     final isEnd = booking.endDay == day;
     const radius = Radius.circular(4);
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return GestureDetector(
       onTap: () => openBookingTab(context, booking),
@@ -342,7 +344,7 @@ class _BookingBar extends StatelessWidget {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(
-              color: booking.color,
+              color: colorScheme.dimmed(booking.color),
               borderRadius: BorderRadius.horizontal(
                 left: isStart ? radius : Radius.zero,
                 right: isEnd ? radius : Radius.zero,
@@ -355,7 +357,7 @@ class _BookingBar extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style:
                   (height < 24 ? textTheme.labelSmall : textTheme.labelMedium)
-                      ?.copyWith(color: Colors.white),
+                      ?.copyWith(color: colorScheme.onSurface),
             ),
           ),
         ),

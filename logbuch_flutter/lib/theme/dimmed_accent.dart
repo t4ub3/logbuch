@@ -21,4 +21,16 @@ extension DimmedAccent on ColorScheme {
         .withLightness(0.27)
         .toColor();
   }
+
+  /// A subdued version of any [color], for areas that carry a color of
+  /// their own, such as the bars of bookings in the calendars. It is as
+  /// much paler than [color] as [dimmedPrimary] is than [primary], and
+  /// text in [onSurface] can be read on it.
+  Color dimmed(Color color) {
+    final hsl = HSLColor.fromColor(color);
+    final dimmed = brightness == Brightness.light
+        ? hsl.withSaturation(hsl.saturation * 0.7).withLightness(0.72)
+        : hsl.withSaturation(hsl.saturation * 0.45).withLightness(0.27);
+    return dimmed.toColor();
+  }
 }

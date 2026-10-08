@@ -1,0 +1,12 @@
+### A kind of room or house that is priced the same way, such as a room in
+### the main house or a bungalow. Its prices are in the price lists.
+class: UnitType
+table: unit_types
+fields:
+  name: String
+  sortOrder: int, default=0
+  ### What staying in a unit of this type is taxed with, in basis points.
+  taxRate: int, default=700
+  ### Several bookings may hold a unit of this type during the same night.
+  ### They share what it costs per night.
+  shared: bool, default=false

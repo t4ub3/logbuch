@@ -1,0 +1,6 @@
+### A house, or a group of houses, that rooms are in.
+class: Building
+table: buildings
+fields:
+  name: String
+  sortOrder: int, default=0

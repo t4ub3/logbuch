@@ -13,20 +13,25 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:logbuch_server/src/generated/protocol.dart' as _iil9w69f;
 import 'package:serverpod/serverpod.dart' as _is;
-import '../pricing/price_category.dart' as _io5akotj;
+import '../pricing/unit_type.dart' as _iwfco3zw;
+import '../rooms/building.dart' as _ig4w4s7q;
+import '../rooms/room_fee.dart' as _iv47he65;
 
+/// A room, or a house that is booked as a whole, such as a bungalow.
 abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
   Room._({
     this.id,
     required this.roomNumber,
     required this.bedAmount,
+    this.buildingId,
     this.building,
     this.floor,
-    required this.priceCategoryId,
-    this.priceCategory,
+    required this.unitTypeId,
+    this.unitType,
     bool? cribPossible,
     bool? active,
     this.notes,
+    this.fees,
   }) : cribPossible = cribPossible ?? false,
        active = active ?? true;
 
@@ -34,13 +39,15 @@ abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
     int? id,
     required String roomNumber,
     required int bedAmount,
-    String? building,
+    int? buildingId,
+    _ig4w4s7q.Building? building,
     String? floor,
-    required int priceCategoryId,
-    _io5akotj.PriceCategory? priceCategory,
+    required int unitTypeId,
+    _iwfco3zw.UnitType? unitType,
     bool? cribPossible,
     bool? active,
     String? notes,
+    List<_iv47he65.RoomFee>? fees,
   }) = _RoomImpl;
 
   factory Room.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -48,13 +55,18 @@ abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
       id: jsonSerialization['id'] as int?,
       roomNumber: jsonSerialization['roomNumber'] as String,
       bedAmount: jsonSerialization['bedAmount'] as int,
-      building: jsonSerialization['building'] as String?,
-      floor: jsonSerialization['floor'] as String?,
-      priceCategoryId: jsonSerialization['priceCategoryId'] as int,
-      priceCategory: jsonSerialization['priceCategory'] == null
+      buildingId: jsonSerialization['buildingId'] as int?,
+      building: jsonSerialization['building'] == null
           ? null
-          : _iil9w69f.Protocol().deserialize<_io5akotj.PriceCategory>(
-              jsonSerialization['priceCategory'],
+          : _iil9w69f.Protocol().deserialize<_ig4w4s7q.Building>(
+              jsonSerialization['building'],
+            ),
+      floor: jsonSerialization['floor'] as String?,
+      unitTypeId: jsonSerialization['unitTypeId'] as int,
+      unitType: jsonSerialization['unitType'] == null
+          ? null
+          : _iil9w69f.Protocol().deserialize<_iwfco3zw.UnitType>(
+              jsonSerialization['unitType'],
             ),
       cribPossible: jsonSerialization['cribPossible'] == null
           ? null
@@ -63,6 +75,11 @@ abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
           ? null
           : _is.BoolJsonExtension.fromJson(jsonSerialization['active']),
       notes: jsonSerialization['notes'] as String?,
+      fees: jsonSerialization['fees'] == null
+          ? null
+          : _iil9w69f.Protocol().deserialize<List<_iv47he65.RoomFee>>(
+              jsonSerialization['fees'],
+            ),
     );
   }
 
@@ -77,19 +94,24 @@ abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
 
   int bedAmount;
 
-  String? building;
+  int? buildingId;
+
+  _ig4w4s7q.Building? building;
 
   String? floor;
 
-  int priceCategoryId;
+  int unitTypeId;
 
-  _io5akotj.PriceCategory? priceCategory;
+  _iwfco3zw.UnitType? unitType;
 
   bool cribPossible;
 
   bool active;
 
   String? notes;
+
+  /// The surcharges of the room.
+  List<_iv47he65.RoomFee>? fees;
 
   @override
   _is.Table<int?> get table => t;
@@ -101,13 +123,15 @@ abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
     int? id,
     String? roomNumber,
     int? bedAmount,
-    String? building,
+    int? buildingId,
+    _ig4w4s7q.Building? building,
     String? floor,
-    int? priceCategoryId,
-    _io5akotj.PriceCategory? priceCategory,
+    int? unitTypeId,
+    _iwfco3zw.UnitType? unitType,
     bool? cribPossible,
     bool? active,
     String? notes,
+    List<_iv47he65.RoomFee>? fees,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -116,13 +140,15 @@ abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
       if (id != null) 'id': id,
       'roomNumber': roomNumber,
       'bedAmount': bedAmount,
-      if (building != null) 'building': building,
+      if (buildingId != null) 'buildingId': buildingId,
+      if (building != null) 'building': building?.toJson(),
       if (floor != null) 'floor': floor,
-      'priceCategoryId': priceCategoryId,
-      if (priceCategory != null) 'priceCategory': priceCategory?.toJson(),
+      'unitTypeId': unitTypeId,
+      if (unitType != null) 'unitType': unitType?.toJson(),
       'cribPossible': cribPossible,
       'active': active,
       if (notes != null) 'notes': notes,
+      if (fees != null) 'fees': fees?.toJson(valueToJson: (v) => v.toJson()),
     };
   }
 
@@ -133,19 +159,29 @@ abstract class Room implements _is.TableRow<int?>, _is.ProtocolSerialization {
       if (id != null) 'id': id,
       'roomNumber': roomNumber,
       'bedAmount': bedAmount,
-      if (building != null) 'building': building,
+      if (buildingId != null) 'buildingId': buildingId,
+      if (building != null) 'building': building?.toJsonForProtocol(),
       if (floor != null) 'floor': floor,
-      'priceCategoryId': priceCategoryId,
-      if (priceCategory != null)
-        'priceCategory': priceCategory?.toJsonForProtocol(),
+      'unitTypeId': unitTypeId,
+      if (unitType != null) 'unitType': unitType?.toJsonForProtocol(),
       'cribPossible': cribPossible,
       'active': active,
       if (notes != null) 'notes': notes,
+      if (fees != null)
+        'fees': fees?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
     };
   }
 
-  static RoomInclude include({_io5akotj.PriceCategoryInclude? priceCategory}) {
-    return RoomInclude._(priceCategory: priceCategory);
+  static RoomInclude include({
+    _ig4w4s7q.BuildingInclude? building,
+    _iwfco3zw.UnitTypeInclude? unitType,
+    _iv47he65.RoomFeeIncludeList? fees,
+  }) {
+    return RoomInclude._(
+      building: building,
+      unitType: unitType,
+      fees: fees,
+    );
   }
 
   static RoomIncludeList includeList({
@@ -179,24 +215,28 @@ class _RoomImpl extends Room {
     int? id,
     required String roomNumber,
     required int bedAmount,
-    String? building,
+    int? buildingId,
+    _ig4w4s7q.Building? building,
     String? floor,
-    required int priceCategoryId,
-    _io5akotj.PriceCategory? priceCategory,
+    required int unitTypeId,
+    _iwfco3zw.UnitType? unitType,
     bool? cribPossible,
     bool? active,
     String? notes,
+    List<_iv47he65.RoomFee>? fees,
   }) : super._(
          id: id,
          roomNumber: roomNumber,
          bedAmount: bedAmount,
+         buildingId: buildingId,
          building: building,
          floor: floor,
-         priceCategoryId: priceCategoryId,
-         priceCategory: priceCategory,
+         unitTypeId: unitTypeId,
+         unitType: unitType,
          cribPossible: cribPossible,
          active: active,
          notes: notes,
+         fees: fees,
        );
 
   /// Returns a shallow copy of this [Room]
@@ -207,27 +247,35 @@ class _RoomImpl extends Room {
     Object? id = _Undefined,
     String? roomNumber,
     int? bedAmount,
+    Object? buildingId = _Undefined,
     Object? building = _Undefined,
     Object? floor = _Undefined,
-    int? priceCategoryId,
-    Object? priceCategory = _Undefined,
+    int? unitTypeId,
+    Object? unitType = _Undefined,
     bool? cribPossible,
     bool? active,
     Object? notes = _Undefined,
+    Object? fees = _Undefined,
   }) {
     return Room(
       id: id is int? ? id : this.id,
       roomNumber: roomNumber ?? this.roomNumber,
       bedAmount: bedAmount ?? this.bedAmount,
-      building: building is String? ? building : this.building,
+      buildingId: buildingId is int? ? buildingId : this.buildingId,
+      building: building is _ig4w4s7q.Building?
+          ? building
+          : this.building?.copyWith(),
       floor: floor is String? ? floor : this.floor,
-      priceCategoryId: priceCategoryId ?? this.priceCategoryId,
-      priceCategory: priceCategory is _io5akotj.PriceCategory?
-          ? priceCategory
-          : this.priceCategory?.copyWith(),
+      unitTypeId: unitTypeId ?? this.unitTypeId,
+      unitType: unitType is _iwfco3zw.UnitType?
+          ? unitType
+          : this.unitType?.copyWith(),
       cribPossible: cribPossible ?? this.cribPossible,
       active: active ?? this.active,
       notes: notes is String? ? notes : this.notes,
+      fees: fees is List<_iv47he65.RoomFee>?
+          ? fees
+          : this.fees?.map((e0) => e0.copyWith()).toList(),
     );
   }
 }
@@ -245,8 +293,8 @@ class RoomUpdateTable extends _is.UpdateTable<RoomTable> {
     value,
   );
 
-  _is.ColumnValue<String, String> building(String? value) => _is.ColumnValue(
-    table.building,
+  _is.ColumnValue<int, int> buildingId(int? value) => _is.ColumnValue(
+    table.buildingId,
     value,
   );
 
@@ -255,8 +303,8 @@ class RoomUpdateTable extends _is.UpdateTable<RoomTable> {
     value,
   );
 
-  _is.ColumnValue<int, int> priceCategoryId(int value) => _is.ColumnValue(
-    table.priceCategoryId,
+  _is.ColumnValue<int, int> unitTypeId(int value) => _is.ColumnValue(
+    table.unitTypeId,
     value,
   );
 
@@ -287,16 +335,16 @@ class RoomTable extends _is.Table<int?> {
       'bedAmount',
       this,
     );
-    building = _is.ColumnString(
-      'building',
+    buildingId = _is.ColumnInt(
+      'buildingId',
       this,
     );
     floor = _is.ColumnString(
       'floor',
       this,
     );
-    priceCategoryId = _is.ColumnInt(
-      'priceCategoryId',
+    unitTypeId = _is.ColumnInt(
+      'unitTypeId',
       this,
     );
     cribPossible = _is.ColumnBool(
@@ -321,13 +369,15 @@ class RoomTable extends _is.Table<int?> {
 
   late final _is.ColumnInt bedAmount;
 
-  late final _is.ColumnString building;
+  late final _is.ColumnInt buildingId;
+
+  _ig4w4s7q.BuildingTable? _building;
 
   late final _is.ColumnString floor;
 
-  late final _is.ColumnInt priceCategoryId;
+  late final _is.ColumnInt unitTypeId;
 
-  _io5akotj.PriceCategoryTable? _priceCategory;
+  _iwfco3zw.UnitTypeTable? _unitType;
 
   late final _is.ColumnBool cribPossible;
 
@@ -335,17 +385,68 @@ class RoomTable extends _is.Table<int?> {
 
   late final _is.ColumnString notes;
 
-  _io5akotj.PriceCategoryTable get priceCategory {
-    if (_priceCategory != null) return _priceCategory!;
-    _priceCategory = _is.createRelationTable(
-      relationFieldName: 'priceCategory',
-      field: Room.t.priceCategoryId,
-      foreignField: _io5akotj.PriceCategory.t.id,
+  /// The surcharges of the room.
+  _iv47he65.RoomFeeTable? ___fees;
+
+  /// The surcharges of the room.
+  _is.ManyRelation<_iv47he65.RoomFeeTable>? _fees;
+
+  _ig4w4s7q.BuildingTable get building {
+    if (_building != null) return _building!;
+    _building = _is.createRelationTable(
+      relationFieldName: 'building',
+      field: Room.t.buildingId,
+      foreignField: _ig4w4s7q.Building.t.id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _io5akotj.PriceCategoryTable(tableRelation: foreignTableRelation),
+          _ig4w4s7q.BuildingTable(tableRelation: foreignTableRelation),
     );
-    return _priceCategory!;
+    return _building!;
+  }
+
+  _iwfco3zw.UnitTypeTable get unitType {
+    if (_unitType != null) return _unitType!;
+    _unitType = _is.createRelationTable(
+      relationFieldName: 'unitType',
+      field: Room.t.unitTypeId,
+      foreignField: _iwfco3zw.UnitType.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _iwfco3zw.UnitTypeTable(tableRelation: foreignTableRelation),
+    );
+    return _unitType!;
+  }
+
+  _iv47he65.RoomFeeTable get __fees {
+    if (___fees != null) return ___fees!;
+    ___fees = _is.createRelationTable(
+      relationFieldName: '__fees',
+      field: Room.t.id,
+      foreignField: _iv47he65.RoomFee.t.roomId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _iv47he65.RoomFeeTable(tableRelation: foreignTableRelation),
+    );
+    return ___fees!;
+  }
+
+  _is.ManyRelation<_iv47he65.RoomFeeTable> get fees {
+    if (_fees != null) return _fees!;
+    var relationTable = _is.createRelationTable(
+      relationFieldName: 'fees',
+      field: Room.t.id,
+      foreignField: _iv47he65.RoomFee.t.roomId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _iv47he65.RoomFeeTable(tableRelation: foreignTableRelation),
+    );
+    _fees = _is.ManyRelation<_iv47he65.RoomFeeTable>(
+      tableWithRelations: relationTable,
+      table: _iv47he65.RoomFeeTable(
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
+    );
+    return _fees!;
   }
 
   @override
@@ -353,9 +454,9 @@ class RoomTable extends _is.Table<int?> {
     id,
     roomNumber,
     bedAmount,
-    building,
+    buildingId,
     floor,
-    priceCategoryId,
+    unitTypeId,
     cribPossible,
     active,
     notes,
@@ -363,22 +464,42 @@ class RoomTable extends _is.Table<int?> {
 
   @override
   _is.Table? getRelationTable(String relationField) {
-    if (relationField == 'priceCategory') {
-      return priceCategory;
+    if (relationField == 'building') {
+      return building;
+    }
+    if (relationField == 'unitType') {
+      return unitType;
+    }
+    if (relationField == 'fees') {
+      return __fees;
     }
     return null;
   }
 }
 
 class RoomInclude extends _is.IncludeObject {
-  RoomInclude._({_io5akotj.PriceCategoryInclude? priceCategory}) {
-    _priceCategory = priceCategory;
+  RoomInclude._({
+    _ig4w4s7q.BuildingInclude? building,
+    _iwfco3zw.UnitTypeInclude? unitType,
+    _iv47he65.RoomFeeIncludeList? fees,
+  }) {
+    _building = building;
+    _unitType = unitType;
+    _fees = fees;
   }
 
-  _io5akotj.PriceCategoryInclude? _priceCategory;
+  _ig4w4s7q.BuildingInclude? _building;
+
+  _iwfco3zw.UnitTypeInclude? _unitType;
+
+  _iv47he65.RoomFeeIncludeList? _fees;
 
   @override
-  Map<String, _is.Include?> get includes => {'priceCategory': _priceCategory};
+  Map<String, _is.Include?> get includes => {
+    'building': _building,
+    'unitType': _unitType,
+    'fees': _fees,
+  };
 
   @override
   _is.Table<int?> get table => Room.t;
@@ -406,7 +527,11 @@ class RoomIncludeList extends _is.IncludeList {
 class RoomRepository {
   const RoomRepository._();
 
+  final attach = const RoomAttachRepository._();
+
   final attachRow = const RoomAttachRowRepository._();
+
+  final detachRow = const RoomDetachRowRepository._();
 
   /// Returns a list of [Room]s matching the given query parameters.
   ///
@@ -806,28 +931,127 @@ class RoomRepository {
   }
 }
 
+class RoomAttachRepository {
+  const RoomAttachRepository._();
+
+  /// Creates a relation between this [Room] and the given [RoomFee]s
+  /// by setting each [RoomFee]'s foreign key `roomId` to refer to this [Room].
+  Future<void> fees(
+    _is.DatabaseSession session,
+    Room room,
+    List<_iv47he65.RoomFee> roomFee, {
+    _is.Transaction? transaction,
+  }) async {
+    if (roomFee.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('roomFee.id');
+    }
+    if (room.id == null) {
+      throw ArgumentError.notNull('room.id');
+    }
+
+    var $roomFee = roomFee.map((e) => e.copyWith(roomId: room.id)).toList();
+    await session.db.update<_iv47he65.RoomFee>(
+      $roomFee,
+      columns: [_iv47he65.RoomFee.t.roomId],
+      transaction: transaction,
+    );
+  }
+}
+
 class RoomAttachRowRepository {
   const RoomAttachRowRepository._();
 
-  /// Creates a relation between the given [Room] and [PriceCategory]
-  /// by setting the [Room]'s foreign key `priceCategoryId` to refer to the [PriceCategory].
-  Future<void> priceCategory(
+  /// Creates a relation between the given [Room] and [Building]
+  /// by setting the [Room]'s foreign key `buildingId` to refer to the [Building].
+  Future<void> building(
     _is.DatabaseSession session,
     Room room,
-    _io5akotj.PriceCategory priceCategory, {
+    _ig4w4s7q.Building building, {
     _is.Transaction? transaction,
   }) async {
     if (room.id == null) {
       throw ArgumentError.notNull('room.id');
     }
-    if (priceCategory.id == null) {
-      throw ArgumentError.notNull('priceCategory.id');
+    if (building.id == null) {
+      throw ArgumentError.notNull('building.id');
     }
 
-    var $room = room.copyWith(priceCategoryId: priceCategory.id);
+    var $room = room.copyWith(buildingId: building.id);
     await session.db.updateRow<Room>(
       $room,
-      columns: [Room.t.priceCategoryId],
+      columns: [Room.t.buildingId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between the given [Room] and [UnitType]
+  /// by setting the [Room]'s foreign key `unitTypeId` to refer to the [UnitType].
+  Future<void> unitType(
+    _is.DatabaseSession session,
+    Room room,
+    _iwfco3zw.UnitType unitType, {
+    _is.Transaction? transaction,
+  }) async {
+    if (room.id == null) {
+      throw ArgumentError.notNull('room.id');
+    }
+    if (unitType.id == null) {
+      throw ArgumentError.notNull('unitType.id');
+    }
+
+    var $room = room.copyWith(unitTypeId: unitType.id);
+    await session.db.updateRow<Room>(
+      $room,
+      columns: [Room.t.unitTypeId],
+      transaction: transaction,
+    );
+  }
+
+  /// Creates a relation between this [Room] and the given [RoomFee]
+  /// by setting the [RoomFee]'s foreign key `roomId` to refer to this [Room].
+  Future<void> fees(
+    _is.DatabaseSession session,
+    Room room,
+    _iv47he65.RoomFee roomFee, {
+    _is.Transaction? transaction,
+  }) async {
+    if (roomFee.id == null) {
+      throw ArgumentError.notNull('roomFee.id');
+    }
+    if (room.id == null) {
+      throw ArgumentError.notNull('room.id');
+    }
+
+    var $roomFee = roomFee.copyWith(roomId: room.id);
+    await session.db.updateRow<_iv47he65.RoomFee>(
+      $roomFee,
+      columns: [_iv47he65.RoomFee.t.roomId],
+      transaction: transaction,
+    );
+  }
+}
+
+class RoomDetachRowRepository {
+  const RoomDetachRowRepository._();
+
+  /// Detaches the relation between this [Room] and the [Building] set in `building`
+  /// by setting the [Room]'s foreign key `buildingId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> building(
+    _is.DatabaseSession session,
+    Room room, {
+    _is.Transaction? transaction,
+  }) async {
+    if (room.id == null) {
+      throw ArgumentError.notNull('room.id');
+    }
+
+    var $room = room.copyWith(buildingId: null);
+    await session.db.updateRow<Room>(
+      $room,
+      columns: [Room.t.buildingId],
       transaction: transaction,
     );
   }

@@ -165,6 +165,7 @@ void main() {
   ) async {
     final client = filledClient();
     await pumpApp(tester, const AdminPanel(), client);
+    await open(tester, 'Organisation');
     await open(tester, 'Operator');
 
     // A notice by § 60a AO needs the purposes in a second wording, an

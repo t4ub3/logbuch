@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:test/test.dart';
 
+import 'prices.dart';
 import 'roles.dart';
 import 'validation_matcher.dart';
 
@@ -14,23 +15,25 @@ void main() {
   ) {
     late Contact lead;
     late Contact partner;
-    late Season season;
+    late PriceList priceList;
     late AgeGroup adult;
     late Room room;
     late Booking booking;
     late GuestGroup friends;
 
-    Future<void> setRate(int price) => endpoints.roomRate.saveForSeason(
+    Future<void> setRate(int price) => endpoints.priceList.savePrices(
       sessionBuilder,
-      season.id!,
-      [
-        RoomRate(
-          seasonId: season.id!,
-          priceCategoryId: room.priceCategoryId,
-          ageGroupId: adult.id!,
-          pricePerNight: price,
-        ),
-      ],
+      priceList.id!,
+      prices(
+        roomRates: [
+          RoomRate(
+            priceListId: priceList.id!,
+            unitTypeId: room.unitTypeId,
+            ageGroupId: adult.id!,
+            pricePerNight: price,
+          ),
+        ],
+      ),
     );
 
     Future<List<Folio>> folios() =>
@@ -70,21 +73,18 @@ void main() {
           birthDate: DateTime.utc(1980, 1, 1),
         ),
       );
-      final category = await endpoints.priceCategory.add(
+      final category = await endpoints.unitType.add(
         sessionBuilder,
-        PriceCategory(name: 'Standard'),
+        UnitType(name: 'Standard'),
       );
       room = await endpoints.room.add(
         sessionBuilder,
-        Room(roomNumber: '101', bedAmount: 4, priceCategoryId: category.id!),
+        Room(roomNumber: '101', bedAmount: 4, unitTypeId: category.id!),
+        const [],
       );
-      season = await endpoints.season.add(
+      priceList = await endpoints.priceList.add(
         sessionBuilder,
-        Season(
-          name: 'Spring',
-          validFrom: DateTime.utc(2027, 3, 1),
-          validTo: DateTime.utc(2027, 5, 31),
-        ),
+        PriceList(name: '2027', validFrom: DateTime.utc(2027)),
       );
       adult = await endpoints.ageGroup.add(
         sessionBuilder,

@@ -4,6 +4,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:test/test.dart';
 
+import 'prices.dart';
 import 'roles.dart';
 import 'test_tools/serverpod_test_tools.dart';
 import 'validation_matcher.dart';
@@ -14,14 +15,14 @@ void main() {
     endpoints,
   ) {
     setUp(() async {
-      await endpoints.priceCategory.add(
+      await endpoints.unitType.add(
         sessionBuilder.asAdmin,
-        PriceCategory(name: 'Standard'),
+        UnitType(name: 'Standard'),
       );
     });
 
     test('when a viewer reads then the data is returned', () async {
-      final categories = await endpoints.priceCategory.getAll(
+      final categories = await endpoints.unitType.getAll(
         sessionBuilder.asViewer,
       );
 
@@ -30,20 +31,20 @@ void main() {
 
     test('when a viewer changes data then it is rejected', () async {
       final viewer = sessionBuilder.asViewer;
-      final category = PriceCategory(id: 1, name: 'Comfort');
+      final category = UnitType(id: 1, name: 'Comfort');
       final rejected = throwsValidation(ValidationError.adminRequired);
 
       await expectLater(
-        endpoints.priceCategory.add(viewer, category),
+        endpoints.unitType.add(viewer, category),
         rejected,
       );
       await expectLater(
-        endpoints.priceCategory.update(viewer, category),
+        endpoints.unitType.update(viewer, category),
         rejected,
       );
-      await expectLater(endpoints.priceCategory.delete(viewer, 1), rejected);
+      await expectLater(endpoints.unitType.delete(viewer, 1), rejected);
       await expectLater(
-        endpoints.roomRate.saveForSeason(viewer, 1, []),
+        endpoints.priceList.savePrices(viewer, 1, prices()),
         rejected,
       );
       await expectLater(endpoints.booking.setRooms(viewer, 1, []), rejected);
@@ -55,14 +56,14 @@ void main() {
 
     test('when a user without a role reads then it is rejected', () async {
       await expectLater(
-        endpoints.priceCategory.getAll(sessionBuilder.withoutRole),
+        endpoints.unitType.getAll(sessionBuilder.withoutRole),
         throwsA(isA<ServerpodInsufficientAccessException>()),
       );
     });
 
     test('when nobody is signed in then reading is rejected', () async {
       await expectLater(
-        endpoints.priceCategory.getAll(sessionBuilder),
+        endpoints.unitType.getAll(sessionBuilder),
         throwsA(isA<ServerpodUnauthenticatedException>()),
       );
     });

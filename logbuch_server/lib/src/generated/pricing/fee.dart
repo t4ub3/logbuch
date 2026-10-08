@@ -8,44 +8,53 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
+// ignore_for_file: dead_code, unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:logbuch_server/src/generated/protocol.dart' as _iil9w69f;
 import 'package:serverpod/serverpod.dart' as _is;
 import '../pricing/fee_unit.dart' as _ivlcb7ri;
+import '../rooms/room_fee.dart' as _iv47he65;
 
+/// A surcharge or fee. What it costs is in the price lists; a list without
+/// an amount for it does not charge it.
 abstract class Fee implements _is.TableRow<int?>, _is.ProtocolSerialization {
   Fee._({
     this.id,
     required this.name,
-    required this.amount,
     required this.unit,
     this.ageGroupId,
     int? taxRate,
     bool? autoApply,
+    this.rooms,
   }) : taxRate = taxRate ?? 0,
        autoApply = autoApply ?? false;
 
   factory Fee({
     int? id,
     required String name,
-    required int amount,
     required _ivlcb7ri.FeeUnit unit,
     int? ageGroupId,
     int? taxRate,
     bool? autoApply,
+    List<_iv47he65.RoomFee>? rooms,
   }) = _FeeImpl;
 
   factory Fee.fromJson(Map<String, dynamic> jsonSerialization) {
     return Fee(
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
-      amount: jsonSerialization['amount'] as int,
       unit: _ivlcb7ri.FeeUnit.fromJson((jsonSerialization['unit'] as String)),
       ageGroupId: jsonSerialization['ageGroupId'] as int?,
       taxRate: jsonSerialization['taxRate'] as int?,
       autoApply: jsonSerialization['autoApply'] == null
           ? null
           : _is.BoolJsonExtension.fromJson(jsonSerialization['autoApply']),
+      rooms: jsonSerialization['rooms'] == null
+          ? null
+          : _iil9w69f.Protocol().deserialize<List<_iv47he65.RoomFee>>(
+              jsonSerialization['rooms'],
+            ),
     );
   }
 
@@ -58,15 +67,17 @@ abstract class Fee implements _is.TableRow<int?>, _is.ProtocolSerialization {
 
   String name;
 
-  int amount;
-
   _ivlcb7ri.FeeUnit unit;
 
   int? ageGroupId;
 
   int taxRate;
 
+  /// Charged to every booking. Otherwise the fee is a surcharge of the
+  /// rooms it is assigned to.
   bool autoApply;
+
+  List<_iv47he65.RoomFee>? rooms;
 
   @override
   _is.Table<int?> get table => t;
@@ -77,11 +88,11 @@ abstract class Fee implements _is.TableRow<int?>, _is.ProtocolSerialization {
   Fee copyWith({
     int? id,
     String? name,
-    int? amount,
     _ivlcb7ri.FeeUnit? unit,
     int? ageGroupId,
     int? taxRate,
     bool? autoApply,
+    List<_iv47he65.RoomFee>? rooms,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -89,11 +100,11 @@ abstract class Fee implements _is.TableRow<int?>, _is.ProtocolSerialization {
       '__className__': 'Fee',
       if (id != null) 'id': id,
       'name': name,
-      'amount': amount,
       'unit': unit.toJson(),
       if (ageGroupId != null) 'ageGroupId': ageGroupId,
       'taxRate': taxRate,
       'autoApply': autoApply,
+      if (rooms != null) 'rooms': rooms?.toJson(valueToJson: (v) => v.toJson()),
     };
   }
 
@@ -103,16 +114,17 @@ abstract class Fee implements _is.TableRow<int?>, _is.ProtocolSerialization {
       '__className__': 'Fee',
       if (id != null) 'id': id,
       'name': name,
-      'amount': amount,
       'unit': unit.toJson(),
       if (ageGroupId != null) 'ageGroupId': ageGroupId,
       'taxRate': taxRate,
       'autoApply': autoApply,
+      if (rooms != null)
+        'rooms': rooms?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
     };
   }
 
-  static FeeInclude include() {
-    return FeeInclude._();
+  static FeeInclude include({_iv47he65.RoomFeeIncludeList? rooms}) {
+    return FeeInclude._(rooms: rooms);
   }
 
   static FeeIncludeList includeList({
@@ -145,19 +157,19 @@ class _FeeImpl extends Fee {
   _FeeImpl({
     int? id,
     required String name,
-    required int amount,
     required _ivlcb7ri.FeeUnit unit,
     int? ageGroupId,
     int? taxRate,
     bool? autoApply,
+    List<_iv47he65.RoomFee>? rooms,
   }) : super._(
          id: id,
          name: name,
-         amount: amount,
          unit: unit,
          ageGroupId: ageGroupId,
          taxRate: taxRate,
          autoApply: autoApply,
+         rooms: rooms,
        );
 
   /// Returns a shallow copy of this [Fee]
@@ -167,20 +179,22 @@ class _FeeImpl extends Fee {
   Fee copyWith({
     Object? id = _Undefined,
     String? name,
-    int? amount,
     _ivlcb7ri.FeeUnit? unit,
     Object? ageGroupId = _Undefined,
     int? taxRate,
     bool? autoApply,
+    Object? rooms = _Undefined,
   }) {
     return Fee(
       id: id is int? ? id : this.id,
       name: name ?? this.name,
-      amount: amount ?? this.amount,
       unit: unit ?? this.unit,
       ageGroupId: ageGroupId is int? ? ageGroupId : this.ageGroupId,
       taxRate: taxRate ?? this.taxRate,
       autoApply: autoApply ?? this.autoApply,
+      rooms: rooms is List<_iv47he65.RoomFee>?
+          ? rooms
+          : this.rooms?.map((e0) => e0.copyWith()).toList(),
     );
   }
 }
@@ -190,11 +204,6 @@ class FeeUpdateTable extends _is.UpdateTable<FeeTable> {
 
   _is.ColumnValue<String, String> name(String value) => _is.ColumnValue(
     table.name,
-    value,
-  );
-
-  _is.ColumnValue<int, int> amount(int value) => _is.ColumnValue(
-    table.amount,
     value,
   );
 
@@ -228,10 +237,6 @@ class FeeTable extends _is.Table<int?> {
       'name',
       this,
     );
-    amount = _is.ColumnInt(
-      'amount',
-      this,
-    );
     unit = _is.ColumnEnum(
       'unit',
       this,
@@ -257,33 +262,80 @@ class FeeTable extends _is.Table<int?> {
 
   late final _is.ColumnString name;
 
-  late final _is.ColumnInt amount;
-
   late final _is.ColumnEnum<_ivlcb7ri.FeeUnit> unit;
 
   late final _is.ColumnInt ageGroupId;
 
   late final _is.ColumnInt taxRate;
 
+  /// Charged to every booking. Otherwise the fee is a surcharge of the
+  /// rooms it is assigned to.
   late final _is.ColumnBool autoApply;
+
+  _iv47he65.RoomFeeTable? ___rooms;
+
+  _is.ManyRelation<_iv47he65.RoomFeeTable>? _rooms;
+
+  _iv47he65.RoomFeeTable get __rooms {
+    if (___rooms != null) return ___rooms!;
+    ___rooms = _is.createRelationTable(
+      relationFieldName: '__rooms',
+      field: Fee.t.id,
+      foreignField: _iv47he65.RoomFee.t.feeId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _iv47he65.RoomFeeTable(tableRelation: foreignTableRelation),
+    );
+    return ___rooms!;
+  }
+
+  _is.ManyRelation<_iv47he65.RoomFeeTable> get rooms {
+    if (_rooms != null) return _rooms!;
+    var relationTable = _is.createRelationTable(
+      relationFieldName: 'rooms',
+      field: Fee.t.id,
+      foreignField: _iv47he65.RoomFee.t.feeId,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _iv47he65.RoomFeeTable(tableRelation: foreignTableRelation),
+    );
+    _rooms = _is.ManyRelation<_iv47he65.RoomFeeTable>(
+      tableWithRelations: relationTable,
+      table: _iv47he65.RoomFeeTable(
+        tableRelation: relationTable.tableRelation!.lastRelation,
+      ),
+    );
+    return _rooms!;
+  }
 
   @override
   List<_is.Column> get columns => [
     id,
     name,
-    amount,
     unit,
     ageGroupId,
     taxRate,
     autoApply,
   ];
+
+  @override
+  _is.Table? getRelationTable(String relationField) {
+    if (relationField == 'rooms') {
+      return __rooms;
+    }
+    return null;
+  }
 }
 
 class FeeInclude extends _is.IncludeObject {
-  FeeInclude._();
+  FeeInclude._({_iv47he65.RoomFeeIncludeList? rooms}) {
+    _rooms = rooms;
+  }
+
+  _iv47he65.RoomFeeIncludeList? _rooms;
 
   @override
-  Map<String, _is.Include?> get includes => {};
+  Map<String, _is.Include?> get includes => {'rooms': _rooms};
 
   @override
   _is.Table<int?> get table => Fee.t;
@@ -310,6 +362,10 @@ class FeeIncludeList extends _is.IncludeList {
 
 class FeeRepository {
   const FeeRepository._();
+
+  final attach = const FeeAttachRepository._();
+
+  final attachRow = const FeeAttachRowRepository._();
 
   /// Returns a list of [Fee]s matching the given query parameters.
   ///
@@ -341,6 +397,7 @@ class FeeRepository {
     _is.OrderByBuilder<FeeTable>? orderBy,
     _is.OrderByListBuilder<FeeTable>? orderByList,
     _is.Transaction? transaction,
+    FeeInclude? include,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
@@ -351,6 +408,7 @@ class FeeRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -380,6 +438,7 @@ class FeeRepository {
     _is.OrderByBuilder<FeeTable>? orderBy,
     _is.OrderByListBuilder<FeeTable>? orderByList,
     _is.Transaction? transaction,
+    FeeInclude? include,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
@@ -389,6 +448,7 @@ class FeeRepository {
       orderByList: orderByList?.call(Fee.t),
       offset: offset,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -399,12 +459,14 @@ class FeeRepository {
     _is.DatabaseSession session,
     int id, {
     _is.Transaction? transaction,
+    FeeInclude? include,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Fee>(
       id,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -698,6 +760,60 @@ class FeeRepository {
       where: where(Fee.t),
       lockMode: lockMode,
       lockBehavior: lockBehavior,
+      transaction: transaction,
+    );
+  }
+}
+
+class FeeAttachRepository {
+  const FeeAttachRepository._();
+
+  /// Creates a relation between this [Fee] and the given [RoomFee]s
+  /// by setting each [RoomFee]'s foreign key `feeId` to refer to this [Fee].
+  Future<void> rooms(
+    _is.DatabaseSession session,
+    Fee fee,
+    List<_iv47he65.RoomFee> roomFee, {
+    _is.Transaction? transaction,
+  }) async {
+    if (roomFee.any((e) => e.id == null)) {
+      throw ArgumentError.notNull('roomFee.id');
+    }
+    if (fee.id == null) {
+      throw ArgumentError.notNull('fee.id');
+    }
+
+    var $roomFee = roomFee.map((e) => e.copyWith(feeId: fee.id)).toList();
+    await session.db.update<_iv47he65.RoomFee>(
+      $roomFee,
+      columns: [_iv47he65.RoomFee.t.feeId],
+      transaction: transaction,
+    );
+  }
+}
+
+class FeeAttachRowRepository {
+  const FeeAttachRowRepository._();
+
+  /// Creates a relation between this [Fee] and the given [RoomFee]
+  /// by setting the [RoomFee]'s foreign key `feeId` to refer to this [Fee].
+  Future<void> rooms(
+    _is.DatabaseSession session,
+    Fee fee,
+    _iv47he65.RoomFee roomFee, {
+    _is.Transaction? transaction,
+  }) async {
+    if (roomFee.id == null) {
+      throw ArgumentError.notNull('roomFee.id');
+    }
+    if (fee.id == null) {
+      throw ArgumentError.notNull('fee.id');
+    }
+
+    var $roomFee = roomFee.copyWith(feeId: fee.id);
+    await session.db.updateRow<_iv47he65.RoomFee>(
+      $roomFee,
+      columns: [_iv47he65.RoomFee.t.feeId],
       transaction: transaction,
     );
   }

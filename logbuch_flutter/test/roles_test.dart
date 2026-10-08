@@ -31,6 +31,8 @@ void main() {
       expect(find.byType(AlertDialog), findsNothing);
 
       await open(tester, 'Prices');
+      await open(tester, 'Price lists');
+      expect(find.text('New price list'), findsNothing);
       expect(
         tester.widget<TextField>(find.byType(TextField).at(1)).enabled,
         isFalse,
@@ -62,6 +64,7 @@ void main() {
     final client = filledClient();
     await pumpApp(tester, const AdminPanel(), client);
 
+    await open(tester, 'Organisation');
     await open(tester, 'Users');
 
     // Admins cannot change their own role.

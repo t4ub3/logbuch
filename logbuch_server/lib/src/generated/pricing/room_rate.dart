@@ -12,20 +12,21 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _is;
 
+/// What a guest of an age group pays per night in a unit of a type.
 abstract class RoomRate
     implements _is.TableRow<int?>, _is.ProtocolSerialization {
   RoomRate._({
     this.id,
-    required this.seasonId,
-    required this.priceCategoryId,
+    required this.priceListId,
+    required this.unitTypeId,
     required this.ageGroupId,
     required this.pricePerNight,
   });
 
   factory RoomRate({
     int? id,
-    required int seasonId,
-    required int priceCategoryId,
+    required int priceListId,
+    required int unitTypeId,
     required int ageGroupId,
     required int pricePerNight,
   }) = _RoomRateImpl;
@@ -33,8 +34,8 @@ abstract class RoomRate
   factory RoomRate.fromJson(Map<String, dynamic> jsonSerialization) {
     return RoomRate(
       id: jsonSerialization['id'] as int?,
-      seasonId: jsonSerialization['seasonId'] as int,
-      priceCategoryId: jsonSerialization['priceCategoryId'] as int,
+      priceListId: jsonSerialization['priceListId'] as int,
+      unitTypeId: jsonSerialization['unitTypeId'] as int,
       ageGroupId: jsonSerialization['ageGroupId'] as int,
       pricePerNight: jsonSerialization['pricePerNight'] as int,
     );
@@ -47,9 +48,9 @@ abstract class RoomRate
   @override
   int? id;
 
-  int seasonId;
+  int priceListId;
 
-  int priceCategoryId;
+  int unitTypeId;
 
   int ageGroupId;
 
@@ -63,8 +64,8 @@ abstract class RoomRate
   @_is.useResult
   RoomRate copyWith({
     int? id,
-    int? seasonId,
-    int? priceCategoryId,
+    int? priceListId,
+    int? unitTypeId,
     int? ageGroupId,
     int? pricePerNight,
   });
@@ -73,8 +74,8 @@ abstract class RoomRate
     return {
       '__className__': 'RoomRate',
       if (id != null) 'id': id,
-      'seasonId': seasonId,
-      'priceCategoryId': priceCategoryId,
+      'priceListId': priceListId,
+      'unitTypeId': unitTypeId,
       'ageGroupId': ageGroupId,
       'pricePerNight': pricePerNight,
     };
@@ -85,8 +86,8 @@ abstract class RoomRate
     return {
       '__className__': 'RoomRate',
       if (id != null) 'id': id,
-      'seasonId': seasonId,
-      'priceCategoryId': priceCategoryId,
+      'priceListId': priceListId,
+      'unitTypeId': unitTypeId,
       'ageGroupId': ageGroupId,
       'pricePerNight': pricePerNight,
     };
@@ -125,14 +126,14 @@ class _Undefined {}
 class _RoomRateImpl extends RoomRate {
   _RoomRateImpl({
     int? id,
-    required int seasonId,
-    required int priceCategoryId,
+    required int priceListId,
+    required int unitTypeId,
     required int ageGroupId,
     required int pricePerNight,
   }) : super._(
          id: id,
-         seasonId: seasonId,
-         priceCategoryId: priceCategoryId,
+         priceListId: priceListId,
+         unitTypeId: unitTypeId,
          ageGroupId: ageGroupId,
          pricePerNight: pricePerNight,
        );
@@ -143,15 +144,15 @@ class _RoomRateImpl extends RoomRate {
   @override
   RoomRate copyWith({
     Object? id = _Undefined,
-    int? seasonId,
-    int? priceCategoryId,
+    int? priceListId,
+    int? unitTypeId,
     int? ageGroupId,
     int? pricePerNight,
   }) {
     return RoomRate(
       id: id is int? ? id : this.id,
-      seasonId: seasonId ?? this.seasonId,
-      priceCategoryId: priceCategoryId ?? this.priceCategoryId,
+      priceListId: priceListId ?? this.priceListId,
+      unitTypeId: unitTypeId ?? this.unitTypeId,
       ageGroupId: ageGroupId ?? this.ageGroupId,
       pricePerNight: pricePerNight ?? this.pricePerNight,
     );
@@ -161,13 +162,13 @@ class _RoomRateImpl extends RoomRate {
 class RoomRateUpdateTable extends _is.UpdateTable<RoomRateTable> {
   RoomRateUpdateTable(super.table);
 
-  _is.ColumnValue<int, int> seasonId(int value) => _is.ColumnValue(
-    table.seasonId,
+  _is.ColumnValue<int, int> priceListId(int value) => _is.ColumnValue(
+    table.priceListId,
     value,
   );
 
-  _is.ColumnValue<int, int> priceCategoryId(int value) => _is.ColumnValue(
-    table.priceCategoryId,
+  _is.ColumnValue<int, int> unitTypeId(int value) => _is.ColumnValue(
+    table.unitTypeId,
     value,
   );
 
@@ -185,12 +186,12 @@ class RoomRateUpdateTable extends _is.UpdateTable<RoomRateTable> {
 class RoomRateTable extends _is.Table<int?> {
   RoomRateTable({super.tableRelation}) : super(tableName: 'room_rates') {
     updateTable = RoomRateUpdateTable(this);
-    seasonId = _is.ColumnInt(
-      'seasonId',
+    priceListId = _is.ColumnInt(
+      'priceListId',
       this,
     );
-    priceCategoryId = _is.ColumnInt(
-      'priceCategoryId',
+    unitTypeId = _is.ColumnInt(
+      'unitTypeId',
       this,
     );
     ageGroupId = _is.ColumnInt(
@@ -205,9 +206,9 @@ class RoomRateTable extends _is.Table<int?> {
 
   late final RoomRateUpdateTable updateTable;
 
-  late final _is.ColumnInt seasonId;
+  late final _is.ColumnInt priceListId;
 
-  late final _is.ColumnInt priceCategoryId;
+  late final _is.ColumnInt unitTypeId;
 
   late final _is.ColumnInt ageGroupId;
 
@@ -216,8 +217,8 @@ class RoomRateTable extends _is.Table<int?> {
   @override
   List<_is.Column> get columns => [
     id,
-    seasonId,
-    priceCategoryId,
+    priceListId,
+    unitTypeId,
     ageGroupId,
     pricePerNight,
   ];

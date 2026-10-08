@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:test/test.dart';
 
+import 'prices.dart';
 import 'roles.dart';
 import 'test_tools/serverpod_test_tools.dart';
 import 'validation_matcher.dart';
@@ -42,17 +43,19 @@ void main() {
         sessionBuilder,
         Contact(firstName: 'Ada', lastName: 'Lovelace'),
       );
-      final category = await endpoints.priceCategory.add(
+      final category = await endpoints.unitType.add(
         sessionBuilder,
-        PriceCategory(name: 'Standard'),
+        UnitType(name: 'Standard'),
       );
       room101 = await endpoints.room.add(
         sessionBuilder,
-        Room(roomNumber: '101', bedAmount: 4, priceCategoryId: category.id!),
+        Room(roomNumber: '101', bedAmount: 4, unitTypeId: category.id!),
+        const [],
       );
       room102 = await endpoints.room.add(
         sessionBuilder,
-        Room(roomNumber: '102', bedAmount: 2, priceCategoryId: category.id!),
+        Room(roomNumber: '102', bedAmount: 2, unitTypeId: category.id!),
+        const [],
       );
     });
 
@@ -187,6 +190,7 @@ void main() {
         await endpoints.room.update(
           sessionBuilder,
           room102.copyWith(active: false),
+          const [],
         );
 
         expect(await freeRooms(20, 22), ['101']);
@@ -400,6 +404,7 @@ void main() {
       await endpoints.room.update(
         sessionBuilder,
         room102.copyWith(active: false),
+        const [],
       );
       final camp = await addOctober('Camp', 12, 16);
 
@@ -407,6 +412,127 @@ void main() {
         endpoints.booking.setRooms(sessionBuilder, camp.id!, [room102.id!]),
         throwsValidation(ValidationError.roomUnavailable, detail: '102'),
       );
+    });
+
+    group('and a hall that bookings share', () {
+      late Room hall;
+
+      Future<Booking> addWithHall(String title, int arrival, int departure) {
+        return addOctober(title, arrival, departure).then(
+          (added) => endpoints.booking.setRooms(sessionBuilder, added.id!, [
+            hall.id!,
+          ]),
+        );
+      }
+
+      Future<List<String>> crowded(Booking booking) async => [
+        for (final room in await endpoints.booking.crowdedRooms(
+          sessionBuilder,
+          booking.id!,
+        ))
+          room.roomNumber,
+      ];
+
+      setUp(() async {
+        final shared = await endpoints.unitType.add(
+          sessionBuilder,
+          UnitType(name: 'Hall', shared: true),
+        );
+        hall = await endpoints.room.add(
+          sessionBuilder,
+          Room(roomNumber: 'Hall', bedAmount: 0, unitTypeId: shared.id!),
+          const [],
+        );
+        final list = await endpoints.priceList.add(
+          sessionBuilder,
+          PriceList(name: '2026', validFrom: DateTime.utc(2026)),
+        );
+        await endpoints.priceList.savePrices(
+          sessionBuilder,
+          list.id!,
+          prices(
+            unitPrices: [
+              UnitPrice(
+                priceListId: list.id!,
+                unitTypeId: shared.id!,
+                pricePerNight: 5000,
+              ),
+            ],
+          ),
+        );
+      });
+
+      test('when two bookings take it for the same nights '
+          'then both get it and it stays available', () async {
+        final camp = await addWithHall('Camp', 12, 16);
+        final choir = await addWithHall('Choir', 14, 18);
+
+        expect(camp.rooms!.single.roomId, hall.id);
+        expect(choir.rooms!.single.roomId, hall.id);
+        final free = await endpoints.booking.availableRooms(
+          sessionBuilder,
+          DateTime.utc(2026, 10, 12),
+          DateTime.utc(2026, 10, 16),
+        );
+        expect(free.map((room) => room.roomNumber), contains('Hall'));
+      });
+
+      test('when two bookings share it '
+          'then each pays half for the nights they share', () async {
+        final camp = await addWithHall('Camp', 12, 16);
+        final choir = await addWithHall('Choir', 14, 18);
+
+        final campPrice = await endpoints.pricing.calculate(
+          sessionBuilder,
+          camp.id!,
+        );
+        final choirPrice = await endpoints.pricing.calculate(
+          sessionBuilder,
+          choir.id!,
+        );
+
+        expect(campPrice.lines.map((l) => (l.quantity, l.unitPrice)), [
+          (2, 5000),
+          (2, 2500),
+        ]);
+        expect(choirPrice.lines.map((l) => (l.quantity, l.unitPrice)), [
+          (2, 2500),
+          (2, 5000),
+        ]);
+      });
+
+      test('when one of them is cancelled '
+          'then the other pays in full again', () async {
+        final camp = await addWithHall('Camp', 12, 16);
+        final choir = await addWithHall('Choir', 12, 16);
+        await endpoints.booking.update(
+          sessionBuilder,
+          choir.copyWith(status: BookingStatus.cancelled),
+        );
+
+        final price = await endpoints.pricing.calculate(
+          sessionBuilder,
+          camp.id!,
+        );
+
+        expect(price.total, 20000);
+      });
+
+      test('when more than two bookings hold it in the same night '
+          'then it is crowded for those bookings', () async {
+        final camp = await addWithHall('Camp', 12, 16);
+        final choir = await addWithHall('Choir', 15, 18);
+        expect(await crowded(camp), isEmpty);
+
+        final party = await addWithHall('Party', 15, 16);
+        final later = await addWithHall('Later', 16, 17);
+
+        expect(await crowded(camp), ['Hall']);
+        expect(await crowded(choir), ['Hall']);
+        expect(await crowded(party), ['Hall']);
+        // On its night only the choir is there as well.
+        expect(await crowded(later), isEmpty);
+      });
     });
   });
 
@@ -421,13 +547,14 @@ void main() {
           admin,
           Contact(firstName: 'Ada', lastName: 'Lovelace'),
         );
-        final category = await endpoints.priceCategory.add(
+        final category = await endpoints.unitType.add(
           admin,
-          PriceCategory(name: 'Standard'),
+          UnitType(name: 'Standard'),
         );
         final room = await endpoints.room.add(
           admin,
-          Room(roomNumber: '101', bedAmount: 4, priceCategoryId: category.id!),
+          Room(roomNumber: '101', bedAmount: 4, unitTypeId: category.id!),
+          const [],
         );
         final bookings = [
           for (final title in ['Camp', 'Choir'])

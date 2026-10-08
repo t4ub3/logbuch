@@ -4,6 +4,7 @@ values:
   - datesMissing
   - ageUnknown
   - roomMissing
-  - seasonMissing
+  - priceListMissing
   - roomRateMissing
   - mealRateMissing
+  - dayUsePriceMissing

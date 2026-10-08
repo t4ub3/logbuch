@@ -1,0 +1,14 @@
+### What a unit of a type costs as a whole, whoever stays in it.
+class: UnitPrice
+table: unit_prices
+fields:
+  priceListId: int, relation(parent=price_lists, onDelete=Cascade)
+  unitTypeId: int, relation(parent=unit_types, onDelete=Cascade)
+  ### Null if the unit itself costs nothing and only its guests pay.
+  pricePerNight: int?
+  ### What a booking that arrives and departs on the same day pays.
+  dayUsePrice: int?
+indexes:
+  unit_prices_unique_idx:
+    fields: priceListId, unitTypeId
+    unique: true

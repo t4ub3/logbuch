@@ -1,9 +1,13 @@
+### A surcharge or fee. What it costs is in the price lists; a list without
+### an amount for it does not charge it.
 class: Fee
 table: fees
 fields:
   name: String
-  amount: int
   unit: FeeUnit
   ageGroupId: int?, relation(parent=age_groups, onDelete=Restrict)
   taxRate: int, default=0
+  ### Charged to every booking. Otherwise the fee is a surcharge of the
+  ### rooms it is assigned to.
   autoApply: bool, default=false
+  rooms: List<RoomFee>?, relation(name=fee_rooms)

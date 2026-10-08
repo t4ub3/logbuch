@@ -44,7 +44,7 @@ void main() {
 
     expect(billing('Marie Weber'), findsOneWidget);
     expect(billing('Not invoiced yet'), findsOneWidget);
-    expect(billing('Lodging · Standard · Adult · Spring'), findsOneWidget);
+    expect(billing('Lodging · Standard · Adult'), findsOneWidget);
     expect(billing('4 × €25.00'), findsOneWidget);
     expect(billing('Fee · Final cleaning'), findsOneWidget);
     expect(billing('Still to pay'), findsOneWidget);

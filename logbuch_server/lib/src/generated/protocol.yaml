@@ -36,6 +36,7 @@ booking:
   - update:
   - getConfirmationPdf:
   - availableRooms:
+  - crowdedRooms:
   - setRooms:
 contact:
   - getAll:
@@ -94,20 +95,21 @@ mealPlan:
   - add:
   - update:
   - delete:
-mealRate:
-  - getBySeason:
-  - saveForSeason:
-priceCategory:
+priceList:
   - getAll:
   - add:
   - update:
   - delete:
+  - getPrices:
+  - savePrices:
 pricing:
   - calculate:
-roomRate:
-  - getBySeason:
-  - saveForSeason:
-season:
+unitType:
+  - getAll:
+  - add:
+  - update:
+  - delete:
+building:
   - getAll:
   - add:
   - update:

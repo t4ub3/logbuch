@@ -83,10 +83,10 @@ void main() {
         sessionBuilder,
         Fee(
           name: 'Crib',
-          amount: 500,
           unit: FeeUnit.perPersonNight,
           ageGroupId: toddler.id,
         ),
+        const [],
       );
 
       await expectLater(

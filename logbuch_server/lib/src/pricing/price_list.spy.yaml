@@ -1,0 +1,11 @@
+### The prices from a day on, until the next price list begins. A night is
+### priced by the list that is in force on the day it starts.
+class: PriceList
+table: price_lists
+fields:
+  name: String
+  validFrom: DateTime
+indexes:
+  price_lists_valid_from_idx:
+    fields: validFrom
+    unique: true

@@ -2,8 +2,11 @@
 ### the tax.
 class: ChargeLine
 fields:
-  ### Null for fees that are charged per booking or per room.
+  ### Null for what is charged per booking or per room.
   guestId: int?
+  ### The room of the booking that a line without a guest is charged for.
+  ### Null for what is charged per booking.
+  bookingRoomId: int?
   type: ChargeType
   description: String
   quantity: int

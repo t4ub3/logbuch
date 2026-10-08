@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/providers/booking_price_provider.dart';
+import 'package:logbuch_flutter/providers/crowded_rooms_provider.dart';
 import 'package:logbuch_flutter/providers/folios_provider.dart';
 import 'package:logbuch_flutter/providers/guest_groups_provider.dart';
 import 'package:logbuch_flutter/providers/kitchen_overview_provider.dart';
@@ -239,5 +240,6 @@ Future<void> showBookingOverlay(
   ref.invalidate(guestGroupsProvider(bookingId));
   ref.invalidate(kitchenOverviewProvider(bookingId));
   ref.invalidate(bookingPriceProvider(bookingId));
+  ref.invalidate(crowdedRoomsProvider(bookingId));
   ref.invalidate(foliosProvider(bookingId));
 }

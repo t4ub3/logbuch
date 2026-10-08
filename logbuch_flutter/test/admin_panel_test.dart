@@ -18,46 +18,79 @@ Future<void> _pumpAdmin(
 ElevatedButton _saveButton(WidgetTester tester) =>
     tester.widget(find.widgetWithText(ElevatedButton, 'Save'));
 
+/// Opens a group of the admin panel and, if given, one of its sections.
+Future<void> _goTo(WidgetTester tester, String group, [String? section]) async {
+  await open(tester, group);
+  if (section != null) await open(tester, section);
+}
+
 void main() {
-  const sections = [
-    'Rooms',
-    'Price categories',
-    'Age groups',
-    'Seasons',
-    'Meal plans',
-    'Prices',
-    'Fees',
-    'Operator',
-    'Users',
-  ];
+  // The groups with their sections. A group opens with its first section,
+  // and one with a single section does not name it.
+  const groups = {
+    'House': ['Buildings', 'Rooms'],
+    'Prices': [
+      'Unit types',
+      'Age groups',
+      'Meal plans',
+      'Surcharges and fees',
+      'Price lists',
+    ],
+    'Bookings': <String>[],
+    'Organisation': ['Operator', 'Users'],
+  };
 
   testWidgets('every section shows its records', (tester) async {
     await _pumpAdmin(tester, filledClient());
 
+    // The panel opens with the rooms.
     expect(find.text('Room 101'), findsOneWidget);
     expect(find.text('4 beds · Standard · Crib possible'), findsOneWidget);
     expect(find.text('Inactive · 1 bed · Comfort · Annex'), findsOneWidget);
 
-    await open(tester, 'Price categories');
+    await open(tester, 'Buildings');
+    expect(find.text('Annex'), findsOneWidget);
+    expect(find.text('1 room'), findsOneWidget);
+
+    await _goTo(tester, 'Prices');
     expect(find.text('Comfort'), findsOneWidget);
+    expect(find.text('7 % tax'), findsNWidgets(2));
 
     await open(tester, 'Age groups');
     expect(find.text('0 to 17 years'), findsOneWidget);
     expect(find.text('18 years and older'), findsOneWidget);
 
-    await open(tester, 'Seasons');
-    expect(find.text('Mar 1, 2027 – May 31, 2027'), findsOneWidget);
-
     await open(tester, 'Meal plans');
     expect(find.text('Full board'), findsOneWidget);
 
-    await open(tester, 'Fees');
+    await open(tester, 'Surcharges and fees');
     expect(
-      find.text(
-        '€2.00 per person and night · Adult · 7 % tax · every booking',
-      ),
+      find.text('per person and night · Adult · 7 % tax · every booking'),
       findsOneWidget,
     );
+
+    await open(tester, 'Price lists');
+    expect(find.widgetWithText(ChoiceChip, 'Prices 2127'), findsOneWidget);
+    expect(find.widgetWithText(ChoiceChip, 'Prices 2128'), findsOneWidget);
+    expect(find.text('from Jan 1, 2127'), findsOneWidget);
+
+    await _goTo(tester, 'Bookings');
+    expect(find.text('School'), findsOneWidget);
+  });
+
+  testWidgets('a group opens with its first section', (tester) async {
+    await _pumpAdmin(tester, filledClient());
+
+    await _goTo(tester, 'Prices');
+    expect(find.text('New unit type'), findsOneWidget);
+
+    await _goTo(tester, 'House');
+    expect(find.text('New building'), findsOneWidget);
+
+    // A group with one section has nothing to choose from.
+    await _goTo(tester, 'Bookings');
+    expect(find.byType(ChoiceChip), findsNothing);
+    expect(find.text('New booking category'), findsOneWidget);
   });
 
   testWidgets('every section fits a narrow window, with and without records', (
@@ -65,22 +98,16 @@ void main() {
   ) async {
     for (final client in [filledClient(), FakeClient()]) {
       await _pumpAdmin(tester, client, size: const Size(420, 600));
-      for (final section in sections) {
-        await open(tester, section);
-        expect(tester.takeException(), isNull, reason: section);
+      for (final MapEntry(key: group, value: sections) in groups.entries) {
+        await _goTo(tester, group);
+        expect(tester.takeException(), isNull, reason: group);
+        for (final section in sections) {
+          await open(tester, section);
+          expect(tester.takeException(), isNull, reason: section);
+        }
       }
       await tester.pumpWidget(const SizedBox());
     }
-  });
-
-  testWidgets('seasons warn about the days no season covers', (tester) async {
-    await _pumpAdmin(tester, filledClient());
-    await open(tester, 'Seasons');
-
-    expect(
-      find.textContaining('No season covers Jun 1, 2027 – Aug 31, 2027.'),
-      findsOneWidget,
-    );
   });
 
   testWidgets('a new room is only saved once the form is complete', (
@@ -99,9 +126,13 @@ void main() {
 
     await tester.enterText(field('Room number'), ' 103 ');
     await tester.enterText(field('Beds'), '3');
-    await tester.tap(find.text('Price category'));
+    await tester.tap(find.text('Unit type'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Comfort').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('No building'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Annex').last);
     await tester.pumpAndSettle();
     await tester.enterText(field('Floor'), '1');
     await tester.tap(find.text('A crib can be set up'));
@@ -111,21 +142,52 @@ void main() {
     final room = client.room.rooms.last;
     expect(room.roomNumber, '103');
     expect(room.bedAmount, 3);
-    expect(room.priceCategoryId, 2);
+    expect(room.unitTypeId, 2);
+    expect(room.buildingId, 1);
     expect(room.floor, '1');
-    expect(room.building, isNull);
     expect(room.cribPossible, isTrue);
     expect(room.active, isTrue);
+    expect(client.room.addedFeeIds, isEmpty);
     // The dialog closed and the list shows the new room.
     expect(find.text('New room'), findsOneWidget);
     expect(find.text('Room 103'), findsOneWidget);
+  });
+
+  testWidgets('a room takes the surcharges that are chosen for it', (
+    tester,
+  ) async {
+    final client = filledClient();
+    client.fee.fees = [
+      ...client.fee.fees,
+      Fee(id: 2, name: 'Bathroom', unit: FeeUnit.perPersonNight, rooms: []),
+      // Charged per booking, so it cannot be the surcharge of a room.
+      Fee(id: 3, name: 'Cleaning', unit: FeeUnit.perBooking, rooms: []),
+    ];
+    await _pumpAdmin(tester, client);
+
+    await tester.tap(find.text('New room'));
+    await tester.pumpAndSettle();
+    // Neither the fee of every booking nor the one per booking is offered.
+    expect(find.byType(FilterChip), findsOneWidget);
+
+    await tester.enterText(field('Room number'), '103');
+    await tester.enterText(field('Beds'), '2');
+    await tester.tap(find.text('Unit type'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Standard').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilterChip, 'Bathroom'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+    await tester.pumpAndSettle();
+
+    expect(client.room.addedFeeIds, [2]);
   });
 
   testWidgets('a rejected record keeps its dialog open with the reason', (
     tester,
   ) async {
     await _pumpAdmin(tester, filledClient());
-    await open(tester, 'Age groups');
+    await _goTo(tester, 'Prices', 'Age groups');
 
     await tester.tap(find.text('New age group'));
     await tester.pumpAndSettle();
@@ -144,7 +206,7 @@ void main() {
 
   testWidgets('a record that is in use stays and says why', (tester) async {
     await _pumpAdmin(tester, filledClient());
-    await open(tester, 'Price categories');
+    await _goTo(tester, 'Prices', 'Unit types');
 
     await tester.tap(find.byTooltip('Delete').first);
     await tester.pumpAndSettle();
@@ -162,16 +224,17 @@ void main() {
   testWidgets('every form opens empty and can be cancelled', (tester) async {
     await _pumpAdmin(tester, filledClient());
 
-    const forms = {
-      'Rooms': 'New room',
-      'Price categories': 'New price category',
-      'Age groups': 'New age group',
-      'Seasons': 'New season',
-      'Meal plans': 'New meal plan',
-      'Fees': 'New fee',
-    };
-    for (final MapEntry(key: section, value: form) in forms.entries) {
-      await open(tester, section);
+    const forms = [
+      ('House', 'Buildings', 'New building'),
+      ('House', 'Rooms', 'New room'),
+      ('Prices', 'Unit types', 'New unit type'),
+      ('Prices', 'Age groups', 'New age group'),
+      ('Prices', 'Meal plans', 'New meal plan'),
+      ('Prices', 'Surcharges and fees', 'New fee'),
+      ('Prices', 'Price lists', 'New price list'),
+    ];
+    for (final (group, section, form) in forms) {
+      await _goTo(tester, group, section);
       await tester.tap(find.text(form));
       await tester.pumpAndSettle();
       expect(find.byType(AlertDialog), findsOneWidget, reason: form);
@@ -182,134 +245,201 @@ void main() {
     }
   });
 
-  testWidgets('a season needs a name and a period', (tester) async {
-    await _pumpAdmin(tester, filledClient());
-    await open(tester, 'Seasons');
-
-    await tester.tap(find.text('New season'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
-    await tester.pumpAndSettle();
-    expect(find.text('Required'), findsNWidgets(2));
-    await tester.tap(find.text('Cancel'));
-    await tester.pumpAndSettle();
-
-    // An existing season opens with its period.
-    await tester.tap(find.text('Spring'));
-    await tester.pumpAndSettle();
-    expect(find.text('Mar 1, 2027 – May 31, 2027'), findsNWidgets(2));
-  });
-
-  testWidgets('a fee is saved in cents and basis points', (tester) async {
+  testWidgets('a unit type is saved with its tax rate and whether bookings '
+      'share it', (tester) async {
     final client = filledClient();
     await _pumpAdmin(tester, client);
-    await open(tester, 'Fees');
+    await _goTo(tester, 'Prices', 'Unit types');
 
-    // The existing fee opens with its amount and tax rate.
+    await tester.tap(find.text('New unit type'));
+    await tester.pumpAndSettle();
+    // Lodging is taxed at 7 % unless something else is entered.
+    expect(find.widgetWithText(TextFormField, '7'), findsOneWidget);
+    await tester.enterText(field('Name'), 'Hall');
+    await tester.enterText(field('Tax rate'), '19');
+    await tester.tap(find.text('Bookings can share it'));
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+    await tester.pumpAndSettle();
+
+    final type = client.unitType.types.last;
+    expect(type.name, 'Hall');
+    expect(type.taxRate, 1900);
+    expect(type.shared, isTrue);
+    // It goes to the end of the list.
+    expect(type.sortOrder, 2);
+    expect(find.text('19 % tax · shared'), findsOneWidget);
+  });
+
+  testWidgets('a fee is saved with its tax rate in basis points '
+      'and the rooms it is a surcharge of', (tester) async {
+    final client = filledClient();
+    await _pumpAdmin(tester, client);
+    await _goTo(tester, 'Prices', 'Surcharges and fees');
+
+    // The existing fee opens with its tax rate. It is charged to every
+    // booking, so there are no rooms to choose.
     await tester.tap(find.text('Tourist tax'));
     await tester.pumpAndSettle();
-    expect(find.widgetWithText(TextFormField, '2.00'), findsOneWidget);
     expect(find.widgetWithText(TextFormField, '7'), findsOneWidget);
+    expect(find.text('Surcharge of these rooms'), findsNothing);
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('New fee'));
     await tester.pumpAndSettle();
     await tester.enterText(field('Name'), 'Bed linen');
-    await tester.enterText(field('Amount'), '8,5');
     await tester.enterText(field('Tax rate'), '19');
     await tester.tap(find.text('per person and night'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('per person').last);
+    await tester.tap(find.text('per person, once per stay').last);
     await tester.pumpAndSettle();
+    // The rooms come building by building, those without one last.
+    expect(find.text('Surcharge of these rooms'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilterChip, '101'));
+    await tester.pump();
+    await tester.tap(find.widgetWithText(ActionChip, 'Annex'));
+    await tester.pump();
     await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
     await tester.pumpAndSettle();
 
     final fee = client.fee.fees.last;
     expect(fee.name, 'Bed linen');
-    expect(fee.amount, 850);
     expect(fee.taxRate, 1900);
     expect(fee.unit, FeeUnit.perPerson);
     expect(fee.ageGroupId, isNull);
     expect(fee.autoApply, isFalse);
-    expect(find.text('€8.50 per person · 19 % tax'), findsOneWidget);
+    expect(client.fee.addedRoomIds, unorderedEquals([1, 2]));
+    expect(
+      find.textContaining('per person, once per stay · 19 % tax'),
+      findsOneWidget,
+    );
   });
 
-  testWidgets('amounts and dates follow the German language', (tester) async {
+  testWidgets('a fee of every booking is saved without rooms', (tester) async {
+    final client = filledClient();
+    await _pumpAdmin(tester, client);
+    await _goTo(tester, 'Prices', 'Surcharges and fees');
+
+    await tester.tap(find.text('New fee'));
+    await tester.pumpAndSettle();
+    await tester.enterText(field('Name'), 'Heating');
+    await tester.tap(find.widgetWithText(FilterChip, '101'));
+    await tester.pump();
+    await tester.ensureVisible(find.text('Add to every booking'));
+    await tester.tap(find.text('Add to every booking'));
+    await tester.pumpAndSettle();
+    expect(find.text('Surcharge of these rooms'), findsNothing);
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+    await tester.pumpAndSettle();
+
+    expect(client.fee.fees.last.autoApply, isTrue);
+    expect(client.fee.addedRoomIds, isEmpty);
+  });
+
+  testWidgets('amounts follow the German language', (tester) async {
     await _pumpAdmin(tester, filledClient(), locale: AppLocale.de);
     addTearDown(() => LocaleSettings.setLocaleSync(AppLocale.en));
 
-    await open(tester, 'Gebühren');
+    await _goTo(tester, 'Preise', 'Zuschläge und Gebühren');
     expect(
-      find.textContaining('2,00 € pro Person und Nacht · Adult · 7 % Steuer'),
+      find.textContaining('pro Person und Nacht · Adult · 7 % Steuer'),
       findsOneWidget,
     );
 
-    await open(tester, 'Saisons');
-    expect(find.text('1. März 2027 – 31. Mai 2027'), findsOneWidget);
-
-    await open(tester, 'Preise');
+    await open(tester, 'Preislisten');
     final adultStandard = tester.widget<TextField>(
       find.byType(TextField).at(1),
     );
     expect(adultStandard.controller!.text, '25,00');
   });
 
-  group('prices', () {
-    // The fields of the matrix, row by row: Standard and Comfort, each for
-    // children and adults.
+  group('price lists', () {
+    // The fields of the selected list, row by row. Lodging: Standard and
+    // Comfort, each for children, for adults, as a whole and for day use.
+    // Meals: full board for children and for adults. Fees: the tourist tax.
     Finder cell(int index) => find.byType(TextField).at(index);
+    const fullBoardAdult = 9;
+    const touristTax = 10;
 
-    testWidgets('show the stored prices of the selected season', (
-      tester,
-    ) async {
-      await _pumpAdmin(tester, filledClient());
-      await open(tester, 'Prices');
+    String text(WidgetTester tester, int index) =>
+        tester.widget<TextField>(cell(index)).controller!.text;
 
-      expect(find.byType(TextField), findsNWidgets(4));
-      expect(tester.widget<TextField>(cell(0)).controller!.text, '');
-      expect(tester.widget<TextField>(cell(1)).controller!.text, '25.00');
+    Future<void> openLists(WidgetTester tester, FakeClient client) async {
+      await _pumpAdmin(tester, client);
+      await _goTo(tester, 'Prices', 'Price lists');
+    }
+
+    testWidgets('show the stored prices of the selected list', (tester) async {
+      await openLists(tester, filledClient());
+
+      expect(find.byType(TextField), findsNWidgets(11));
+      expect(text(tester, 0), '');
+      expect(text(tester, 1), '25.00');
+      expect(text(tester, touristTax), '2.00');
+      // The fee says how it is charged.
+      expect(find.text('per person and night'), findsOneWidget);
       expect(_saveButton(tester).onPressed, isNull);
 
-      await tester.tap(find.text('Autumn'));
+      await tester.tap(find.text('Prices 2128'));
       await tester.pumpAndSettle();
 
-      expect(tester.widget<TextField>(cell(1)).controller!.text, '');
+      expect(text(tester, 1), '');
+      expect(find.text('from Jan 1, 2128'), findsOneWidget);
     });
 
     testWidgets('are saved as cents, leaving out the empty fields', (
       tester,
     ) async {
       final client = filledClient();
-      await _pumpAdmin(tester, client);
-      await open(tester, 'Prices');
+      await openLists(tester, client);
 
       await tester.enterText(cell(0), '12,5');
       await tester.enterText(cell(1), '');
-      await tester.enterText(cell(3), '31');
+      // Standard as a whole per night, Comfort for day use.
+      await tester.enterText(cell(2), '90');
+      await tester.enterText(cell(7), '120');
+      await tester.enterText(cell(fullBoardAdult), '18');
+      await tester.enterText(cell(touristTax), '');
       await tester.pump();
       await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
       await tester.pumpAndSettle();
 
-      final saved = {
-        for (final rate in client.roomRate.bySeason[1]!)
-          (rate.priceCategoryId, rate.ageGroupId): rate.pricePerNight,
-      };
-      expect(saved, {(1, 1): 1250, (2, 2): 3100});
+      final saved = client.priceList.prices[1]!;
+      expect(
+        {
+          for (final rate in saved.roomRates)
+            (rate.unitTypeId, rate.ageGroupId): rate.pricePerNight,
+        },
+        {(1, 1): 1250},
+      );
+      expect(
+        {
+          for (final price in saved.unitPrices)
+            price.unitTypeId: (price.pricePerNight, price.dayUsePrice),
+        },
+        {1: (9000, null), 2: (null, 12000)},
+      );
+      expect(
+        {
+          for (final rate in saved.mealRates)
+            (rate.mealPlanId, rate.ageGroupId): rate.pricePerNight,
+        },
+        {(1, 2): 1800},
+      );
+      expect(saved.feePrices, isEmpty);
       expect(
         statusMessage(tester),
         isA<Done>().having((done) => done.text, 'text', 'Prices saved'),
       );
-      // The matrix was loaded again and has nothing left to save.
-      expect(tester.widget<TextField>(cell(0)).controller!.text, '12.50');
+      // The prices were loaded again and there is nothing left to save.
+      expect(text(tester, 0), '12.50');
       expect(_saveButton(tester).onPressed, isNull);
     });
 
     testWidgets('cannot be saved while a field is not an amount', (
       tester,
     ) async {
-      await _pumpAdmin(tester, filledClient());
-      await open(tester, 'Prices');
+      await openLists(tester, filledClient());
 
       await tester.enterText(cell(0), '12 euros');
       await tester.pump();
@@ -318,37 +448,92 @@ void main() {
       expect(_saveButton(tester).onPressed, isNull);
     });
 
-    testWidgets('keep their season until changes are saved or discarded', (
+    testWidgets('keep their list until changes are saved or discarded', (
       tester,
     ) async {
-      await _pumpAdmin(tester, filledClient());
-      await open(tester, 'Prices');
+      await openLists(tester, filledClient());
 
-      ChoiceChip autumn() =>
-          tester.widget(find.widgetWithText(ChoiceChip, 'Autumn'));
+      ChoiceChip other() =>
+          tester.widget(find.widgetWithText(ChoiceChip, 'Prices 2128'));
+      ElevatedButton add() =>
+          tester.widget(find.widgetWithText(ElevatedButton, 'New price list'));
 
       await tester.enterText(cell(1), '26');
       await tester.pump();
-      expect(autumn().onSelected, isNull);
+      expect(other().onSelected, isNull);
+      expect(add().onPressed, isNull);
 
       await tester.tap(find.text('Discard'));
       await tester.pump();
 
-      expect(tester.widget<TextField>(cell(1)).controller!.text, '25.00');
-      expect(autumn().onSelected, isNotNull);
+      expect(text(tester, 1), '25.00');
+      expect(other().onSelected, isNotNull);
+      expect(add().onPressed, isNotNull);
     });
 
-    testWidgets('need seasons, age groups and price categories first', (
-      tester,
-    ) async {
-      await _pumpAdmin(tester, FakeClient());
-      await open(tester, 'Prices');
+    testWidgets('need a name and a first day', (tester) async {
+      final client = filledClient();
+      await openLists(tester, client);
+      // The prices below the dialog have a button to save them as well.
+      final saveInDialog = find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.widgetWithText(ElevatedButton, 'Save'),
+      );
+
+      await tester.tap(find.text('New price list'));
+      await tester.pumpAndSettle();
+      await tester.tap(saveInDialog);
+      await tester.pumpAndSettle();
+      expect(find.text('Required'), findsNWidgets(2));
+
+      await tester.enterText(field('Name'), 'Prices 2129');
+      await tester.tap(find.text('Valid from'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('15'));
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+      await tester.tap(saveInDialog);
+      await tester.pumpAndSettle();
+
+      final added = client.priceList.lists.firstWhere(
+        (list) => list.name == 'Prices 2129',
+      );
+      // The day travels as a date without a time.
+      expect(added.validFrom.isUtc, isTrue);
+      expect(added.validFrom.day, 15);
+      // The new list is the one that is shown.
+      final chip = tester.widget<ChoiceChip>(
+        find.widgetWithText(ChoiceChip, 'Prices 2129'),
+      );
+      expect(chip.selected, isTrue);
+    });
+
+    testWidgets('open with their name and first day', (tester) async {
+      await openLists(tester, filledClient());
+
+      await tester.tap(find.byTooltip('Edit'));
+      await tester.pumpAndSettle();
+
+      expect(find.widgetWithText(TextFormField, 'Prices 2127'), findsOneWidget);
+      expect(find.text('Jan 1, 2127'), findsOneWidget);
+    });
+
+    testWidgets('say how to begin while there are none', (tester) async {
+      await openLists(tester, FakeClient());
+
+      expect(find.textContaining('No price lists yet.'), findsOneWidget);
+      expect(find.text('New price list'), findsOneWidget);
+    });
+
+    testWidgets('need something to price', (tester) async {
+      final client = FakeClient();
+      client.priceList.lists = [
+        PriceList(id: 1, name: 'Prices', validFrom: DateTime.utc(2026)),
+      ];
+      await openLists(tester, client);
 
       expect(
-        find.text(
-          'Prices need at least one season, one age group and one price '
-          'category.',
-        ),
+        find.textContaining('Create unit types, age groups, meal plans'),
         findsOneWidget,
       );
     });
@@ -357,7 +542,7 @@ void main() {
   testWidgets('a booking category is changed under Admin', (tester) async {
     final client = filledClient();
     await _pumpAdmin(tester, client);
-    await open(tester, 'Booking categories');
+    await _goTo(tester, 'Bookings');
 
     expect(find.text('School'), findsOneWidget);
     await tester.tap(find.byTooltip('Edit'));

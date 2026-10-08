@@ -1,6 +1,7 @@
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:test/test.dart';
 
+import 'prices.dart';
 import 'roles.dart';
 import 'validation_matcher.dart';
 
@@ -39,13 +40,14 @@ void main() {
           birthDate: DateTime.utc(1984, 5, 17),
         ),
       );
-      final category = await endpoints.priceCategory.add(
+      final category = await endpoints.unitType.add(
         sessionBuilder,
-        PriceCategory(name: 'Standard'),
+        UnitType(name: 'Standard'),
       );
       room = await endpoints.room.add(
         sessionBuilder,
-        Room(roomNumber: '101', bedAmount: 4, priceCategoryId: category.id!),
+        Room(roomNumber: '101', bedAmount: 4, unitTypeId: category.id!),
+        const [],
       );
       booking = await addBooking('Family days', 10, 13);
       booking = await endpoints.booking.setRooms(sessionBuilder, booking.id!, [
@@ -270,34 +272,43 @@ void main() {
 
       test('then the price follows the rates for the room and the age '
           'of the guest', () async {
-        final season = await endpoints.season.add(
+        final list = await endpoints.priceList.add(
           sessionBuilder,
-          Season(
-            name: 'Spring',
-            validFrom: DateTime.utc(2027, 3, 1),
-            validTo: DateTime.utc(2027, 5, 31),
-          ),
+          PriceList(name: '2027', validFrom: DateTime.utc(2027)),
         );
         final adult = await endpoints.ageGroup.add(
           sessionBuilder,
           AgeGroup(name: 'Adult', minAge: 18),
         );
-        await endpoints.roomRate.saveForSeason(sessionBuilder, season.id!, [
-          RoomRate(
-            seasonId: season.id!,
-            priceCategoryId: room.priceCategoryId,
-            ageGroupId: adult.id!,
-            pricePerNight: 2500,
-          ),
-        ]);
-        await endpoints.fee.add(
+        final cleaning = await endpoints.fee.add(
           sessionBuilder,
           Fee(
             name: 'Final cleaning',
-            amount: 4000,
             unit: FeeUnit.perBooking,
             taxRate: 700,
             autoApply: true,
+          ),
+          const [],
+        );
+        await endpoints.priceList.savePrices(
+          sessionBuilder,
+          list.id!,
+          prices(
+            roomRates: [
+              RoomRate(
+                priceListId: list.id!,
+                unitTypeId: room.unitTypeId,
+                ageGroupId: adult.id!,
+                pricePerNight: 2500,
+              ),
+            ],
+            feePrices: [
+              FeePrice(
+                priceListId: list.id!,
+                feeId: cleaning.id!,
+                amount: 4000,
+              ),
+            ],
           ),
         );
 

@@ -121,6 +121,7 @@
         "unassigned": "Without a room",
         "everybodyAssigned": "Everybody has a room.",
         "noRoomsHeld": "The booking holds no rooms yet.",
+        "crowdedRooms": "More than two bookings share {rooms} during some of these nights.",
         "moveTo": "Move to",
         "bedsUsed": "{used} of {beds} beds",
         "roomFull": "Full",
@@ -145,9 +146,10 @@
             "datesMissing": "The booking has no dates.",
             "ageUnknown": "{name}: the age is not known. Enter a date of birth or choose an age group.",
             "roomMissing": "{name}: has no room yet.",
-            "seasonMissing": "No season covers {date}.",
+            "priceListMissing": "No price list is valid on {date}.",
             "roomRateMissing": "No lodging price for {detail}.",
-            "mealRateMissing": "No meal price for {detail}."
+            "mealRateMissing": "No meal price for {detail}.",
+            "dayUsePriceMissing": "No price for day use for {detail}."
         },
         "billing": "Billing",
         "noFolios": "Nothing to bill yet. Add guests and give them rooms first.",
@@ -243,14 +245,20 @@
         }
     },
     "admin": {
+        "groups": {
+            "house": "House",
+            "prices": "Prices",
+            "bookings": "Bookings",
+            "organisation": "Organisation"
+        },
         "sections": {
+            "buildings": "Buildings",
             "rooms": "Rooms",
-            "priceCategories": "Price categories",
+            "unitTypes": "Unit types",
             "ageGroups": "Age groups",
-            "seasons": "Seasons",
             "mealPlans": "Meal plans",
-            "rates": "Prices",
-            "fees": "Fees",
+            "fees": "Surcharges and fees",
+            "priceLists": "Price lists",
             "bookingCategories": "Booking categories",
             "users": "Users",
             "operator": "Operator"
@@ -262,11 +270,12 @@
             "nameRequired": "A name is required.",
             "invalidDate": "The date is not valid.",
             "invalidDateRange": "The end must not be before the start.",
-            "seasonOverlap": "The period overlaps with the season “{name}”.",
+            "priceListDateTaken": "The price list “{name}” begins on the same day.",
             "invalidAgeRange": "The maximum age must not be below the minimum age.",
             "ageGroupOverlap": "The ages overlap with the age group “{name}”.",
             "invalidAmount": "Amounts must not be negative.",
             "invalidTaxRate": "The tax rate must be between 0 and 100 %.",
+            "invalidFeeScope": "A fee for every booking, or one charged per booking, cannot be the surcharge of a room.",
             "invalidBedAmount": "The number of beds must not be negative.",
             "duplicateRate": "A price was entered twice.",
             "inUse": "This entry is still in use and cannot be deleted.",
@@ -286,15 +295,23 @@
             "alreadyGuest": "Nobody in this household can be added: it has no members, or all of them are guests of the booking already.",
             "notConfirmed": "A confirmation is only available for a booking that is an option or confirmed."
         },
+        "buildings": {
+            "empty": "No buildings",
+            "add": "New building",
+            "edit": "Edit building",
+            "sortOrder": "Position in lists"
+        },
         "rooms": {
             "add": "New room",
             "edit": "Edit room",
             "number": "Room number",
             "beds": "Beds",
-            "priceCategory": "Price category",
-            "noPriceCategories": "Create a price category first.",
+            "unitType": "Unit type",
+            "noUnitTypes": "Create a unit type first.",
             "building": "Building",
+            "noBuilding": "No building",
             "floor": "Floor",
+            "surcharges": "Surcharges",
             "cribPossible": "A crib can be set up",
             "crib": "Crib possible",
             "active": "Active",
@@ -302,12 +319,16 @@
             "inactive": "Inactive",
             "notes": "Notes"
         },
-        "priceCategories": {
-            "empty": "No price categories",
-            "add": "New price category",
-            "edit": "Edit price category",
+        "unitTypes": {
+            "empty": "No unit types",
+            "add": "New unit type",
+            "edit": "Edit unit type",
             "sortOrder": "Position in lists",
-            "deleteHint": "The prices of this category are deleted as well."
+            "taxRate": "Tax rate",
+            "shared": "Bookings can share it",
+            "sharedHint": "Several bookings can hold a unit of this type for the same night. They split its price per night.",
+            "sharedLabel": "shared",
+            "deleteHint": "The prices of this unit type are deleted as well."
         },
         "ageGroups": {
             "empty": "No age groups",
@@ -324,14 +345,6 @@
             "openRange": "{min} years and older",
             "deleteHint": "The prices of this age group are deleted as well."
         },
-        "seasons": {
-            "empty": "No seasons",
-            "add": "New season",
-            "edit": "Edit season",
-            "period": "Period",
-            "gap": "No season covers {from} – {to}. Stays in this period cannot be priced.",
-            "deleteHint": "The prices of this season are deleted as well."
-        },
         "bookingCategories": {
             "empty": "No booking categories",
             "add": "New booking category",
@@ -345,28 +358,16 @@
             "edit": "Edit meal plan",
             "deleteHint": "The prices of this meal plan are deleted as well."
         },
-        "rates": {
-            "lodging": "Lodging",
-            "meals": "Meals",
-            "priceCategory": "Price category",
-            "mealPlan": "Meal plan",
-            "missingLodging": "Prices need at least one season, one age group and one price category.",
-            "missingMeals": "Prices need at least one season, one age group and one meal plan.",
-            "hint": "Prices per person and night in euros. An empty field has no price.",
-            "invalid": "Enter amounts such as 12.50.",
-            "saved": "Prices saved"
-        },
         "fees": {
-            "empty": "No fees",
+            "empty": "No surcharges or fees",
             "add": "New fee",
             "edit": "Edit fee",
-            "amount": "Amount",
             "unit": "Charged",
             "units": {
                 "perBooking": "per booking",
-                "perPerson": "per person",
+                "perPerson": "per person, once per stay",
                 "perPersonNight": "per person and night",
-                "perRoom": "per room",
+                "perRoom": "per room, once per stay",
                 "perRoomNight": "per room and night"
             },
             "ageGroup": "Applies to",
@@ -374,8 +375,34 @@
             "taxRate": "Tax rate",
             "tax": "{rate} % tax",
             "autoApply": "Add to every booking",
-            "autoApplyHint": "Otherwise the fee is added to a booking by hand.",
-            "auto": "every booking"
+            "autoApplyHint": "Otherwise the fee is a surcharge of the rooms chosen below.",
+            "auto": "every booking",
+            "rooms": "Surcharge of these rooms",
+            "noRooms": "There are no rooms yet.",
+            "unused": "not charged",
+            "priceHint": "What it costs is entered in the price lists."
+        },
+        "priceLists": {
+            "empty": "No price lists yet. A price list holds all prices from its first day on, until the next list begins.",
+            "add": "New price list",
+            "edit": "Edit price list",
+            "validFrom": "Valid from",
+            "from": "from {date}",
+            "addHint": "A new list starts with the prices that are in force on its first day.",
+            "deleteHint": "All prices of this list are deleted as well.",
+            "lodging": "Lodging per night",
+            "unitType": "Unit type",
+            "perUnit": "Whole unit",
+            "dayUse": "Day use",
+            "meals": "Meals per night",
+            "mealPlan": "Meal plan",
+            "fees": "Surcharges and fees",
+            "fee": "Fee",
+            "amount": "Amount",
+            "nothingToPrice": "Create unit types, age groups, meal plans or fees first. Their prices are entered here.",
+            "hint": "Prices in euros, including tax. An empty field has no price, and a fee without an amount is not charged.",
+            "invalid": "Enter amounts such as 12.50.",
+            "saved": "Prices saved"
         },
         "users": {
             "empty": "No users",

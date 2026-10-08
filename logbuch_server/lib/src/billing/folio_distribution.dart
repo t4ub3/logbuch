@@ -14,8 +14,15 @@ const adultAge = 18;
 /// - Per guest: adults pay for themselves. Minors, and guests whose age is
 ///   not known, are paid for like under "per group".
 ///
-/// What is not charged to a guest, such as a fee per booking, always goes to
-/// the lead.
+/// What is charged for a room, such as the price of a bungalow or its final
+/// cleaning, is split evenly between the guests in that room, and so
+/// between those who pay for them. Only guests who pay something for their
+/// stay count, so not a baby that stays for free. A room without such
+/// guests, like a common room, is split between the paying guests of the
+/// whole booking.
+///
+/// What is charged to neither a guest nor a room, such as a fee per
+/// booking, always goes to the lead.
 ///
 /// [groups] must come with their guests and the contacts of those.
 Map<int, List<ChargeLine>> distributeLines({
@@ -24,6 +31,7 @@ Map<int, List<ChargeLine>> distributeLines({
   required List<AgeGroup> ageGroups,
   required List<ChargeLine> lines,
 }) {
+  final guests = [for (final group in groups) ...?group.guests];
   final payers = <int, int>{};
   for (final group in groups) {
     final groupPayer = group.payerId ?? booking.leadId;
@@ -36,11 +44,63 @@ Map<int, List<ChargeLine>> distributeLines({
       };
     }
   }
+  final paying = {
+    for (final line in lines)
+      if (line.guestId != null && line.total > 0) line.guestId,
+  };
+
+  /// The guests who share what is charged for a room: the first of these
+  /// that there are any of.
+  List<Guest> sharing(int bookingRoomId) {
+    final inRoom = guests.where((g) => g.bookingRoomId == bookingRoomId);
+    return [
+          inRoom.where((g) => paying.contains(g.id)),
+          inRoom,
+          guests.where((g) => paying.contains(g.id)),
+          guests,
+        ]
+        .map((found) => found.toList())
+        .firstWhere(
+          (found) => found.isNotEmpty,
+          orElse: () => [],
+        );
+  }
 
   final byPayer = <int, List<ChargeLine>>{};
   for (final line in lines) {
-    final payer = payers[line.guestId] ?? booking.leadId;
-    byPayer.putIfAbsent(payer, () => []).add(line);
+    final roomId = line.bookingRoomId;
+    final heads = <int, int>{};
+    if (line.guestId == null && roomId != null) {
+      for (final guest in sharing(roomId)) {
+        final payer = payers[guest.id]!;
+        heads[payer] = (heads[payer] ?? 0) + 1;
+      }
+    }
+    if (heads.length < 2) {
+      final payer =
+          heads.keys.firstOrNull ?? payers[line.guestId] ?? booking.leadId;
+      byPayer.putIfAbsent(payer, () => []).add(line);
+      continue;
+    }
+
+    // Each payer gets their part of every cent, so the parts add up.
+    final all = heads.values.fold(0, (sum, count) => sum + count);
+    var before = 0;
+    for (final MapEntry(key: payer, value: count) in heads.entries) {
+      final share =
+          line.total * (before + count) ~/ all - line.total * before ~/ all;
+      before += count;
+      byPayer
+          .putIfAbsent(payer, () => [])
+          .add(
+            line.copyWith(
+              description: '${line.description} · $count/$all',
+              quantity: 1,
+              unitPrice: share,
+              total: share,
+            ),
+          );
+    }
   }
   return byPayer;
 }

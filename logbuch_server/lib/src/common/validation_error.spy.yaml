@@ -4,11 +4,12 @@ values:
   - nameRequired
   - invalidDate
   - invalidDateRange
-  - seasonOverlap
+  - priceListDateTaken
   - invalidAgeRange
   - ageGroupOverlap
   - invalidAmount
   - invalidTaxRate
+  - invalidFeeScope
   - invalidBedAmount
   - invalidGuestCount
   - duplicateRate

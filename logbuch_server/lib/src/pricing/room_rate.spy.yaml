@@ -1,11 +1,12 @@
+### What a guest of an age group pays per night in a unit of a type.
 class: RoomRate
 table: room_rates
 fields:
-  seasonId: int, relation(parent=seasons, onDelete=Cascade)
-  priceCategoryId: int, relation(parent=price_categories, onDelete=Cascade)
+  priceListId: int, relation(parent=price_lists, onDelete=Cascade)
+  unitTypeId: int, relation(parent=unit_types, onDelete=Cascade)
   ageGroupId: int, relation(parent=age_groups, onDelete=Cascade)
   pricePerNight: int
 indexes:
   room_rates_unique_idx:
-    fields: seasonId, priceCategoryId, ageGroupId
+    fields: priceListId, unitTypeId, ageGroupId
     unique: true

@@ -35,13 +35,13 @@ import 'package:logbuch_server/src/generated/pricing/age_group.dart'
 import 'package:logbuch_server/src/generated/pricing/fee.dart' as _ishmp5re;
 import 'package:logbuch_server/src/generated/pricing/meal_plan.dart'
     as _ie35qe72;
-import 'package:logbuch_server/src/generated/pricing/meal_rate.dart'
-    as _ii7pox79;
-import 'package:logbuch_server/src/generated/pricing/price_category.dart'
-    as _iqby8hww;
-import 'package:logbuch_server/src/generated/pricing/room_rate.dart'
-    as _iglzf0wc;
-import 'package:logbuch_server/src/generated/pricing/season.dart' as _ityrq9rl;
+import 'package:logbuch_server/src/generated/pricing/price_list.dart'
+    as _ic4bgbrp;
+import 'package:logbuch_server/src/generated/pricing/price_list_prices.dart'
+    as _ilzxb4ig;
+import 'package:logbuch_server/src/generated/pricing/unit_type.dart'
+    as _ic12qaye;
+import 'package:logbuch_server/src/generated/rooms/building.dart' as _i5t9xicf;
 import 'package:logbuch_server/src/generated/rooms/room.dart' as _iu0pobb2;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
@@ -65,11 +65,10 @@ import '../guests/guest_endpoint.dart' as _i2qdn6vg;
 import '../pricing/age_group_endpoint.dart' as _inglletr;
 import '../pricing/fee_endpoint.dart' as _i3umwvkq;
 import '../pricing/meal_plan_endpoint.dart' as _i3hv2u2h;
-import '../pricing/meal_rate_endpoint.dart' as _ilwr02hf;
-import '../pricing/price_category_endpoint.dart' as _ie4qwjfy;
+import '../pricing/price_list_endpoint.dart' as _ibefjgue;
 import '../pricing/pricing_endpoint.dart' as _i8epyrd1;
-import '../pricing/room_rate_endpoint.dart' as _il118ona;
-import '../pricing/season_endpoint.dart' as _ivdu7l1v;
+import '../pricing/unit_type_endpoint.dart' as _i3kf3p9u;
+import '../rooms/building_endpoint.dart' as _ibkfsl22;
 import '../rooms/room_endpoint.dart' as _idkvzxf4;
 
 class Endpoints extends _is.EndpointDispatch {
@@ -178,16 +177,10 @@ class Endpoints extends _is.EndpointDispatch {
           'mealPlan',
           null,
         ),
-      'mealRate': _ilwr02hf.MealRateEndpoint()
+      'priceList': _ibefjgue.PriceListEndpoint()
         ..initialize(
           server,
-          'mealRate',
-          null,
-        ),
-      'priceCategory': _ie4qwjfy.PriceCategoryEndpoint()
-        ..initialize(
-          server,
-          'priceCategory',
+          'priceList',
           null,
         ),
       'pricing': _i8epyrd1.PricingEndpoint()
@@ -196,16 +189,16 @@ class Endpoints extends _is.EndpointDispatch {
           'pricing',
           null,
         ),
-      'roomRate': _il118ona.RoomRateEndpoint()
+      'unitType': _i3kf3p9u.UnitTypeEndpoint()
         ..initialize(
           server,
-          'roomRate',
+          'unitType',
           null,
         ),
-      'season': _ivdu7l1v.SeasonEndpoint()
+      'building': _ibkfsl22.BuildingEndpoint()
         ..initialize(
           server,
-          'season',
+          'building',
           null,
         ),
       'room': _idkvzxf4.RoomEndpoint()
@@ -873,6 +866,25 @@ class Endpoints extends _is.EndpointDispatch {
                     params['arrival'],
                     params['departure'],
                     exceptBookingId: params['exceptBookingId'],
+                  ),
+        ),
+        'crowdedRooms': _is.MethodConnector(
+          name: 'crowdedRooms',
+          params: {
+            'bookingId': _is.ParameterDescription(
+              name: 'bookingId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['booking'] as _i7f5j1eo.BookingEndpoint)
+                  .crowdedRooms(
+                    session,
+                    params['bookingId'],
                   ),
         ),
         'setRooms': _is.MethodConnector(
@@ -1673,6 +1685,11 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<_ishmp5re.Fee>(),
               nullable: false,
             ),
+            'roomIds': _is.ParameterDescription(
+              name: 'roomIds',
+              type: _is.getType<List<int>>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -1681,6 +1698,7 @@ class Endpoints extends _is.EndpointDispatch {
               ) async => (endpoints['fee'] as _i3umwvkq.FeeEndpoint).add(
                 session,
                 params['fee'],
+                params['roomIds'],
               ),
         ),
         'update': _is.MethodConnector(
@@ -1691,6 +1709,11 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<_ishmp5re.Fee>(),
               nullable: false,
             ),
+            'roomIds': _is.ParameterDescription(
+              name: 'roomIds',
+              type: _is.getType<List<int>>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -1699,6 +1722,7 @@ class Endpoints extends _is.EndpointDispatch {
               ) async => (endpoints['fee'] as _i3umwvkq.FeeEndpoint).update(
                 session,
                 params['fee'],
+                params['roomIds'],
               ),
         ),
         'delete': _is.MethodConnector(
@@ -1794,59 +1818,9 @@ class Endpoints extends _is.EndpointDispatch {
         ),
       },
     );
-    connectors['mealRate'] = _is.EndpointConnector(
-      name: 'mealRate',
-      endpoint: endpoints['mealRate']!,
-      methodConnectors: {
-        'getBySeason': _is.MethodConnector(
-          name: 'getBySeason',
-          params: {
-            'seasonId': _is.ParameterDescription(
-              name: 'seasonId',
-              type: _is.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['mealRate'] as _ilwr02hf.MealRateEndpoint)
-                  .getBySeason(
-                    session,
-                    params['seasonId'],
-                  ),
-        ),
-        'saveForSeason': _is.MethodConnector(
-          name: 'saveForSeason',
-          params: {
-            'seasonId': _is.ParameterDescription(
-              name: 'seasonId',
-              type: _is.getType<int>(),
-              nullable: false,
-            ),
-            'rates': _is.ParameterDescription(
-              name: 'rates',
-              type: _is.getType<List<_ii7pox79.MealRate>>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['mealRate'] as _ilwr02hf.MealRateEndpoint)
-                  .saveForSeason(
-                    session,
-                    params['seasonId'],
-                    params['rates'],
-                  ),
-        ),
-      },
-    );
-    connectors['priceCategory'] = _is.EndpointConnector(
-      name: 'priceCategory',
-      endpoint: endpoints['priceCategory']!,
+    connectors['priceList'] = _is.EndpointConnector(
+      name: 'priceList',
+      endpoint: endpoints['priceList']!,
       methodConnectors: {
         'getAll': _is.MethodConnector(
           name: 'getAll',
@@ -1855,17 +1829,15 @@ class Endpoints extends _is.EndpointDispatch {
               (
                 _is.Session session,
                 Map<String, dynamic> params,
-              ) async =>
-                  (endpoints['priceCategory']
-                          as _ie4qwjfy.PriceCategoryEndpoint)
-                      .getAll(session),
+              ) async => (endpoints['priceList'] as _ibefjgue.PriceListEndpoint)
+                  .getAll(session),
         ),
         'add': _is.MethodConnector(
           name: 'add',
           params: {
-            'category': _is.ParameterDescription(
-              name: 'category',
-              type: _is.getType<_iqby8hww.PriceCategory>(),
+            'list': _is.ParameterDescription(
+              name: 'list',
+              type: _is.getType<_ic4bgbrp.PriceList>(),
               nullable: false,
             ),
           },
@@ -1874,19 +1846,17 @@ class Endpoints extends _is.EndpointDispatch {
                 _is.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['priceCategory']
-                          as _ie4qwjfy.PriceCategoryEndpoint)
-                      .add(
-                        session,
-                        params['category'],
-                      ),
+                  (endpoints['priceList'] as _ibefjgue.PriceListEndpoint).add(
+                    session,
+                    params['list'],
+                  ),
         ),
         'update': _is.MethodConnector(
           name: 'update',
           params: {
-            'category': _is.ParameterDescription(
-              name: 'category',
-              type: _is.getType<_iqby8hww.PriceCategory>(),
+            'list': _is.ParameterDescription(
+              name: 'list',
+              type: _is.getType<_ic4bgbrp.PriceList>(),
               nullable: false,
             ),
           },
@@ -1894,13 +1864,11 @@ class Endpoints extends _is.EndpointDispatch {
               (
                 _is.Session session,
                 Map<String, dynamic> params,
-              ) async =>
-                  (endpoints['priceCategory']
-                          as _ie4qwjfy.PriceCategoryEndpoint)
-                      .update(
-                        session,
-                        params['category'],
-                      ),
+              ) async => (endpoints['priceList'] as _ibefjgue.PriceListEndpoint)
+                  .update(
+                    session,
+                    params['list'],
+                  ),
         ),
         'delete': _is.MethodConnector(
           name: 'delete',
@@ -1915,13 +1883,55 @@ class Endpoints extends _is.EndpointDispatch {
               (
                 _is.Session session,
                 Map<String, dynamic> params,
-              ) async =>
-                  (endpoints['priceCategory']
-                          as _ie4qwjfy.PriceCategoryEndpoint)
-                      .delete(
-                        session,
-                        params['id'],
-                      ),
+              ) async => (endpoints['priceList'] as _ibefjgue.PriceListEndpoint)
+                  .delete(
+                    session,
+                    params['id'],
+                  ),
+        ),
+        'getPrices': _is.MethodConnector(
+          name: 'getPrices',
+          params: {
+            'priceListId': _is.ParameterDescription(
+              name: 'priceListId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['priceList'] as _ibefjgue.PriceListEndpoint)
+                  .getPrices(
+                    session,
+                    params['priceListId'],
+                  ),
+        ),
+        'savePrices': _is.MethodConnector(
+          name: 'savePrices',
+          params: {
+            'priceListId': _is.ParameterDescription(
+              name: 'priceListId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'prices': _is.ParameterDescription(
+              name: 'prices',
+              type: _is.getType<_ilzxb4ig.PriceListPrices>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['priceList'] as _ibefjgue.PriceListEndpoint)
+                  .savePrices(
+                    session,
+                    params['priceListId'],
+                    params['prices'],
+                  ),
         ),
       },
     );
@@ -1950,59 +1960,9 @@ class Endpoints extends _is.EndpointDispatch {
         ),
       },
     );
-    connectors['roomRate'] = _is.EndpointConnector(
-      name: 'roomRate',
-      endpoint: endpoints['roomRate']!,
-      methodConnectors: {
-        'getBySeason': _is.MethodConnector(
-          name: 'getBySeason',
-          params: {
-            'seasonId': _is.ParameterDescription(
-              name: 'seasonId',
-              type: _is.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['roomRate'] as _il118ona.RoomRateEndpoint)
-                  .getBySeason(
-                    session,
-                    params['seasonId'],
-                  ),
-        ),
-        'saveForSeason': _is.MethodConnector(
-          name: 'saveForSeason',
-          params: {
-            'seasonId': _is.ParameterDescription(
-              name: 'seasonId',
-              type: _is.getType<int>(),
-              nullable: false,
-            ),
-            'rates': _is.ParameterDescription(
-              name: 'rates',
-              type: _is.getType<List<_iglzf0wc.RoomRate>>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['roomRate'] as _il118ona.RoomRateEndpoint)
-                  .saveForSeason(
-                    session,
-                    params['seasonId'],
-                    params['rates'],
-                  ),
-        ),
-      },
-    );
-    connectors['season'] = _is.EndpointConnector(
-      name: 'season',
-      endpoint: endpoints['season']!,
+    connectors['unitType'] = _is.EndpointConnector(
+      name: 'unitType',
+      endpoint: endpoints['unitType']!,
       methodConnectors: {
         'getAll': _is.MethodConnector(
           name: 'getAll',
@@ -2011,33 +1971,15 @@ class Endpoints extends _is.EndpointDispatch {
               (
                 _is.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['season'] as _ivdu7l1v.SeasonEndpoint)
+              ) async => (endpoints['unitType'] as _i3kf3p9u.UnitTypeEndpoint)
                   .getAll(session),
         ),
         'add': _is.MethodConnector(
           name: 'add',
           params: {
-            'season': _is.ParameterDescription(
-              name: 'season',
-              type: _is.getType<_ityrq9rl.Season>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['season'] as _ivdu7l1v.SeasonEndpoint).add(
-                session,
-                params['season'],
-              ),
-        ),
-        'update': _is.MethodConnector(
-          name: 'update',
-          params: {
-            'season': _is.ParameterDescription(
-              name: 'season',
-              type: _is.getType<_ityrq9rl.Season>(),
+            'type': _is.ParameterDescription(
+              name: 'type',
+              type: _is.getType<_ic12qaye.UnitType>(),
               nullable: false,
             ),
           },
@@ -2046,9 +1988,28 @@ class Endpoints extends _is.EndpointDispatch {
                 _is.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['season'] as _ivdu7l1v.SeasonEndpoint).update(
+                  (endpoints['unitType'] as _i3kf3p9u.UnitTypeEndpoint).add(
                     session,
-                    params['season'],
+                    params['type'],
+                  ),
+        ),
+        'update': _is.MethodConnector(
+          name: 'update',
+          params: {
+            'type': _is.ParameterDescription(
+              name: 'type',
+              type: _is.getType<_ic12qaye.UnitType>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['unitType'] as _i3kf3p9u.UnitTypeEndpoint).update(
+                    session,
+                    params['type'],
                   ),
         ),
         'delete': _is.MethodConnector(
@@ -2065,7 +2026,80 @@ class Endpoints extends _is.EndpointDispatch {
                 _is.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['season'] as _ivdu7l1v.SeasonEndpoint).delete(
+                  (endpoints['unitType'] as _i3kf3p9u.UnitTypeEndpoint).delete(
+                    session,
+                    params['id'],
+                  ),
+        ),
+      },
+    );
+    connectors['building'] = _is.EndpointConnector(
+      name: 'building',
+      endpoint: endpoints['building']!,
+      methodConnectors: {
+        'getAll': _is.MethodConnector(
+          name: 'getAll',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['building'] as _ibkfsl22.BuildingEndpoint)
+                  .getAll(session),
+        ),
+        'add': _is.MethodConnector(
+          name: 'add',
+          params: {
+            'building': _is.ParameterDescription(
+              name: 'building',
+              type: _is.getType<_i5t9xicf.Building>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['building'] as _ibkfsl22.BuildingEndpoint).add(
+                    session,
+                    params['building'],
+                  ),
+        ),
+        'update': _is.MethodConnector(
+          name: 'update',
+          params: {
+            'building': _is.ParameterDescription(
+              name: 'building',
+              type: _is.getType<_i5t9xicf.Building>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['building'] as _ibkfsl22.BuildingEndpoint).update(
+                    session,
+                    params['building'],
+                  ),
+        ),
+        'delete': _is.MethodConnector(
+          name: 'delete',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['building'] as _ibkfsl22.BuildingEndpoint).delete(
                     session,
                     params['id'],
                   ),
@@ -2112,6 +2146,11 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<_iu0pobb2.Room>(),
               nullable: false,
             ),
+            'feeIds': _is.ParameterDescription(
+              name: 'feeIds',
+              type: _is.getType<List<int>>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -2120,6 +2159,7 @@ class Endpoints extends _is.EndpointDispatch {
               ) async => (endpoints['room'] as _idkvzxf4.RoomEndpoint).add(
                 session,
                 params['room'],
+                params['feeIds'],
               ),
         ),
         'update': _is.MethodConnector(
@@ -2130,6 +2170,11 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<_iu0pobb2.Room>(),
               nullable: false,
             ),
+            'feeIds': _is.ParameterDescription(
+              name: 'feeIds',
+              type: _is.getType<List<int>>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -2138,6 +2183,7 @@ class Endpoints extends _is.EndpointDispatch {
               ) async => (endpoints['room'] as _idkvzxf4.RoomEndpoint).update(
                 session,
                 params['room'],
+                params['feeIds'],
               ),
         ),
         'delete': _is.MethodConnector(

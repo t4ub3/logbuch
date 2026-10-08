@@ -8,6 +8,7 @@ import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
 import 'package:logbuch_flutter/providers/available_rooms_provider.dart';
 import 'package:logbuch_flutter/providers/bookings_provider.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
+import 'package:logbuch_flutter/providers/crowded_rooms_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
 import 'package:logbuch_flutter/providers/status_provider.dart';
 import 'package:logbuch_flutter/providers/tabs_provider.dart';
@@ -18,7 +19,8 @@ String _roomDetails(BuildContext context, Room room) {
   final t = context.t;
   return [
     t.rooms.beds(n: room.bedAmount),
-    ?room.priceCategory?.name,
+    ?room.unitType?.name,
+    if (room.unitType?.shared ?? false) t.admin.unitTypes.sharedLabel,
     if (room.cribPossible) t.admin.rooms.crib,
     if (!room.active) t.admin.rooms.inactive,
   ].join(' · ');
@@ -39,6 +41,10 @@ class BookingRoomsCard extends ConsumerWidget {
       for (final hold in booking.rooms ?? <BookingRoom>[]) ?hold.room,
     ]..sort((a, b) => a.roomNumber.compareTo(b.roomNumber));
     final beds = rooms.fold(0, (beds, room) => beds + room.bedAmount);
+    // Bookings may share a room as often as they like, so this only warns.
+    final crowded = rooms.any((room) => room.unitType?.shared ?? false)
+        ? ref.watch(crowdedRoomsProvider(booking.id!)).value ?? <Room>[]
+        : <Room>[];
 
     return BookingCard(
       title: t.bookings.rooms,
@@ -59,6 +65,21 @@ class BookingRoomsCard extends ConsumerWidget {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (crowded.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: YaruInfoBox(
+                      yaruInfoType: YaruInfoType.warning,
+                      subtitle: Text(
+                        t.bookings.crowdedRooms(
+                          rooms: [
+                            for (final room in crowded)
+                              t.rooms.room(number: room.roomNumber),
+                          ].join(', '),
+                        ),
+                      ),
+                    ),
+                  ),
                 CardNote(
                   [
                     t.bookings.bedsInRooms(

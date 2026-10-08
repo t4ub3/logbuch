@@ -23,22 +23,24 @@ void main() {
           birthDate: DateTime.utc(1984, 5, 17),
         ),
       );
-      final category = await endpoints.priceCategory.add(
+      final category = await endpoints.unitType.add(
         sessionBuilder,
-        PriceCategory(name: 'Standard'),
+        UnitType(name: 'Standard'),
       );
       final room = await endpoints.room.add(
         sessionBuilder,
-        Room(roomNumber: '101', bedAmount: 4, priceCategoryId: category.id!),
+        Room(roomNumber: '101', bedAmount: 4, unitTypeId: category.id!),
+        const [],
       );
       await endpoints.room.add(
         sessionBuilder,
         Room(
           roomNumber: '102',
           bedAmount: 2,
-          priceCategoryId: category.id!,
+          unitTypeId: category.id!,
           active: false,
         ),
+        const [],
       );
       await endpoints.ageGroup.add(
         sessionBuilder,

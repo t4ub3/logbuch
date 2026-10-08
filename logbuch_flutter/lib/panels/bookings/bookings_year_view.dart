@@ -10,6 +10,7 @@ import 'package:logbuch_flutter/panels/bookings/booking_extensions.dart';
 import 'package:logbuch_flutter/providers/bookings_provider.dart';
 import 'package:logbuch_flutter/providers/bookings_view_provider.dart';
 import 'package:logbuch_flutter/providers/settings_provider.dart';
+import 'package:logbuch_flutter/theme/dimmed_accent.dart';
 
 /// Linear year calendar: one row per month, with the days shifted so that
 /// equal weekdays line up in the same column across all months.
@@ -429,6 +430,7 @@ class _BookingBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const radius = Radius.circular(3);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return GestureDetector(
       onTap: () => openBookingTab(context, booking),
@@ -445,7 +447,7 @@ class _BookingBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             alignment: Alignment.centerLeft,
             decoration: BoxDecoration(
-              color: booking.color,
+              color: colorScheme.dimmed(booking.color),
               borderRadius: BorderRadius.horizontal(
                 left: isStart ? radius : Radius.zero,
                 right: isEnd ? radius : Radius.zero,
@@ -457,7 +459,7 @@ class _BookingBar extends StatelessWidget {
               softWrap: false,
               overflow: TextOverflow.fade,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: Colors.white,
+                color: colorScheme.onSurface,
                 height: 1,
               ),
             ),

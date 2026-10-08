@@ -191,6 +191,7 @@ class _Translations$bookings$de extends Translations$bookings$en {
 	@override String get unassigned => 'Ohne Zimmer';
 	@override String get everybodyAssigned => 'Alle haben ein Zimmer.';
 	@override String get noRoomsHeld => 'Die Buchung hat noch keine Zimmer.';
+	@override String crowdedRooms({required Object rooms}) => '${rooms}: In einigen dieser Nächte teilen sich mehr als zwei Buchungen die Unterkunft.';
 	@override String get moveTo => 'Verschieben nach';
 	@override String bedsUsed({required Object used, required Object beds}) => '${used} von ${beds} Betten';
 	@override String get roomFull => 'Voll';
@@ -316,19 +317,20 @@ class _Translations$admin$de extends Translations$admin$en {
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
+	@override late final _Translations$admin$groups$de groups = _Translations$admin$groups$de._(_root);
 	@override late final _Translations$admin$sections$de sections = _Translations$admin$sections$de._(_root);
 	@override String deleteTitle({required Object name}) => '„${name}“ löschen?';
 	@override String get invalidNumber => 'Bitte eine ganze Zahl eingeben';
 	@override String get invalidAmount => 'Bitte einen Betrag wie 12,50 eingeben';
 	@override late final _Translations$admin$errors$de errors = _Translations$admin$errors$de._(_root);
+	@override late final _Translations$admin$buildings$de buildings = _Translations$admin$buildings$de._(_root);
 	@override late final _Translations$admin$rooms$de rooms = _Translations$admin$rooms$de._(_root);
-	@override late final _Translations$admin$priceCategories$de priceCategories = _Translations$admin$priceCategories$de._(_root);
+	@override late final _Translations$admin$unitTypes$de unitTypes = _Translations$admin$unitTypes$de._(_root);
 	@override late final _Translations$admin$ageGroups$de ageGroups = _Translations$admin$ageGroups$de._(_root);
-	@override late final _Translations$admin$seasons$de seasons = _Translations$admin$seasons$de._(_root);
 	@override late final _Translations$admin$bookingCategories$de bookingCategories = _Translations$admin$bookingCategories$de._(_root);
 	@override late final _Translations$admin$mealPlans$de mealPlans = _Translations$admin$mealPlans$de._(_root);
-	@override late final _Translations$admin$rates$de rates = _Translations$admin$rates$de._(_root);
 	@override late final _Translations$admin$fees$de fees = _Translations$admin$fees$de._(_root);
+	@override late final _Translations$admin$priceLists$de priceLists = _Translations$admin$priceLists$de._(_root);
 	@override late final _Translations$admin$users$de users = _Translations$admin$users$de._(_root);
 	@override late final _Translations$admin$operator$de operator = _Translations$admin$operator$de._(_root);
 }
@@ -500,9 +502,10 @@ class _Translations$bookings$pricingProblems$de extends Translations$bookings$pr
 	@override String get datesMissing => 'Die Buchung hat keinen Zeitraum.';
 	@override String ageUnknown({required Object name}) => '${name}: Das Alter ist nicht bekannt. Bitte Geburtsdatum eintragen oder Altersgruppe wählen.';
 	@override String roomMissing({required Object name}) => '${name}: hat noch kein Zimmer.';
-	@override String seasonMissing({required Object date}) => 'Für den ${date} gibt es keine Saison.';
+	@override String priceListMissing({required Object date}) => 'Am ${date} gilt keine Preisliste.';
 	@override String roomRateMissing({required Object detail}) => 'Kein Übernachtungspreis für ${detail}.';
 	@override String mealRateMissing({required Object detail}) => 'Kein Verpflegungspreis für ${detail}.';
+	@override String dayUsePriceMissing({required Object detail}) => 'Kein Preis für die Tagesnutzung für ${detail}.';
 }
 
 // Path: bookings.paymentMethods
@@ -518,6 +521,19 @@ class _Translations$bookings$paymentMethods$de extends Translations$bookings$pay
 	@override String get other => 'Sonstiges';
 }
 
+// Path: admin.groups
+class _Translations$admin$groups$de extends Translations$admin$groups$en {
+	_Translations$admin$groups$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get house => 'Haus';
+	@override String get prices => 'Preise';
+	@override String get bookings => 'Buchungen';
+	@override String get organisation => 'Organisation';
+}
+
 // Path: admin.sections
 class _Translations$admin$sections$de extends Translations$admin$sections$en {
 	_Translations$admin$sections$de._(TranslationsDe root) : this._root = root, super.internal(root);
@@ -525,13 +541,13 @@ class _Translations$admin$sections$de extends Translations$admin$sections$en {
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
+	@override String get buildings => 'Gebäude';
 	@override String get rooms => 'Zimmer';
-	@override String get priceCategories => 'Preiskategorien';
+	@override String get unitTypes => 'Unterkunftsarten';
 	@override String get ageGroups => 'Altersgruppen';
-	@override String get seasons => 'Saisons';
 	@override String get mealPlans => 'Verpflegung';
-	@override String get rates => 'Preise';
-	@override String get fees => 'Gebühren';
+	@override String get fees => 'Zuschläge und Gebühren';
+	@override String get priceLists => 'Preislisten';
 	@override String get bookingCategories => 'Buchungskategorien';
 	@override String get users => 'Benutzer';
 	@override String get operator => 'Träger';
@@ -547,11 +563,12 @@ class _Translations$admin$errors$de extends Translations$admin$errors$en {
 	@override String get nameRequired => 'Ein Name ist erforderlich.';
 	@override String get invalidDate => 'Das Datum ist ungültig.';
 	@override String get invalidDateRange => 'Das Ende darf nicht vor dem Beginn liegen.';
-	@override String seasonOverlap({required Object name}) => 'Der Zeitraum überschneidet sich mit der Saison „${name}“.';
+	@override String priceListDateTaken({required Object name}) => 'Die Preisliste „${name}“ beginnt am selben Tag.';
 	@override String get invalidAgeRange => 'Das Höchstalter darf nicht unter dem Mindestalter liegen.';
 	@override String ageGroupOverlap({required Object name}) => 'Die Altersangaben überschneiden sich mit der Altersgruppe „${name}“.';
 	@override String get invalidAmount => 'Beträge dürfen nicht negativ sein.';
 	@override String get invalidTaxRate => 'Der Steuersatz muss zwischen 0 und 100 % liegen.';
+	@override String get invalidFeeScope => 'Eine Gebühr für jede Buchung oder eine Gebühr pro Buchung kann kein Zuschlag eines Zimmers sein.';
 	@override String get invalidBedAmount => 'Die Bettenzahl darf nicht negativ sein.';
 	@override String get duplicateRate => 'Ein Preis wurde doppelt angegeben.';
 	@override String get inUse => 'Dieser Eintrag wird noch verwendet und kann nicht gelöscht werden.';
@@ -572,6 +589,19 @@ class _Translations$admin$errors$de extends Translations$admin$errors$en {
 	@override String get notConfirmed => 'Eine Bestätigung gibt es nur für Buchungen, die ein Angebot haben oder bestätigt sind.';
 }
 
+// Path: admin.buildings
+class _Translations$admin$buildings$de extends Translations$admin$buildings$en {
+	_Translations$admin$buildings$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => 'Keine Gebäude';
+	@override String get add => 'Neues Gebäude';
+	@override String get edit => 'Gebäude bearbeiten';
+	@override String get sortOrder => 'Position in Listen';
+}
+
 // Path: admin.rooms
 class _Translations$admin$rooms$de extends Translations$admin$rooms$en {
 	_Translations$admin$rooms$de._(TranslationsDe root) : this._root = root, super.internal(root);
@@ -583,10 +613,12 @@ class _Translations$admin$rooms$de extends Translations$admin$rooms$en {
 	@override String get edit => 'Zimmer bearbeiten';
 	@override String get number => 'Zimmernummer';
 	@override String get beds => 'Betten';
-	@override String get priceCategory => 'Preiskategorie';
-	@override String get noPriceCategories => 'Bitte zuerst eine Preiskategorie anlegen.';
+	@override String get unitType => 'Unterkunftsart';
+	@override String get noUnitTypes => 'Bitte zuerst eine Unterkunftsart anlegen.';
 	@override String get building => 'Gebäude';
+	@override String get noBuilding => 'Kein Gebäude';
 	@override String get floor => 'Etage';
+	@override String get surcharges => 'Zuschläge';
 	@override String get cribPossible => 'Ein Kinderbett kann aufgestellt werden';
 	@override String get crib => 'Kinderbett möglich';
 	@override String get active => 'Aktiv';
@@ -595,18 +627,22 @@ class _Translations$admin$rooms$de extends Translations$admin$rooms$en {
 	@override String get notes => 'Notizen';
 }
 
-// Path: admin.priceCategories
-class _Translations$admin$priceCategories$de extends Translations$admin$priceCategories$en {
-	_Translations$admin$priceCategories$de._(TranslationsDe root) : this._root = root, super.internal(root);
+// Path: admin.unitTypes
+class _Translations$admin$unitTypes$de extends Translations$admin$unitTypes$en {
+	_Translations$admin$unitTypes$de._(TranslationsDe root) : this._root = root, super.internal(root);
 
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
-	@override String get empty => 'Keine Preiskategorien';
-	@override String get add => 'Neue Preiskategorie';
-	@override String get edit => 'Preiskategorie bearbeiten';
+	@override String get empty => 'Keine Unterkunftsarten';
+	@override String get add => 'Neue Unterkunftsart';
+	@override String get edit => 'Unterkunftsart bearbeiten';
 	@override String get sortOrder => 'Position in Listen';
-	@override String get deleteHint => 'Die Preise dieser Kategorie werden ebenfalls gelöscht.';
+	@override String get taxRate => 'Steuersatz';
+	@override String get shared => 'Buchungen können sie teilen';
+	@override String get sharedHint => 'Mehrere Buchungen können eine Unterkunft dieser Art in derselben Nacht belegen. Sie teilen sich den Preis pro Nacht.';
+	@override String get sharedLabel => 'geteilt';
+	@override String get deleteHint => 'Die Preise dieser Unterkunftsart werden ebenfalls gelöscht.';
 }
 
 // Path: admin.ageGroups
@@ -629,21 +665,6 @@ class _Translations$admin$ageGroups$de extends Translations$admin$ageGroups$en {
 	);
 	@override String openRange({required Object min}) => 'ab ${min} Jahren';
 	@override String get deleteHint => 'Die Preise dieser Altersgruppe werden ebenfalls gelöscht.';
-}
-
-// Path: admin.seasons
-class _Translations$admin$seasons$de extends Translations$admin$seasons$en {
-	_Translations$admin$seasons$de._(TranslationsDe root) : this._root = root, super.internal(root);
-
-	final TranslationsDe _root; // ignore: unused_field
-
-	// Translations
-	@override String get empty => 'Keine Saisons';
-	@override String get add => 'Neue Saison';
-	@override String get edit => 'Saison bearbeiten';
-	@override String get period => 'Zeitraum';
-	@override String gap({required Object from, required Object to}) => 'Für ${from} – ${to} gibt es keine Saison. Aufenthalte in diesem Zeitraum können nicht berechnet werden.';
-	@override String get deleteHint => 'Die Preise dieser Saison werden ebenfalls gelöscht.';
 }
 
 // Path: admin.bookingCategories
@@ -673,24 +694,6 @@ class _Translations$admin$mealPlans$de extends Translations$admin$mealPlans$en {
 	@override String get deleteHint => 'Die Preise dieser Verpflegungsart werden ebenfalls gelöscht.';
 }
 
-// Path: admin.rates
-class _Translations$admin$rates$de extends Translations$admin$rates$en {
-	_Translations$admin$rates$de._(TranslationsDe root) : this._root = root, super.internal(root);
-
-	final TranslationsDe _root; // ignore: unused_field
-
-	// Translations
-	@override String get lodging => 'Übernachtung';
-	@override String get meals => 'Verpflegung';
-	@override String get priceCategory => 'Preiskategorie';
-	@override String get mealPlan => 'Verpflegung';
-	@override String get missingLodging => 'Für Preise werden mindestens eine Saison, eine Altersgruppe und eine Preiskategorie benötigt.';
-	@override String get missingMeals => 'Für Preise werden mindestens eine Saison, eine Altersgruppe und eine Verpflegungsart benötigt.';
-	@override String get hint => 'Preise pro Person und Nacht in Euro. Ein leeres Feld hat keinen Preis.';
-	@override String get invalid => 'Bitte Beträge wie 12,50 eingeben.';
-	@override String get saved => 'Preise gespeichert';
-}
-
 // Path: admin.fees
 class _Translations$admin$fees$de extends Translations$admin$fees$en {
 	_Translations$admin$fees$de._(TranslationsDe root) : this._root = root, super.internal(root);
@@ -698,10 +701,9 @@ class _Translations$admin$fees$de extends Translations$admin$fees$en {
 	final TranslationsDe _root; // ignore: unused_field
 
 	// Translations
-	@override String get empty => 'Keine Gebühren';
+	@override String get empty => 'Keine Zuschläge oder Gebühren';
 	@override String get add => 'Neue Gebühr';
 	@override String get edit => 'Gebühr bearbeiten';
-	@override String get amount => 'Betrag';
 	@override String get unit => 'Berechnung';
 	@override late final _Translations$admin$fees$units$de units = _Translations$admin$fees$units$de._(_root);
 	@override String get ageGroup => 'Gilt für';
@@ -709,8 +711,41 @@ class _Translations$admin$fees$de extends Translations$admin$fees$en {
 	@override String get taxRate => 'Steuersatz';
 	@override String tax({required Object rate}) => '${rate} % Steuer';
 	@override String get autoApply => 'Zu jeder Buchung hinzufügen';
-	@override String get autoApplyHint => 'Andernfalls wird die Gebühr einer Buchung von Hand hinzugefügt.';
+	@override String get autoApplyHint => 'Sonst ist die Gebühr ein Zuschlag der unten gewählten Zimmer.';
 	@override String get auto => 'jede Buchung';
+	@override String get rooms => 'Zuschlag für diese Zimmer';
+	@override String get noRooms => 'Es gibt noch keine Zimmer.';
+	@override String get unused => 'wird nicht berechnet';
+	@override String get priceHint => 'Was sie kostet, steht in den Preislisten.';
+}
+
+// Path: admin.priceLists
+class _Translations$admin$priceLists$de extends Translations$admin$priceLists$en {
+	_Translations$admin$priceLists$de._(TranslationsDe root) : this._root = root, super.internal(root);
+
+	final TranslationsDe _root; // ignore: unused_field
+
+	// Translations
+	@override String get empty => 'Noch keine Preislisten. Eine Preisliste enthält alle Preise ab ihrem ersten Tag, bis die nächste Liste beginnt.';
+	@override String get add => 'Neue Preisliste';
+	@override String get edit => 'Preisliste bearbeiten';
+	@override String get validFrom => 'Gültig ab';
+	@override String from({required Object date}) => 'ab ${date}';
+	@override String get addHint => 'Eine neue Liste übernimmt die Preise, die an ihrem ersten Tag gelten.';
+	@override String get deleteHint => 'Alle Preise dieser Liste werden ebenfalls gelöscht.';
+	@override String get lodging => 'Übernachtung pro Nacht';
+	@override String get unitType => 'Unterkunftsart';
+	@override String get perUnit => 'Ganze Unterkunft';
+	@override String get dayUse => 'Tagesnutzung';
+	@override String get meals => 'Verpflegung pro Nacht';
+	@override String get mealPlan => 'Verpflegung';
+	@override String get fees => 'Zuschläge und Gebühren';
+	@override String get fee => 'Gebühr';
+	@override String get amount => 'Betrag';
+	@override String get nothingToPrice => 'Bitte zuerst Unterkunftsarten, Altersgruppen, Verpflegungsarten oder Gebühren anlegen. Ihre Preise werden hier eingetragen.';
+	@override String get hint => 'Preise in Euro, inklusive Steuer. Ein leeres Feld hat keinen Preis, und eine Gebühr ohne Betrag wird nicht berechnet.';
+	@override String get invalid => 'Bitte Beträge wie 12,50 eingeben.';
+	@override String get saved => 'Preise gespeichert';
 }
 
 // Path: admin.users
@@ -780,9 +815,9 @@ class _Translations$admin$fees$units$de extends Translations$admin$fees$units$en
 
 	// Translations
 	@override String get perBooking => 'pro Buchung';
-	@override String get perPerson => 'pro Person';
+	@override String get perPerson => 'pro Person, einmal je Aufenthalt';
 	@override String get perPersonNight => 'pro Person und Nacht';
-	@override String get perRoom => 'pro Zimmer';
+	@override String get perRoom => 'pro Zimmer, einmal je Aufenthalt';
 	@override String get perRoomNight => 'pro Zimmer und Nacht';
 }
 
@@ -896,6 +931,7 @@ extension on TranslationsDe {
 			'bookings.unassigned' => 'Ohne Zimmer',
 			'bookings.everybodyAssigned' => 'Alle haben ein Zimmer.',
 			'bookings.noRoomsHeld' => 'Die Buchung hat noch keine Zimmer.',
+			'bookings.crowdedRooms' => ({required Object rooms}) => '${rooms}: In einigen dieser Nächte teilen sich mehr als zwei Buchungen die Unterkunft.',
 			'bookings.moveTo' => 'Verschieben nach',
 			'bookings.bedsUsed' => ({required Object used, required Object beds}) => '${used} von ${beds} Betten',
 			'bookings.roomFull' => 'Voll',
@@ -914,9 +950,10 @@ extension on TranslationsDe {
 			'bookings.pricingProblems.datesMissing' => 'Die Buchung hat keinen Zeitraum.',
 			'bookings.pricingProblems.ageUnknown' => ({required Object name}) => '${name}: Das Alter ist nicht bekannt. Bitte Geburtsdatum eintragen oder Altersgruppe wählen.',
 			'bookings.pricingProblems.roomMissing' => ({required Object name}) => '${name}: hat noch kein Zimmer.',
-			'bookings.pricingProblems.seasonMissing' => ({required Object date}) => 'Für den ${date} gibt es keine Saison.',
+			'bookings.pricingProblems.priceListMissing' => ({required Object date}) => 'Am ${date} gilt keine Preisliste.',
 			'bookings.pricingProblems.roomRateMissing' => ({required Object detail}) => 'Kein Übernachtungspreis für ${detail}.',
 			'bookings.pricingProblems.mealRateMissing' => ({required Object detail}) => 'Kein Verpflegungspreis für ${detail}.',
+			'bookings.pricingProblems.dayUsePriceMissing' => ({required Object detail}) => 'Kein Preis für die Tagesnutzung für ${detail}.',
 			'bookings.billing' => 'Abrechnung',
 			'bookings.noFolios' => 'Noch nichts abzurechnen. Bitte zuerst Gäste hinzufügen und auf Zimmer verteilen.',
 			'bookings.folioOpen' => 'Noch keine Rechnung',
@@ -1000,13 +1037,17 @@ extension on TranslationsDe {
 			'rooms.empty' => 'Keine Zimmer',
 			'rooms.room' => ({required Object number}) => 'Zimmer ${number}',
 			'rooms.beds' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, one: '${n} Bett', other: '${n} Betten', ), 
+			'admin.groups.house' => 'Haus',
+			'admin.groups.prices' => 'Preise',
+			'admin.groups.bookings' => 'Buchungen',
+			'admin.groups.organisation' => 'Organisation',
+			'admin.sections.buildings' => 'Gebäude',
 			'admin.sections.rooms' => 'Zimmer',
-			'admin.sections.priceCategories' => 'Preiskategorien',
+			'admin.sections.unitTypes' => 'Unterkunftsarten',
 			'admin.sections.ageGroups' => 'Altersgruppen',
-			'admin.sections.seasons' => 'Saisons',
 			'admin.sections.mealPlans' => 'Verpflegung',
-			'admin.sections.rates' => 'Preise',
-			'admin.sections.fees' => 'Gebühren',
+			'admin.sections.fees' => 'Zuschläge und Gebühren',
+			'admin.sections.priceLists' => 'Preislisten',
 			'admin.sections.bookingCategories' => 'Buchungskategorien',
 			'admin.sections.users' => 'Benutzer',
 			'admin.sections.operator' => 'Träger',
@@ -1016,11 +1057,12 @@ extension on TranslationsDe {
 			'admin.errors.nameRequired' => 'Ein Name ist erforderlich.',
 			'admin.errors.invalidDate' => 'Das Datum ist ungültig.',
 			'admin.errors.invalidDateRange' => 'Das Ende darf nicht vor dem Beginn liegen.',
-			'admin.errors.seasonOverlap' => ({required Object name}) => 'Der Zeitraum überschneidet sich mit der Saison „${name}“.',
+			'admin.errors.priceListDateTaken' => ({required Object name}) => 'Die Preisliste „${name}“ beginnt am selben Tag.',
 			'admin.errors.invalidAgeRange' => 'Das Höchstalter darf nicht unter dem Mindestalter liegen.',
 			'admin.errors.ageGroupOverlap' => ({required Object name}) => 'Die Altersangaben überschneiden sich mit der Altersgruppe „${name}“.',
 			'admin.errors.invalidAmount' => 'Beträge dürfen nicht negativ sein.',
 			'admin.errors.invalidTaxRate' => 'Der Steuersatz muss zwischen 0 und 100 % liegen.',
+			'admin.errors.invalidFeeScope' => 'Eine Gebühr für jede Buchung oder eine Gebühr pro Buchung kann kein Zuschlag eines Zimmers sein.',
 			'admin.errors.invalidBedAmount' => 'Die Bettenzahl darf nicht negativ sein.',
 			'admin.errors.duplicateRate' => 'Ein Preis wurde doppelt angegeben.',
 			'admin.errors.inUse' => 'Dieser Eintrag wird noch verwendet und kann nicht gelöscht werden.',
@@ -1039,25 +1081,35 @@ extension on TranslationsDe {
 			'admin.errors.operatorIncomplete' => 'Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen.',
 			'admin.errors.alreadyGuest' => 'Aus diesem Haushalt kann niemand hinzugefügt werden: Er hat keine Mitglieder, oder alle sind bereits Gäste der Buchung.',
 			'admin.errors.notConfirmed' => 'Eine Bestätigung gibt es nur für Buchungen, die ein Angebot haben oder bestätigt sind.',
+			'admin.buildings.empty' => 'Keine Gebäude',
+			'admin.buildings.add' => 'Neues Gebäude',
+			'admin.buildings.edit' => 'Gebäude bearbeiten',
+			'admin.buildings.sortOrder' => 'Position in Listen',
 			'admin.rooms.add' => 'Neues Zimmer',
 			'admin.rooms.edit' => 'Zimmer bearbeiten',
 			'admin.rooms.number' => 'Zimmernummer',
 			'admin.rooms.beds' => 'Betten',
-			'admin.rooms.priceCategory' => 'Preiskategorie',
-			'admin.rooms.noPriceCategories' => 'Bitte zuerst eine Preiskategorie anlegen.',
+			'admin.rooms.unitType' => 'Unterkunftsart',
+			'admin.rooms.noUnitTypes' => 'Bitte zuerst eine Unterkunftsart anlegen.',
 			'admin.rooms.building' => 'Gebäude',
+			'admin.rooms.noBuilding' => 'Kein Gebäude',
 			'admin.rooms.floor' => 'Etage',
+			'admin.rooms.surcharges' => 'Zuschläge',
 			'admin.rooms.cribPossible' => 'Ein Kinderbett kann aufgestellt werden',
 			'admin.rooms.crib' => 'Kinderbett möglich',
 			'admin.rooms.active' => 'Aktiv',
 			'admin.rooms.activeHint' => 'Inaktive Zimmer bleiben in früheren Buchungen erhalten, können aber nicht mehr gebucht werden.',
 			'admin.rooms.inactive' => 'Inaktiv',
 			'admin.rooms.notes' => 'Notizen',
-			'admin.priceCategories.empty' => 'Keine Preiskategorien',
-			'admin.priceCategories.add' => 'Neue Preiskategorie',
-			'admin.priceCategories.edit' => 'Preiskategorie bearbeiten',
-			'admin.priceCategories.sortOrder' => 'Position in Listen',
-			'admin.priceCategories.deleteHint' => 'Die Preise dieser Kategorie werden ebenfalls gelöscht.',
+			'admin.unitTypes.empty' => 'Keine Unterkunftsarten',
+			'admin.unitTypes.add' => 'Neue Unterkunftsart',
+			'admin.unitTypes.edit' => 'Unterkunftsart bearbeiten',
+			'admin.unitTypes.sortOrder' => 'Position in Listen',
+			'admin.unitTypes.taxRate' => 'Steuersatz',
+			'admin.unitTypes.shared' => 'Buchungen können sie teilen',
+			'admin.unitTypes.sharedHint' => 'Mehrere Buchungen können eine Unterkunft dieser Art in derselben Nacht belegen. Sie teilen sich den Preis pro Nacht.',
+			'admin.unitTypes.sharedLabel' => 'geteilt',
+			'admin.unitTypes.deleteHint' => 'Die Preise dieser Unterkunftsart werden ebenfalls gelöscht.',
 			'admin.ageGroups.empty' => 'Keine Altersgruppen',
 			'admin.ageGroups.add' => 'Neue Altersgruppe',
 			'admin.ageGroups.edit' => 'Altersgruppe bearbeiten',
@@ -1068,12 +1120,6 @@ extension on TranslationsDe {
 			'admin.ageGroups.singleAge' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, one: '${n} Jahr', other: '${n} Jahre', ), 
 			'admin.ageGroups.openRange' => ({required Object min}) => 'ab ${min} Jahren',
 			'admin.ageGroups.deleteHint' => 'Die Preise dieser Altersgruppe werden ebenfalls gelöscht.',
-			'admin.seasons.empty' => 'Keine Saisons',
-			'admin.seasons.add' => 'Neue Saison',
-			'admin.seasons.edit' => 'Saison bearbeiten',
-			'admin.seasons.period' => 'Zeitraum',
-			'admin.seasons.gap' => ({required Object from, required Object to}) => 'Für ${from} – ${to} gibt es keine Saison. Aufenthalte in diesem Zeitraum können nicht berechnet werden.',
-			'admin.seasons.deleteHint' => 'Die Preise dieser Saison werden ebenfalls gelöscht.',
 			'admin.bookingCategories.empty' => 'Keine Buchungskategorien',
 			'admin.bookingCategories.add' => 'Neue Buchungskategorie',
 			'admin.bookingCategories.edit' => 'Buchungskategorie bearbeiten',
@@ -1083,32 +1129,46 @@ extension on TranslationsDe {
 			'admin.mealPlans.add' => 'Neue Verpflegungsart',
 			'admin.mealPlans.edit' => 'Verpflegungsart bearbeiten',
 			'admin.mealPlans.deleteHint' => 'Die Preise dieser Verpflegungsart werden ebenfalls gelöscht.',
-			'admin.rates.lodging' => 'Übernachtung',
-			'admin.rates.meals' => 'Verpflegung',
-			'admin.rates.priceCategory' => 'Preiskategorie',
-			'admin.rates.mealPlan' => 'Verpflegung',
-			'admin.rates.missingLodging' => 'Für Preise werden mindestens eine Saison, eine Altersgruppe und eine Preiskategorie benötigt.',
-			'admin.rates.missingMeals' => 'Für Preise werden mindestens eine Saison, eine Altersgruppe und eine Verpflegungsart benötigt.',
-			'admin.rates.hint' => 'Preise pro Person und Nacht in Euro. Ein leeres Feld hat keinen Preis.',
-			'admin.rates.invalid' => 'Bitte Beträge wie 12,50 eingeben.',
-			'admin.rates.saved' => 'Preise gespeichert',
-			'admin.fees.empty' => 'Keine Gebühren',
+			'admin.fees.empty' => 'Keine Zuschläge oder Gebühren',
 			'admin.fees.add' => 'Neue Gebühr',
 			'admin.fees.edit' => 'Gebühr bearbeiten',
-			'admin.fees.amount' => 'Betrag',
 			'admin.fees.unit' => 'Berechnung',
 			'admin.fees.units.perBooking' => 'pro Buchung',
-			'admin.fees.units.perPerson' => 'pro Person',
+			'admin.fees.units.perPerson' => 'pro Person, einmal je Aufenthalt',
 			'admin.fees.units.perPersonNight' => 'pro Person und Nacht',
-			'admin.fees.units.perRoom' => 'pro Zimmer',
+			'admin.fees.units.perRoom' => 'pro Zimmer, einmal je Aufenthalt',
 			'admin.fees.units.perRoomNight' => 'pro Zimmer und Nacht',
 			'admin.fees.ageGroup' => 'Gilt für',
 			'admin.fees.allAges' => 'Alle Altersgruppen',
 			'admin.fees.taxRate' => 'Steuersatz',
 			'admin.fees.tax' => ({required Object rate}) => '${rate} % Steuer',
 			'admin.fees.autoApply' => 'Zu jeder Buchung hinzufügen',
-			'admin.fees.autoApplyHint' => 'Andernfalls wird die Gebühr einer Buchung von Hand hinzugefügt.',
+			'admin.fees.autoApplyHint' => 'Sonst ist die Gebühr ein Zuschlag der unten gewählten Zimmer.',
 			'admin.fees.auto' => 'jede Buchung',
+			'admin.fees.rooms' => 'Zuschlag für diese Zimmer',
+			'admin.fees.noRooms' => 'Es gibt noch keine Zimmer.',
+			'admin.fees.unused' => 'wird nicht berechnet',
+			'admin.fees.priceHint' => 'Was sie kostet, steht in den Preislisten.',
+			'admin.priceLists.empty' => 'Noch keine Preislisten. Eine Preisliste enthält alle Preise ab ihrem ersten Tag, bis die nächste Liste beginnt.',
+			'admin.priceLists.add' => 'Neue Preisliste',
+			'admin.priceLists.edit' => 'Preisliste bearbeiten',
+			'admin.priceLists.validFrom' => 'Gültig ab',
+			'admin.priceLists.from' => ({required Object date}) => 'ab ${date}',
+			'admin.priceLists.addHint' => 'Eine neue Liste übernimmt die Preise, die an ihrem ersten Tag gelten.',
+			'admin.priceLists.deleteHint' => 'Alle Preise dieser Liste werden ebenfalls gelöscht.',
+			'admin.priceLists.lodging' => 'Übernachtung pro Nacht',
+			'admin.priceLists.unitType' => 'Unterkunftsart',
+			'admin.priceLists.perUnit' => 'Ganze Unterkunft',
+			'admin.priceLists.dayUse' => 'Tagesnutzung',
+			'admin.priceLists.meals' => 'Verpflegung pro Nacht',
+			'admin.priceLists.mealPlan' => 'Verpflegung',
+			'admin.priceLists.fees' => 'Zuschläge und Gebühren',
+			'admin.priceLists.fee' => 'Gebühr',
+			'admin.priceLists.amount' => 'Betrag',
+			'admin.priceLists.nothingToPrice' => 'Bitte zuerst Unterkunftsarten, Altersgruppen, Verpflegungsarten oder Gebühren anlegen. Ihre Preise werden hier eingetragen.',
+			'admin.priceLists.hint' => 'Preise in Euro, inklusive Steuer. Ein leeres Feld hat keinen Preis, und eine Gebühr ohne Betrag wird nicht berechnet.',
+			'admin.priceLists.invalid' => 'Bitte Beträge wie 12,50 eingeben.',
+			'admin.priceLists.saved' => 'Preise gespeichert',
 			'admin.users.empty' => 'Keine Benutzer',
 			'admin.users.unknownEmail' => 'Keine E-Mail-Adresse',
 			'admin.users.you' => 'Sie',

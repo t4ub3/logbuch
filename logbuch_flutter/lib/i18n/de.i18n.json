@@ -121,6 +121,7 @@
         "unassigned": "Ohne Zimmer",
         "everybodyAssigned": "Alle haben ein Zimmer.",
         "noRoomsHeld": "Die Buchung hat noch keine Zimmer.",
+        "crowdedRooms": "{rooms}: In einigen dieser Nächte teilen sich mehr als zwei Buchungen die Unterkunft.",
         "moveTo": "Verschieben nach",
         "bedsUsed": "{used} von {beds} Betten",
         "roomFull": "Voll",
@@ -145,9 +146,10 @@
             "datesMissing": "Die Buchung hat keinen Zeitraum.",
             "ageUnknown": "{name}: Das Alter ist nicht bekannt. Bitte Geburtsdatum eintragen oder Altersgruppe wählen.",
             "roomMissing": "{name}: hat noch kein Zimmer.",
-            "seasonMissing": "Für den {date} gibt es keine Saison.",
+            "priceListMissing": "Am {date} gilt keine Preisliste.",
             "roomRateMissing": "Kein Übernachtungspreis für {detail}.",
-            "mealRateMissing": "Kein Verpflegungspreis für {detail}."
+            "mealRateMissing": "Kein Verpflegungspreis für {detail}.",
+            "dayUsePriceMissing": "Kein Preis für die Tagesnutzung für {detail}."
         },
         "billing": "Abrechnung",
         "noFolios": "Noch nichts abzurechnen. Bitte zuerst Gäste hinzufügen und auf Zimmer verteilen.",
@@ -243,14 +245,20 @@
         }
     },
     "admin": {
+        "groups": {
+            "house": "Haus",
+            "prices": "Preise",
+            "bookings": "Buchungen",
+            "organisation": "Organisation"
+        },
         "sections": {
+            "buildings": "Gebäude",
             "rooms": "Zimmer",
-            "priceCategories": "Preiskategorien",
+            "unitTypes": "Unterkunftsarten",
             "ageGroups": "Altersgruppen",
-            "seasons": "Saisons",
             "mealPlans": "Verpflegung",
-            "rates": "Preise",
-            "fees": "Gebühren",
+            "fees": "Zuschläge und Gebühren",
+            "priceLists": "Preislisten",
             "bookingCategories": "Buchungskategorien",
             "users": "Benutzer",
             "operator": "Träger"
@@ -262,11 +270,12 @@
             "nameRequired": "Ein Name ist erforderlich.",
             "invalidDate": "Das Datum ist ungültig.",
             "invalidDateRange": "Das Ende darf nicht vor dem Beginn liegen.",
-            "seasonOverlap": "Der Zeitraum überschneidet sich mit der Saison „{name}“.",
+            "priceListDateTaken": "Die Preisliste „{name}“ beginnt am selben Tag.",
             "invalidAgeRange": "Das Höchstalter darf nicht unter dem Mindestalter liegen.",
             "ageGroupOverlap": "Die Altersangaben überschneiden sich mit der Altersgruppe „{name}“.",
             "invalidAmount": "Beträge dürfen nicht negativ sein.",
             "invalidTaxRate": "Der Steuersatz muss zwischen 0 und 100 % liegen.",
+            "invalidFeeScope": "Eine Gebühr für jede Buchung oder eine Gebühr pro Buchung kann kein Zuschlag eines Zimmers sein.",
             "invalidBedAmount": "Die Bettenzahl darf nicht negativ sein.",
             "duplicateRate": "Ein Preis wurde doppelt angegeben.",
             "inUse": "Dieser Eintrag wird noch verwendet und kann nicht gelöscht werden.",
@@ -286,15 +295,23 @@
             "alreadyGuest": "Aus diesem Haushalt kann niemand hinzugefügt werden: Er hat keine Mitglieder, oder alle sind bereits Gäste der Buchung.",
             "notConfirmed": "Eine Bestätigung gibt es nur für Buchungen, die ein Angebot haben oder bestätigt sind."
         },
+        "buildings": {
+            "empty": "Keine Gebäude",
+            "add": "Neues Gebäude",
+            "edit": "Gebäude bearbeiten",
+            "sortOrder": "Position in Listen"
+        },
         "rooms": {
             "add": "Neues Zimmer",
             "edit": "Zimmer bearbeiten",
             "number": "Zimmernummer",
             "beds": "Betten",
-            "priceCategory": "Preiskategorie",
-            "noPriceCategories": "Bitte zuerst eine Preiskategorie anlegen.",
+            "unitType": "Unterkunftsart",
+            "noUnitTypes": "Bitte zuerst eine Unterkunftsart anlegen.",
             "building": "Gebäude",
+            "noBuilding": "Kein Gebäude",
             "floor": "Etage",
+            "surcharges": "Zuschläge",
             "cribPossible": "Ein Kinderbett kann aufgestellt werden",
             "crib": "Kinderbett möglich",
             "active": "Aktiv",
@@ -302,12 +319,16 @@
             "inactive": "Inaktiv",
             "notes": "Notizen"
         },
-        "priceCategories": {
-            "empty": "Keine Preiskategorien",
-            "add": "Neue Preiskategorie",
-            "edit": "Preiskategorie bearbeiten",
+        "unitTypes": {
+            "empty": "Keine Unterkunftsarten",
+            "add": "Neue Unterkunftsart",
+            "edit": "Unterkunftsart bearbeiten",
             "sortOrder": "Position in Listen",
-            "deleteHint": "Die Preise dieser Kategorie werden ebenfalls gelöscht."
+            "taxRate": "Steuersatz",
+            "shared": "Buchungen können sie teilen",
+            "sharedHint": "Mehrere Buchungen können eine Unterkunft dieser Art in derselben Nacht belegen. Sie teilen sich den Preis pro Nacht.",
+            "sharedLabel": "geteilt",
+            "deleteHint": "Die Preise dieser Unterkunftsart werden ebenfalls gelöscht."
         },
         "ageGroups": {
             "empty": "Keine Altersgruppen",
@@ -324,14 +345,6 @@
             "openRange": "ab {min} Jahren",
             "deleteHint": "Die Preise dieser Altersgruppe werden ebenfalls gelöscht."
         },
-        "seasons": {
-            "empty": "Keine Saisons",
-            "add": "Neue Saison",
-            "edit": "Saison bearbeiten",
-            "period": "Zeitraum",
-            "gap": "Für {from} – {to} gibt es keine Saison. Aufenthalte in diesem Zeitraum können nicht berechnet werden.",
-            "deleteHint": "Die Preise dieser Saison werden ebenfalls gelöscht."
-        },
         "bookingCategories": {
             "empty": "Keine Buchungskategorien",
             "add": "Neue Buchungskategorie",
@@ -345,28 +358,16 @@
             "edit": "Verpflegungsart bearbeiten",
             "deleteHint": "Die Preise dieser Verpflegungsart werden ebenfalls gelöscht."
         },
-        "rates": {
-            "lodging": "Übernachtung",
-            "meals": "Verpflegung",
-            "priceCategory": "Preiskategorie",
-            "mealPlan": "Verpflegung",
-            "missingLodging": "Für Preise werden mindestens eine Saison, eine Altersgruppe und eine Preiskategorie benötigt.",
-            "missingMeals": "Für Preise werden mindestens eine Saison, eine Altersgruppe und eine Verpflegungsart benötigt.",
-            "hint": "Preise pro Person und Nacht in Euro. Ein leeres Feld hat keinen Preis.",
-            "invalid": "Bitte Beträge wie 12,50 eingeben.",
-            "saved": "Preise gespeichert"
-        },
         "fees": {
-            "empty": "Keine Gebühren",
+            "empty": "Keine Zuschläge oder Gebühren",
             "add": "Neue Gebühr",
             "edit": "Gebühr bearbeiten",
-            "amount": "Betrag",
             "unit": "Berechnung",
             "units": {
                 "perBooking": "pro Buchung",
-                "perPerson": "pro Person",
+                "perPerson": "pro Person, einmal je Aufenthalt",
                 "perPersonNight": "pro Person und Nacht",
-                "perRoom": "pro Zimmer",
+                "perRoom": "pro Zimmer, einmal je Aufenthalt",
                 "perRoomNight": "pro Zimmer und Nacht"
             },
             "ageGroup": "Gilt für",
@@ -374,8 +375,34 @@
             "taxRate": "Steuersatz",
             "tax": "{rate} % Steuer",
             "autoApply": "Zu jeder Buchung hinzufügen",
-            "autoApplyHint": "Andernfalls wird die Gebühr einer Buchung von Hand hinzugefügt.",
-            "auto": "jede Buchung"
+            "autoApplyHint": "Sonst ist die Gebühr ein Zuschlag der unten gewählten Zimmer.",
+            "auto": "jede Buchung",
+            "rooms": "Zuschlag für diese Zimmer",
+            "noRooms": "Es gibt noch keine Zimmer.",
+            "unused": "wird nicht berechnet",
+            "priceHint": "Was sie kostet, steht in den Preislisten."
+        },
+        "priceLists": {
+            "empty": "Noch keine Preislisten. Eine Preisliste enthält alle Preise ab ihrem ersten Tag, bis die nächste Liste beginnt.",
+            "add": "Neue Preisliste",
+            "edit": "Preisliste bearbeiten",
+            "validFrom": "Gültig ab",
+            "from": "ab {date}",
+            "addHint": "Eine neue Liste übernimmt die Preise, die an ihrem ersten Tag gelten.",
+            "deleteHint": "Alle Preise dieser Liste werden ebenfalls gelöscht.",
+            "lodging": "Übernachtung pro Nacht",
+            "unitType": "Unterkunftsart",
+            "perUnit": "Ganze Unterkunft",
+            "dayUse": "Tagesnutzung",
+            "meals": "Verpflegung pro Nacht",
+            "mealPlan": "Verpflegung",
+            "fees": "Zuschläge und Gebühren",
+            "fee": "Gebühr",
+            "amount": "Betrag",
+            "nothingToPrice": "Bitte zuerst Unterkunftsarten, Altersgruppen, Verpflegungsarten oder Gebühren anlegen. Ihre Preise werden hier eingetragen.",
+            "hint": "Preise in Euro, inklusive Steuer. Ein leeres Feld hat keinen Preis, und eine Gebühr ohne Betrag wird nicht berechnet.",
+            "invalid": "Bitte Beträge wie 12,50 eingeben.",
+            "saved": "Preise gespeichert"
         },
         "users": {
             "empty": "Keine Benutzer",

@@ -50,13 +50,13 @@ import 'package:logbuch_client/src/protocol/pricing/booking_price.dart'
 import 'package:logbuch_client/src/protocol/pricing/fee.dart' as _iaal8fsz;
 import 'package:logbuch_client/src/protocol/pricing/meal_plan.dart'
     as _iy1yfvqt;
-import 'package:logbuch_client/src/protocol/pricing/meal_rate.dart'
-    as _i8b25r61;
-import 'package:logbuch_client/src/protocol/pricing/price_category.dart'
-    as _il8lwbsk;
-import 'package:logbuch_client/src/protocol/pricing/room_rate.dart'
-    as _ijssj09l;
-import 'package:logbuch_client/src/protocol/pricing/season.dart' as _id21ndqx;
+import 'package:logbuch_client/src/protocol/pricing/price_list.dart'
+    as _ivembrbw;
+import 'package:logbuch_client/src/protocol/pricing/price_list_prices.dart'
+    as _i5qazncl;
+import 'package:logbuch_client/src/protocol/pricing/unit_type.dart'
+    as _in0tyb01;
+import 'package:logbuch_client/src/protocol/rooms/building.dart' as _iqh700fx;
 import 'package:logbuch_client/src/protocol/rooms/room.dart' as _i5smwbna;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -548,7 +548,7 @@ class EndpointBooking extends EndpointApp {
 
   /// The active rooms that no booking holds during the nights from [arrival]
   /// to [departure]. The rooms of [exceptBookingId] count as free, so that
-  /// the booking can keep them.
+  /// the booking can keep them, and so do rooms that bookings share.
   _ida.Future<List<_i5smwbna.Room>> availableRooms(
     DateTime arrival,
     DateTime departure, {
@@ -562,6 +562,16 @@ class EndpointBooking extends EndpointApp {
       'exceptBookingId': exceptBookingId,
     },
   );
+
+  /// The shared rooms of the booking that more than [maxSharing] bookings
+  /// hold during one of its nights. Sharing is not limited, so this is only
+  /// to warn that it gets crowded.
+  _ida.Future<List<_i5smwbna.Room>> crowdedRooms(int bookingId) =>
+      caller.callServerEndpoint<List<_i5smwbna.Room>>(
+        'booking',
+        'crowdedRooms',
+        {'bookingId': bookingId},
+      );
 
   /// Replaces the rooms that the booking holds. Fails if one of them is
   /// held by another booking during its nights.
@@ -991,6 +1001,7 @@ class EndpointFee extends EndpointApp {
   @override
   String get name => 'fee';
 
+  /// The fees with the rooms they are a surcharge of.
   _ida.Future<List<_iaal8fsz.Fee>> getAll() =>
       caller.callServerEndpoint<List<_iaal8fsz.Fee>>(
         'fee',
@@ -998,20 +1009,33 @@ class EndpointFee extends EndpointApp {
         {},
       );
 
-  _ida.Future<_iaal8fsz.Fee> add(_iaal8fsz.Fee fee) =>
-      caller.callServerEndpoint<_iaal8fsz.Fee>(
-        'fee',
-        'add',
-        {'fee': fee},
-      );
+  /// Adds a fee as a surcharge of the rooms [roomIds], which is empty for a
+  /// fee that every booking is charged.
+  _ida.Future<_iaal8fsz.Fee> add(
+    _iaal8fsz.Fee fee,
+    List<int> roomIds,
+  ) => caller.callServerEndpoint<_iaal8fsz.Fee>(
+    'fee',
+    'add',
+    {
+      'fee': fee,
+      'roomIds': roomIds,
+    },
+  );
 
-  _ida.Future<_iaal8fsz.Fee> update(_iaal8fsz.Fee fee) =>
-      caller.callServerEndpoint<_iaal8fsz.Fee>(
-        'fee',
-        'update',
-        {'fee': fee},
-      );
+  _ida.Future<_iaal8fsz.Fee> update(
+    _iaal8fsz.Fee fee,
+    List<int> roomIds,
+  ) => caller.callServerEndpoint<_iaal8fsz.Fee>(
+    'fee',
+    'update',
+    {
+      'fee': fee,
+      'roomIds': roomIds,
+    },
+  );
 
+  /// Also deletes what the fee costs in the price lists.
   _ida.Future<void> delete(int id) => caller.callServerEndpoint<void>(
     'fee',
     'delete',
@@ -1057,69 +1081,61 @@ class EndpointMealPlan extends EndpointApp {
 }
 
 /// {@category Endpoint}
-class EndpointMealRate extends EndpointApp {
-  EndpointMealRate(_isc.EndpointCaller caller) : super(caller);
+class EndpointPriceList extends EndpointApp {
+  EndpointPriceList(_isc.EndpointCaller caller) : super(caller);
 
   @override
-  String get name => 'mealRate';
+  String get name => 'priceList';
 
-  _ida.Future<List<_i8b25r61.MealRate>> getBySeason(int seasonId) =>
-      caller.callServerEndpoint<List<_i8b25r61.MealRate>>(
-        'mealRate',
-        'getBySeason',
-        {'seasonId': seasonId},
-      );
-
-  /// Replaces all meal rates of the season with [rates]. A combination of
-  /// meal plan and age group that is left out has no price afterwards.
-  _ida.Future<List<_i8b25r61.MealRate>> saveForSeason(
-    int seasonId,
-    List<_i8b25r61.MealRate> rates,
-  ) => caller.callServerEndpoint<List<_i8b25r61.MealRate>>(
-    'mealRate',
-    'saveForSeason',
-    {
-      'seasonId': seasonId,
-      'rates': rates,
-    },
-  );
-}
-
-/// {@category Endpoint}
-class EndpointPriceCategory extends EndpointApp {
-  EndpointPriceCategory(_isc.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'priceCategory';
-
-  _ida.Future<List<_il8lwbsk.PriceCategory>> getAll() =>
-      caller.callServerEndpoint<List<_il8lwbsk.PriceCategory>>(
-        'priceCategory',
+  _ida.Future<List<_ivembrbw.PriceList>> getAll() =>
+      caller.callServerEndpoint<List<_ivembrbw.PriceList>>(
+        'priceList',
         'getAll',
         {},
       );
 
-  _ida.Future<_il8lwbsk.PriceCategory> add(_il8lwbsk.PriceCategory category) =>
-      caller.callServerEndpoint<_il8lwbsk.PriceCategory>(
-        'priceCategory',
+  /// Adds a price list. It starts with the prices that are in force on its
+  /// first day, so that only what changes has to be entered.
+  _ida.Future<_ivembrbw.PriceList> add(_ivembrbw.PriceList list) =>
+      caller.callServerEndpoint<_ivembrbw.PriceList>(
+        'priceList',
         'add',
-        {'category': category},
+        {'list': list},
       );
 
-  _ida.Future<_il8lwbsk.PriceCategory> update(
-    _il8lwbsk.PriceCategory category,
-  ) => caller.callServerEndpoint<_il8lwbsk.PriceCategory>(
-    'priceCategory',
-    'update',
-    {'category': category},
-  );
+  _ida.Future<_ivembrbw.PriceList> update(_ivembrbw.PriceList list) =>
+      caller.callServerEndpoint<_ivembrbw.PriceList>(
+        'priceList',
+        'update',
+        {'list': list},
+      );
 
-  /// Also deletes the room rates of the category. A category that still has
-  /// rooms cannot be deleted.
+  /// Also deletes the prices of the list.
   _ida.Future<void> delete(int id) => caller.callServerEndpoint<void>(
-    'priceCategory',
+    'priceList',
     'delete',
     {'id': id},
+  );
+
+  _ida.Future<_i5qazncl.PriceListPrices> getPrices(int priceListId) =>
+      caller.callServerEndpoint<_i5qazncl.PriceListPrices>(
+        'priceList',
+        'getPrices',
+        {'priceListId': priceListId},
+      );
+
+  /// Replaces all prices of the list with [prices]. What is left out has no
+  /// price afterwards.
+  _ida.Future<_i5qazncl.PriceListPrices> savePrices(
+    int priceListId,
+    _i5qazncl.PriceListPrices prices,
+  ) => caller.callServerEndpoint<_i5qazncl.PriceListPrices>(
+    'priceList',
+    'savePrices',
+    {
+      'priceListId': priceListId,
+      'prices': prices,
+    },
   );
 }
 
@@ -1141,65 +1157,73 @@ class EndpointPricing extends EndpointApp {
 }
 
 /// {@category Endpoint}
-class EndpointRoomRate extends EndpointApp {
-  EndpointRoomRate(_isc.EndpointCaller caller) : super(caller);
+class EndpointUnitType extends EndpointApp {
+  EndpointUnitType(_isc.EndpointCaller caller) : super(caller);
 
   @override
-  String get name => 'roomRate';
+  String get name => 'unitType';
 
-  _ida.Future<List<_ijssj09l.RoomRate>> getBySeason(int seasonId) =>
-      caller.callServerEndpoint<List<_ijssj09l.RoomRate>>(
-        'roomRate',
-        'getBySeason',
-        {'seasonId': seasonId},
-      );
-
-  /// Replaces all room rates of the season with [rates]. A combination of
-  /// price category and age group that is left out has no price afterwards.
-  _ida.Future<List<_ijssj09l.RoomRate>> saveForSeason(
-    int seasonId,
-    List<_ijssj09l.RoomRate> rates,
-  ) => caller.callServerEndpoint<List<_ijssj09l.RoomRate>>(
-    'roomRate',
-    'saveForSeason',
-    {
-      'seasonId': seasonId,
-      'rates': rates,
-    },
-  );
-}
-
-/// {@category Endpoint}
-class EndpointSeason extends EndpointApp {
-  EndpointSeason(_isc.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'season';
-
-  _ida.Future<List<_id21ndqx.Season>> getAll() =>
-      caller.callServerEndpoint<List<_id21ndqx.Season>>(
-        'season',
+  _ida.Future<List<_in0tyb01.UnitType>> getAll() =>
+      caller.callServerEndpoint<List<_in0tyb01.UnitType>>(
+        'unitType',
         'getAll',
         {},
       );
 
-  _ida.Future<_id21ndqx.Season> add(_id21ndqx.Season season) =>
-      caller.callServerEndpoint<_id21ndqx.Season>(
-        'season',
+  _ida.Future<_in0tyb01.UnitType> add(_in0tyb01.UnitType type) =>
+      caller.callServerEndpoint<_in0tyb01.UnitType>(
+        'unitType',
         'add',
-        {'season': season},
+        {'type': type},
       );
 
-  _ida.Future<_id21ndqx.Season> update(_id21ndqx.Season season) =>
-      caller.callServerEndpoint<_id21ndqx.Season>(
-        'season',
+  _ida.Future<_in0tyb01.UnitType> update(_in0tyb01.UnitType type) =>
+      caller.callServerEndpoint<_in0tyb01.UnitType>(
+        'unitType',
         'update',
-        {'season': season},
+        {'type': type},
       );
 
-  /// Also deletes the room and meal rates of the season.
+  /// Also deletes the prices of the type. A type that still has rooms
+  /// cannot be deleted.
   _ida.Future<void> delete(int id) => caller.callServerEndpoint<void>(
-    'season',
+    'unitType',
+    'delete',
+    {'id': id},
+  );
+}
+
+/// {@category Endpoint}
+class EndpointBuilding extends EndpointApp {
+  EndpointBuilding(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'building';
+
+  _ida.Future<List<_iqh700fx.Building>> getAll() =>
+      caller.callServerEndpoint<List<_iqh700fx.Building>>(
+        'building',
+        'getAll',
+        {},
+      );
+
+  _ida.Future<_iqh700fx.Building> add(_iqh700fx.Building building) =>
+      caller.callServerEndpoint<_iqh700fx.Building>(
+        'building',
+        'add',
+        {'building': building},
+      );
+
+  _ida.Future<_iqh700fx.Building> update(_iqh700fx.Building building) =>
+      caller.callServerEndpoint<_iqh700fx.Building>(
+        'building',
+        'update',
+        {'building': building},
+      );
+
+  /// A building that still has rooms cannot be deleted.
+  _ida.Future<void> delete(int id) => caller.callServerEndpoint<void>(
+    'building',
     'delete',
     {'id': id},
   );
@@ -1226,19 +1250,30 @@ class EndpointRoom extends EndpointApp {
         {'id': id},
       );
 
-  _ida.Future<_i5smwbna.Room> add(_i5smwbna.Room room) =>
-      caller.callServerEndpoint<_i5smwbna.Room>(
-        'room',
-        'add',
-        {'room': room},
-      );
+  /// Adds a room with the surcharges [feeIds].
+  _ida.Future<_i5smwbna.Room> add(
+    _i5smwbna.Room room,
+    List<int> feeIds,
+  ) => caller.callServerEndpoint<_i5smwbna.Room>(
+    'room',
+    'add',
+    {
+      'room': room,
+      'feeIds': feeIds,
+    },
+  );
 
-  _ida.Future<_i5smwbna.Room> update(_i5smwbna.Room room) =>
-      caller.callServerEndpoint<_i5smwbna.Room>(
-        'room',
-        'update',
-        {'room': room},
-      );
+  _ida.Future<_i5smwbna.Room> update(
+    _i5smwbna.Room room,
+    List<int> feeIds,
+  ) => caller.callServerEndpoint<_i5smwbna.Room>(
+    'room',
+    'update',
+    {
+      'room': room,
+      'feeIds': feeIds,
+    },
+  );
 
   /// A room that a booking holds or held cannot be deleted, only set
   /// inactive.
@@ -1304,11 +1339,10 @@ class Client extends _isc.ServerpodClientShared {
     ageGroup = EndpointAgeGroup(this);
     fee = EndpointFee(this);
     mealPlan = EndpointMealPlan(this);
-    mealRate = EndpointMealRate(this);
-    priceCategory = EndpointPriceCategory(this);
+    priceList = EndpointPriceList(this);
     pricing = EndpointPricing(this);
-    roomRate = EndpointRoomRate(this);
-    season = EndpointSeason(this);
+    unitType = EndpointUnitType(this);
+    building = EndpointBuilding(this);
     room = EndpointRoom(this);
     modules = Modules(this);
   }
@@ -1347,15 +1381,13 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointMealPlan mealPlan;
 
-  late final EndpointMealRate mealRate;
-
-  late final EndpointPriceCategory priceCategory;
+  late final EndpointPriceList priceList;
 
   late final EndpointPricing pricing;
 
-  late final EndpointRoomRate roomRate;
+  late final EndpointUnitType unitType;
 
-  late final EndpointSeason season;
+  late final EndpointBuilding building;
 
   late final EndpointRoom room;
 
@@ -1380,11 +1412,10 @@ class Client extends _isc.ServerpodClientShared {
     'ageGroup': ageGroup,
     'fee': fee,
     'mealPlan': mealPlan,
-    'mealRate': mealRate,
-    'priceCategory': priceCategory,
+    'priceList': priceList,
     'pricing': pricing,
-    'roomRate': roomRate,
-    'season': season,
+    'unitType': unitType,
+    'building': building,
     'room': room,
   };
 

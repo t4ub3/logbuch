@@ -25,17 +25,15 @@ class FakeClient extends Fake implements Client {
   @override
   final FakeRooms room = FakeRooms();
   @override
-  final FakePriceCategories priceCategory = FakePriceCategories();
+  final FakeBuildings building = FakeBuildings();
+  @override
+  final FakeUnitTypes unitType = FakeUnitTypes();
   @override
   final FakeAgeGroups ageGroup = FakeAgeGroups();
   @override
-  final FakeSeasons season = FakeSeasons();
+  final FakePriceLists priceList = FakePriceLists();
   @override
   final FakeMealPlans mealPlan = FakeMealPlans();
-  @override
-  final FakeRoomRates roomRate = FakeRoomRates();
-  @override
-  final FakeMealRates mealRate = FakeMealRates();
   @override
   final FakeFees fee = FakeFees();
   @override
@@ -120,19 +118,37 @@ class FakeRooms extends Fake implements EndpointRoom {
   @override
   Future<List<Room>> getAll() async => rooms;
 
+  /// The surcharges passed to [add] with the last room.
+  var addedFeeIds = <int>[];
+
   @override
-  Future<Room> add(Room room) async {
+  Future<Room> add(Room room, List<int> feeIds) async {
+    addedFeeIds = feeIds;
     final added = room.copyWith(id: rooms.length + 1);
     rooms = [...rooms, added];
     return added;
   }
 }
 
-class FakePriceCategories extends Fake implements EndpointPriceCategory {
-  var categories = <PriceCategory>[];
+class FakeBuildings extends Fake implements EndpointBuilding {
+  var buildings = <Building>[];
 
   @override
-  Future<List<PriceCategory>> getAll() async => categories;
+  Future<List<Building>> getAll() async => buildings;
+}
+
+class FakeUnitTypes extends Fake implements EndpointUnitType {
+  var types = <UnitType>[];
+
+  @override
+  Future<List<UnitType>> getAll() async => types;
+
+  @override
+  Future<UnitType> add(UnitType type) async {
+    final added = type.copyWith(id: types.length + 1);
+    types = [...types, added];
+    return added;
+  }
 
   @override
   Future<void> delete(int id) async =>
@@ -152,11 +168,38 @@ class FakeAgeGroups extends Fake implements EndpointAgeGroup {
   );
 }
 
-class FakeSeasons extends Fake implements EndpointSeason {
-  var seasons = <Season>[];
+class FakePriceLists extends Fake implements EndpointPriceList {
+  var lists = <PriceList>[];
+
+  /// The prices by the id of their list.
+  final prices = <int, PriceListPrices>{};
 
   @override
-  Future<List<Season>> getAll() async => seasons;
+  Future<List<PriceList>> getAll() async => lists;
+
+  @override
+  Future<PriceList> add(PriceList list) async {
+    final added = list.copyWith(id: lists.length + 1);
+    lists = [...lists, added]
+      ..sort((a, b) => a.validFrom.compareTo(b.validFrom));
+    return added;
+  }
+
+  @override
+  Future<PriceListPrices> getPrices(int priceListId) async =>
+      prices[priceListId] ??
+      PriceListPrices(
+        roomRates: [],
+        unitPrices: [],
+        mealRates: [],
+        feePrices: [],
+      );
+
+  @override
+  Future<PriceListPrices> savePrices(
+    int priceListId,
+    PriceListPrices prices,
+  ) async => this.prices[priceListId] = prices;
 }
 
 class FakeMealPlans extends Fake implements EndpointMealPlan {
@@ -166,33 +209,18 @@ class FakeMealPlans extends Fake implements EndpointMealPlan {
   Future<List<MealPlan>> getAll() async => plans;
 }
 
-class FakeRoomRates extends Fake implements EndpointRoomRate {
-  final bySeason = <int, List<RoomRate>>{};
-
-  @override
-  Future<List<RoomRate>> getBySeason(int seasonId) async =>
-      bySeason[seasonId] ?? [];
-
-  @override
-  Future<List<RoomRate>> saveForSeason(
-    int seasonId,
-    List<RoomRate> rates,
-  ) async => bySeason[seasonId] = rates;
-}
-
-class FakeMealRates extends Fake implements EndpointMealRate {
-  @override
-  Future<List<MealRate>> getBySeason(int seasonId) async => [];
-}
-
 class FakeFees extends Fake implements EndpointFee {
   var fees = <Fee>[];
 
   @override
   Future<List<Fee>> getAll() async => fees;
 
+  /// The rooms passed to [add] with the last fee.
+  var addedRoomIds = <int>[];
+
   @override
-  Future<Fee> add(Fee fee) async {
+  Future<Fee> add(Fee fee, List<int> roomIds) async {
+    addedRoomIds = roomIds;
     final added = fee.copyWith(id: fees.length + 1);
     fees = [...fees, added];
     return added;
@@ -236,6 +264,12 @@ class FakeBookings extends Fake implements EndpointBooking {
 
   /// The rooms that count as free, whatever the dates.
   var available = <Room>[];
+
+  /// The shared rooms that count as crowded, whatever the booking.
+  var crowded = <Room>[];
+
+  @override
+  Future<List<Room>> crowdedRooms(int bookingId) async => crowded;
 
   /// The bookings passed to [add].
   final added = <Booking>[];
@@ -607,77 +641,78 @@ class FakeOperators extends Fake implements EndpointOperator {
       this.operator = operator.copyWith(id: 1);
 }
 
-/// A client with a small but complete setup: two rooms with prices and
-/// fees, two contacts, and bookings in October 2026.
+/// A client with a small but complete setup: two rooms, two price lists
+/// with prices and a fee, two contacts, and bookings in October 2026.
 FakeClient filledClient({UserRole? role = UserRole.admin}) {
   final client = FakeClient(role: role);
-  client.priceCategory.categories = [
-    PriceCategory(id: 1, name: 'Standard', sortOrder: 0),
-    PriceCategory(id: 2, name: 'Comfort', sortOrder: 1),
+  client.unitType.types = [
+    UnitType(id: 1, name: 'Standard', sortOrder: 0),
+    UnitType(id: 2, name: 'Comfort', sortOrder: 1),
   ];
+  final annex = Building(id: 1, name: 'Annex');
+  client.building.buildings = [annex];
   final room101 = Room(
     id: 1,
     roomNumber: '101',
     bedAmount: 4,
-    priceCategoryId: 1,
-    priceCategory: client.priceCategory.categories.first,
+    unitTypeId: 1,
+    unitType: client.unitType.types.first,
     cribPossible: true,
+    fees: [],
   );
   final room102 = Room(
     id: 2,
     roomNumber: '102',
     bedAmount: 1,
-    priceCategoryId: 2,
-    priceCategory: client.priceCategory.categories.last,
+    unitTypeId: 2,
+    unitType: client.unitType.types.last,
     active: false,
-    building: 'Annex',
+    buildingId: 1,
+    building: annex,
+    fees: [],
   );
   final room103 = Room(
     id: 3,
     roomNumber: '103',
     bedAmount: 2,
-    priceCategoryId: 1,
-    priceCategory: client.priceCategory.categories.first,
+    unitTypeId: 1,
+    unitType: client.unitType.types.first,
   );
   client.room.rooms = [room101, room102];
   client.ageGroup.groups = [
     AgeGroup(id: 1, name: 'Child', minAge: 0, maxAge: 17),
     AgeGroup(id: 2, name: 'Adult', minAge: 18),
   ];
-  client.season.seasons = [
-    Season(
-      id: 1,
-      name: 'Spring',
-      validFrom: DateTime.utc(2027, 3, 1),
-      validTo: DateTime.utc(2027, 5, 31),
-    ),
-    Season(
-      id: 2,
-      name: 'Autumn',
-      validFrom: DateTime.utc(2027, 9, 1),
-      validTo: DateTime.utc(2027, 10, 31),
-    ),
+  // Both price lists begin after today, so the first one is shown.
+  client.priceList.lists = [
+    PriceList(id: 1, name: 'Prices 2127', validFrom: DateTime.utc(2127)),
+    PriceList(id: 2, name: 'Prices 2128', validFrom: DateTime.utc(2128)),
   ];
   client.mealPlan.plans = [MealPlan(id: 1, name: 'Full board')];
-  client.roomRate.bySeason[1] = [
-    RoomRate(
-      seasonId: 1,
-      priceCategoryId: 1,
-      ageGroupId: 2,
-      pricePerNight: 2500,
-    ),
-  ];
   client.fee.fees = [
     Fee(
       id: 1,
       name: 'Tourist tax',
-      amount: 200,
       unit: FeeUnit.perPersonNight,
       ageGroupId: 2,
       taxRate: 700,
       autoApply: true,
+      rooms: [],
     ),
   ];
+  client.priceList.prices[1] = PriceListPrices(
+    roomRates: [
+      RoomRate(
+        priceListId: 1,
+        unitTypeId: 1,
+        ageGroupId: 2,
+        pricePerNight: 2500,
+      ),
+    ],
+    unitPrices: [],
+    mealRates: [],
+    feePrices: [FeePrice(priceListId: 1, feeId: 1, amount: 200)],
+  );
 
   final lindenschule = Organization(
     id: 1,
@@ -825,7 +860,7 @@ FakeClient filledClient({UserRole? role = UserRole.admin}) {
           folioId: 1,
           guestId: 1,
           type: ChargeType.lodging,
-          description: 'Standard · Adult · Spring',
+          description: 'Standard · Adult',
           quantity: 4,
           unitPrice: 2500,
           total: 10000,
@@ -1013,7 +1048,7 @@ FakeClient filledClient({UserRole? role = UserRole.admin}) {
       ChargeLine(
         guestId: 1,
         type: ChargeType.lodging,
-        description: 'Standard · Adult · Spring',
+        description: 'Standard · Adult',
         quantity: 4,
         unitPrice: 2500,
         total: 10000,
@@ -1032,7 +1067,7 @@ FakeClient filledClient({UserRole? role = UserRole.admin}) {
     problems: [
       PricingProblem(reason: PricingProblemReason.ageUnknown, guestId: 2),
       PricingProblem(
-        reason: PricingProblemReason.seasonMissing,
+        reason: PricingProblemReason.priceListMissing,
         detail: '2026-10-15',
       ),
     ],

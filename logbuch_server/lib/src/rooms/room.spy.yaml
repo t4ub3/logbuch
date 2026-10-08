@@ -1,11 +1,14 @@
+### A room, or a house that is booked as a whole, such as a bungalow.
 class: Room
 table: rooms
 fields:
   roomNumber: String
   bedAmount: int
-  building: String?
+  building: Building?, relation(optional, onDelete=Restrict)
   floor: String?
-  priceCategory: PriceCategory?, relation(onDelete=Restrict)
+  unitType: UnitType?, relation(onDelete=Restrict)
   cribPossible: bool, default=false
   active: bool, default=true
   notes: String?
+  ### The surcharges of the room.
+  fees: List<RoomFee>?, relation(name=room_fees)

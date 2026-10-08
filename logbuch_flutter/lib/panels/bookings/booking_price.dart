@@ -142,7 +142,7 @@ class _Price extends StatelessWidget {
       PricingProblemReason.ageUnknown => t.ageUnknown(name: name),
       PricingProblemReason.roomMissing => t.roomMissing(name: name),
       // The night comes as a date like 2027-09-01.
-      PricingProblemReason.seasonMissing => t.seasonMissing(
+      PricingProblemReason.priceListMissing => t.priceListMissing(
         date: switch (DateTime.tryParse('${detail}T00:00:00Z')) {
           final night? => formatDate(context, night),
           null => detail,
@@ -150,6 +150,9 @@ class _Price extends StatelessWidget {
       ),
       PricingProblemReason.roomRateMissing => t.roomRateMissing(detail: detail),
       PricingProblemReason.mealRateMissing => t.mealRateMissing(detail: detail),
+      PricingProblemReason.dayUsePriceMissing => t.dayUsePriceMissing(
+        detail: detail,
+      ),
     };
   }
 }

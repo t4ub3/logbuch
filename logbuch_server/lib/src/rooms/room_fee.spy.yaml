@@ -1,0 +1,10 @@
+### A surcharge that a room has.
+class: RoomFee
+table: room_fees
+fields:
+  room: Room?, relation(name=room_fees, onDelete=Cascade)
+  fee: Fee?, relation(name=fee_rooms, onDelete=Cascade)
+indexes:
+  room_fees_unique_idx:
+    fields: roomId, feeId
+    unique: true

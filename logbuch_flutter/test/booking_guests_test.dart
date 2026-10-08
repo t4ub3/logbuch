@@ -29,7 +29,7 @@ void main() {
     Room room({int beds = 2, bool crib = false}) => Room(
       roomNumber: '1',
       bedAmount: beds,
-      priceCategoryId: 1,
+      unitTypeId: 1,
       cribPossible: crib,
     );
     List<Guest> guests(int inBeds, {int inCribs = 0}) => [
@@ -331,7 +331,7 @@ void main() {
 
     expect(price(find.text('Marie Weber')), findsOneWidget);
     expect(
-      price(find.text('Lodging · Standard · Adult · Spring')),
+      price(find.text('Lodging · Standard · Adult')),
       findsOneWidget,
     );
     expect(price(find.text('4 × €25.00')), findsOneWidget);
@@ -345,7 +345,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      price(find.textContaining('No season covers Oct 15, 2026.')),
+      price(find.textContaining('No price list is valid on Oct 15, 2026.')),
       findsOneWidget,
     );
   });

@@ -19,6 +19,7 @@ abstract class ChargeLine
     implements _is.SerializableModel, _is.ProtocolSerialization {
   ChargeLine._({
     this.guestId,
+    this.bookingRoomId,
     required this.type,
     required this.description,
     required this.quantity,
@@ -31,6 +32,7 @@ abstract class ChargeLine
 
   factory ChargeLine({
     int? guestId,
+    int? bookingRoomId,
     required _iiq5obzg.ChargeType type,
     required String description,
     required int quantity,
@@ -44,6 +46,7 @@ abstract class ChargeLine
   factory ChargeLine.fromJson(Map<String, dynamic> jsonSerialization) {
     return ChargeLine(
       guestId: jsonSerialization['guestId'] as int?,
+      bookingRoomId: jsonSerialization['bookingRoomId'] as int?,
       type: _iiq5obzg.ChargeType.fromJson(
         (jsonSerialization['type'] as String),
       ),
@@ -61,8 +64,12 @@ abstract class ChargeLine
     );
   }
 
-  /// Null for fees that are charged per booking or per room.
+  /// Null for what is charged per booking or per room.
   int? guestId;
+
+  /// The room of the booking that a line without a guest is charged for.
+  /// Null for what is charged per booking.
+  int? bookingRoomId;
 
   _iiq5obzg.ChargeType type;
 
@@ -87,6 +94,7 @@ abstract class ChargeLine
   @_is.useResult
   ChargeLine copyWith({
     int? guestId,
+    int? bookingRoomId,
     _iiq5obzg.ChargeType? type,
     String? description,
     int? quantity,
@@ -101,6 +109,7 @@ abstract class ChargeLine
     return {
       '__className__': 'ChargeLine',
       if (guestId != null) 'guestId': guestId,
+      if (bookingRoomId != null) 'bookingRoomId': bookingRoomId,
       'type': type.toJson(),
       'description': description,
       'quantity': quantity,
@@ -117,6 +126,7 @@ abstract class ChargeLine
     return {
       '__className__': 'ChargeLine',
       if (guestId != null) 'guestId': guestId,
+      if (bookingRoomId != null) 'bookingRoomId': bookingRoomId,
       'type': type.toJson(),
       'description': description,
       'quantity': quantity,
@@ -139,6 +149,7 @@ class _Undefined {}
 class _ChargeLineImpl extends ChargeLine {
   _ChargeLineImpl({
     int? guestId,
+    int? bookingRoomId,
     required _iiq5obzg.ChargeType type,
     required String description,
     required int quantity,
@@ -149,6 +160,7 @@ class _ChargeLineImpl extends ChargeLine {
     DateTime? periodTo,
   }) : super._(
          guestId: guestId,
+         bookingRoomId: bookingRoomId,
          type: type,
          description: description,
          quantity: quantity,
@@ -165,6 +177,7 @@ class _ChargeLineImpl extends ChargeLine {
   @override
   ChargeLine copyWith({
     Object? guestId = _Undefined,
+    Object? bookingRoomId = _Undefined,
     _iiq5obzg.ChargeType? type,
     String? description,
     int? quantity,
@@ -176,6 +189,7 @@ class _ChargeLineImpl extends ChargeLine {
   }) {
     return ChargeLine(
       guestId: guestId is int? ? guestId : this.guestId,
+      bookingRoomId: bookingRoomId is int? ? bookingRoomId : this.bookingRoomId,
       type: type ?? this.type,
       description: description ?? this.description,
       quantity: quantity ?? this.quantity,

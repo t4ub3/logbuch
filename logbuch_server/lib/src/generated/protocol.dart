@@ -36,13 +36,11 @@ import 'package:logbuch_server/src/generated/pricing/age_group.dart'
 import 'package:logbuch_server/src/generated/pricing/fee.dart' as _ishmp5re;
 import 'package:logbuch_server/src/generated/pricing/meal_plan.dart'
     as _ie35qe72;
-import 'package:logbuch_server/src/generated/pricing/meal_rate.dart'
-    as _ii7pox79;
-import 'package:logbuch_server/src/generated/pricing/price_category.dart'
-    as _iqby8hww;
-import 'package:logbuch_server/src/generated/pricing/room_rate.dart'
-    as _iglzf0wc;
-import 'package:logbuch_server/src/generated/pricing/season.dart' as _ityrq9rl;
+import 'package:logbuch_server/src/generated/pricing/price_list.dart'
+    as _ic4bgbrp;
+import 'package:logbuch_server/src/generated/pricing/unit_type.dart'
+    as _ic12qaye;
+import 'package:logbuch_server/src/generated/rooms/building.dart' as _i5t9xicf;
 import 'package:logbuch_server/src/generated/rooms/room.dart' as _iu0pobb2;
 import 'package:serverpod/protocol.dart' as _isp;
 import 'package:serverpod/serverpod.dart' as _is;
@@ -94,15 +92,20 @@ import 'pricing/booking_price.dart' as _i53999gr;
 import 'pricing/charge_line.dart' as _idyrztp6;
 import 'pricing/charge_type.dart' as _iodpb345;
 import 'pricing/fee.dart' as _igatvxgq;
+import 'pricing/fee_price.dart' as _idwz9zuu;
 import 'pricing/fee_unit.dart' as _invqlcyo;
 import 'pricing/meal_plan.dart' as _iahrqsj9;
 import 'pricing/meal_rate.dart' as _i79c4x61;
-import 'pricing/price_category.dart' as _ilo0onje;
+import 'pricing/price_list.dart' as _iywc4zrq;
+import 'pricing/price_list_prices.dart' as _i0r81qjm;
 import 'pricing/pricing_problem.dart' as _i2s1dsvn;
 import 'pricing/pricing_problem_reason.dart' as _i0jnw4ju;
 import 'pricing/room_rate.dart' as _ivym9zqa;
-import 'pricing/season.dart' as _i3x806ev;
+import 'pricing/unit_price.dart' as _irmv8dws;
+import 'pricing/unit_type.dart' as _ihus81hy;
+import 'rooms/building.dart' as _iqh2u036;
 import 'rooms/room.dart' as _ix383f3m;
+import 'rooms/room_fee.dart' as _i14ck3rp;
 export 'auth/app_user.dart';
 export 'auth/user_role.dart';
 export 'billing/charge.dart';
@@ -147,15 +150,20 @@ export 'pricing/booking_price.dart';
 export 'pricing/charge_line.dart';
 export 'pricing/charge_type.dart';
 export 'pricing/fee.dart';
+export 'pricing/fee_price.dart';
 export 'pricing/fee_unit.dart';
 export 'pricing/meal_plan.dart';
 export 'pricing/meal_rate.dart';
-export 'pricing/price_category.dart';
+export 'pricing/price_list.dart';
+export 'pricing/price_list_prices.dart';
 export 'pricing/pricing_problem.dart';
 export 'pricing/pricing_problem_reason.dart';
 export 'pricing/room_rate.dart';
-export 'pricing/season.dart';
+export 'pricing/unit_price.dart';
+export 'pricing/unit_type.dart';
+export 'rooms/building.dart';
 export 'rooms/room.dart';
+export 'rooms/room_fee.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
   Protocol._();
@@ -443,6 +451,37 @@ class Protocol extends _is.DatabaseSerializationManager {
           matchType: null,
         ),
       ],
+      indexes: [],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'buildings',
+      dartName: 'Building',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'name',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'sortOrder',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+      ],
+      foreignKeys: [],
       indexes: [],
       managed: true,
     ),
@@ -818,6 +857,81 @@ class Protocol extends _is.DatabaseSerializationManager {
       managed: true,
     ),
     _isp.TableDefinition(
+      name: 'fee_prices',
+      dartName: 'FeePrice',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'priceListId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'feeId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'amount',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'fee_prices_fk_0',
+          columns: ['priceListId'],
+          referenceTable: 'price_lists',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+        _isp.ForeignKeyDefinition(
+          constraintName: 'fee_prices_fk_1',
+          columns: ['feeId'],
+          referenceTable: 'fees',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'fee_prices_unique_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'priceListId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'feeId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
       name: 'fees',
       dartName: 'Fee',
       schema: 'public',
@@ -835,12 +949,6 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
-        ),
-        _isp.ColumnDefinition(
-          name: 'amount',
-          columnType: _isp.ColumnType.bigint,
-          isNullable: false,
-          dartType: 'int',
         ),
         _isp.ColumnDefinition(
           name: 'unit',
@@ -1343,7 +1451,7 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnDefault: 'serial',
         ),
         _isp.ColumnDefinition(
-          name: 'seasonId',
+          name: 'priceListId',
           columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
@@ -1370,8 +1478,8 @@ class Protocol extends _is.DatabaseSerializationManager {
       foreignKeys: [
         _isp.ForeignKeyDefinition(
           constraintName: 'meal_rates_fk_0',
-          columns: ['seasonId'],
-          referenceTable: 'seasons',
+          columns: ['priceListId'],
+          referenceTable: 'price_lists',
           referenceTableSchema: 'public',
           referenceColumns: ['id'],
           onUpdate: _isp.ForeignKeyAction.noAction,
@@ -1406,7 +1514,7 @@ class Protocol extends _is.DatabaseSerializationManager {
           elements: [
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
-              definition: 'seasonId',
+              definition: 'priceListId',
             ),
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
@@ -1681,8 +1789,8 @@ class Protocol extends _is.DatabaseSerializationManager {
       managed: true,
     ),
     _isp.TableDefinition(
-      name: 'price_categories',
-      dartName: 'PriceCategory',
+      name: 'price_lists',
+      dartName: 'PriceList',
       schema: 'public',
       module: 'logbuch',
       columns: [
@@ -1700,15 +1808,97 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'String',
         ),
         _isp.ColumnDefinition(
-          name: 'sortOrder',
-          columnType: _isp.ColumnType.bigint,
+          name: 'validFrom',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: false,
-          dartType: 'int',
-          columnDefault: '0',
+          dartType: 'DateTime',
         ),
       ],
       foreignKeys: [],
-      indexes: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'price_lists_valid_from_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'validFrom',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'room_fees',
+      dartName: 'RoomFee',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'roomId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'feeId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'room_fees_fk_0',
+          columns: ['roomId'],
+          referenceTable: 'rooms',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+        _isp.ForeignKeyDefinition(
+          constraintName: 'room_fees_fk_1',
+          columns: ['feeId'],
+          referenceTable: 'fees',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'room_fees_unique_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'roomId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'feeId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
       managed: true,
     ),
     _isp.TableDefinition(
@@ -1725,13 +1915,13 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnDefault: 'serial',
         ),
         _isp.ColumnDefinition(
-          name: 'seasonId',
+          name: 'priceListId',
           columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
         ),
         _isp.ColumnDefinition(
-          name: 'priceCategoryId',
+          name: 'unitTypeId',
           columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
@@ -1752,8 +1942,8 @@ class Protocol extends _is.DatabaseSerializationManager {
       foreignKeys: [
         _isp.ForeignKeyDefinition(
           constraintName: 'room_rates_fk_0',
-          columns: ['seasonId'],
-          referenceTable: 'seasons',
+          columns: ['priceListId'],
+          referenceTable: 'price_lists',
           referenceTableSchema: 'public',
           referenceColumns: ['id'],
           onUpdate: _isp.ForeignKeyAction.noAction,
@@ -1762,8 +1952,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         ),
         _isp.ForeignKeyDefinition(
           constraintName: 'room_rates_fk_1',
-          columns: ['priceCategoryId'],
-          referenceTable: 'price_categories',
+          columns: ['unitTypeId'],
+          referenceTable: 'unit_types',
           referenceTableSchema: 'public',
           referenceColumns: ['id'],
           onUpdate: _isp.ForeignKeyAction.noAction,
@@ -1788,11 +1978,11 @@ class Protocol extends _is.DatabaseSerializationManager {
           elements: [
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
-              definition: 'seasonId',
+              definition: 'priceListId',
             ),
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
-              definition: 'priceCategoryId',
+              definition: 'unitTypeId',
             ),
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
@@ -1832,10 +2022,10 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'int',
         ),
         _isp.ColumnDefinition(
-          name: 'building',
-          columnType: _isp.ColumnType.text,
+          name: 'buildingId',
+          columnType: _isp.ColumnType.bigint,
           isNullable: true,
-          dartType: 'String?',
+          dartType: 'int?',
         ),
         _isp.ColumnDefinition(
           name: 'floor',
@@ -1844,7 +2034,7 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'String?',
         ),
         _isp.ColumnDefinition(
-          name: 'priceCategoryId',
+          name: 'unitTypeId',
           columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
@@ -1873,8 +2063,18 @@ class Protocol extends _is.DatabaseSerializationManager {
       foreignKeys: [
         _isp.ForeignKeyDefinition(
           constraintName: 'rooms_fk_0',
-          columns: ['priceCategoryId'],
-          referenceTable: 'price_categories',
+          columns: ['buildingId'],
+          referenceTable: 'buildings',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.restrict,
+          matchType: null,
+        ),
+        _isp.ForeignKeyDefinition(
+          constraintName: 'rooms_fk_1',
+          columns: ['unitTypeId'],
+          referenceTable: 'unit_types',
           referenceTableSchema: 'public',
           referenceColumns: ['id'],
           onUpdate: _isp.ForeignKeyAction.noAction,
@@ -1886,8 +2086,89 @@ class Protocol extends _is.DatabaseSerializationManager {
       managed: true,
     ),
     _isp.TableDefinition(
-      name: 'seasons',
-      dartName: 'Season',
+      name: 'unit_prices',
+      dartName: 'UnitPrice',
+      schema: 'public',
+      module: 'logbuch',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'priceListId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'unitTypeId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'pricePerNight',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'dayUsePrice',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'unit_prices_fk_0',
+          columns: ['priceListId'],
+          referenceTable: 'price_lists',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+        _isp.ForeignKeyDefinition(
+          constraintName: 'unit_prices_fk_1',
+          columns: ['unitTypeId'],
+          referenceTable: 'unit_types',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'unit_prices_unique_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'priceListId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'unitTypeId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'unit_types',
+      dartName: 'UnitType',
       schema: 'public',
       module: 'logbuch',
       columns: [
@@ -1905,16 +2186,25 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'String',
         ),
         _isp.ColumnDefinition(
-          name: 'validFrom',
-          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          name: 'sortOrder',
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
-          dartType: 'DateTime',
+          dartType: 'int',
+          columnDefault: '0',
         ),
         _isp.ColumnDefinition(
-          name: 'validTo',
-          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          name: 'taxRate',
+          columnType: _isp.ColumnType.bigint,
           isNullable: false,
-          dartType: 'DateTime',
+          dartType: 'int',
+          columnDefault: '700',
+        ),
+        _isp.ColumnDefinition(
+          name: 'shared',
+          columnType: _isp.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+          columnDefault: 'false',
         ),
       ],
       foreignKeys: [],
@@ -2085,6 +2375,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _igatvxgq.Fee) {
       return _igatvxgq.Fee.fromJson(data) as T;
     }
+    if (t == _idwz9zuu.FeePrice) {
+      return _idwz9zuu.FeePrice.fromJson(data) as T;
+    }
     if (t == _invqlcyo.FeeUnit) {
       return _invqlcyo.FeeUnit.fromJson(data) as T;
     }
@@ -2094,8 +2387,11 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _i79c4x61.MealRate) {
       return _i79c4x61.MealRate.fromJson(data) as T;
     }
-    if (t == _ilo0onje.PriceCategory) {
-      return _ilo0onje.PriceCategory.fromJson(data) as T;
+    if (t == _iywc4zrq.PriceList) {
+      return _iywc4zrq.PriceList.fromJson(data) as T;
+    }
+    if (t == _i0r81qjm.PriceListPrices) {
+      return _i0r81qjm.PriceListPrices.fromJson(data) as T;
     }
     if (t == _i2s1dsvn.PricingProblem) {
       return _i2s1dsvn.PricingProblem.fromJson(data) as T;
@@ -2106,11 +2402,20 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ivym9zqa.RoomRate) {
       return _ivym9zqa.RoomRate.fromJson(data) as T;
     }
-    if (t == _i3x806ev.Season) {
-      return _i3x806ev.Season.fromJson(data) as T;
+    if (t == _irmv8dws.UnitPrice) {
+      return _irmv8dws.UnitPrice.fromJson(data) as T;
+    }
+    if (t == _ihus81hy.UnitType) {
+      return _ihus81hy.UnitType.fromJson(data) as T;
+    }
+    if (t == _iqh2u036.Building) {
+      return _iqh2u036.Building.fromJson(data) as T;
     }
     if (t == _ix383f3m.Room) {
       return _ix383f3m.Room.fromJson(data) as T;
+    }
+    if (t == _i14ck3rp.RoomFee) {
+      return _i14ck3rp.RoomFee.fromJson(data) as T;
     }
     if (t == _is.getType<_ij0177b8.AppUser?>()) {
       return (data != null ? _ij0177b8.AppUser.fromJson(data) : null) as T;
@@ -2267,6 +2572,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_igatvxgq.Fee?>()) {
       return (data != null ? _igatvxgq.Fee.fromJson(data) : null) as T;
     }
+    if (t == _is.getType<_idwz9zuu.FeePrice?>()) {
+      return (data != null ? _idwz9zuu.FeePrice.fromJson(data) : null) as T;
+    }
     if (t == _is.getType<_invqlcyo.FeeUnit?>()) {
       return (data != null ? _invqlcyo.FeeUnit.fromJson(data) : null) as T;
     }
@@ -2276,8 +2584,11 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_i79c4x61.MealRate?>()) {
       return (data != null ? _i79c4x61.MealRate.fromJson(data) : null) as T;
     }
-    if (t == _is.getType<_ilo0onje.PriceCategory?>()) {
-      return (data != null ? _ilo0onje.PriceCategory.fromJson(data) : null)
+    if (t == _is.getType<_iywc4zrq.PriceList?>()) {
+      return (data != null ? _iywc4zrq.PriceList.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i0r81qjm.PriceListPrices?>()) {
+      return (data != null ? _i0r81qjm.PriceListPrices.fromJson(data) : null)
           as T;
     }
     if (t == _is.getType<_i2s1dsvn.PricingProblem?>()) {
@@ -2293,11 +2604,20 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_ivym9zqa.RoomRate?>()) {
       return (data != null ? _ivym9zqa.RoomRate.fromJson(data) : null) as T;
     }
-    if (t == _is.getType<_i3x806ev.Season?>()) {
-      return (data != null ? _i3x806ev.Season.fromJson(data) : null) as T;
+    if (t == _is.getType<_irmv8dws.UnitPrice?>()) {
+      return (data != null ? _irmv8dws.UnitPrice.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ihus81hy.UnitType?>()) {
+      return (data != null ? _ihus81hy.UnitType.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_iqh2u036.Building?>()) {
+      return (data != null ? _iqh2u036.Building.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_ix383f3m.Room?>()) {
       return (data != null ? _ix383f3m.Room.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i14ck3rp.RoomFee?>()) {
+      return (data != null ? _i14ck3rp.RoomFee.fromJson(data) : null) as T;
     }
     if (t == List<_iwk2mful.Charge>) {
       return (data as List)
@@ -2435,6 +2755,44 @@ class Protocol extends _is.DatabaseSerializationManager {
               .toList()
           as T;
     }
+    if (t == List<_i14ck3rp.RoomFee>) {
+      return (data as List)
+              .map((e) => deserialize<_i14ck3rp.RoomFee>(e))
+              .toList()
+          as T;
+    }
+    if (t == _is.getType<List<_i14ck3rp.RoomFee>?>()) {
+      return (data != null
+              ? (data as List)
+                    .map((e) => deserialize<_i14ck3rp.RoomFee>(e))
+                    .toList()
+              : null)
+          as T;
+    }
+    if (t == List<_ivym9zqa.RoomRate>) {
+      return (data as List)
+              .map((e) => deserialize<_ivym9zqa.RoomRate>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_irmv8dws.UnitPrice>) {
+      return (data as List)
+              .map((e) => deserialize<_irmv8dws.UnitPrice>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i79c4x61.MealRate>) {
+      return (data as List)
+              .map((e) => deserialize<_i79c4x61.MealRate>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_idwz9zuu.FeePrice>) {
+      return (data as List)
+              .map((e) => deserialize<_idwz9zuu.FeePrice>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_ikienaka.AppUser>) {
       return (data as List)
               .map((e) => deserialize<_ikienaka.AppUser>(e))
@@ -2522,27 +2880,21 @@ class Protocol extends _is.DatabaseSerializationManager {
               .toList()
           as T;
     }
-    if (t == List<_ii7pox79.MealRate>) {
+    if (t == List<_ic4bgbrp.PriceList>) {
       return (data as List)
-              .map((e) => deserialize<_ii7pox79.MealRate>(e))
+              .map((e) => deserialize<_ic4bgbrp.PriceList>(e))
               .toList()
           as T;
     }
-    if (t == List<_iqby8hww.PriceCategory>) {
+    if (t == List<_ic12qaye.UnitType>) {
       return (data as List)
-              .map((e) => deserialize<_iqby8hww.PriceCategory>(e))
+              .map((e) => deserialize<_ic12qaye.UnitType>(e))
               .toList()
           as T;
     }
-    if (t == List<_iglzf0wc.RoomRate>) {
+    if (t == List<_i5t9xicf.Building>) {
       return (data as List)
-              .map((e) => deserialize<_iglzf0wc.RoomRate>(e))
-              .toList()
-          as T;
-    }
-    if (t == List<_ityrq9rl.Season>) {
-      return (data as List)
-              .map((e) => deserialize<_ityrq9rl.Season>(e))
+              .map((e) => deserialize<_i5t9xicf.Building>(e))
               .toList()
           as T;
     }
@@ -2604,15 +2956,20 @@ class Protocol extends _is.DatabaseSerializationManager {
       _idyrztp6.ChargeLine => 'ChargeLine',
       _iodpb345.ChargeType => 'ChargeType',
       _igatvxgq.Fee => 'Fee',
+      _idwz9zuu.FeePrice => 'FeePrice',
       _invqlcyo.FeeUnit => 'FeeUnit',
       _iahrqsj9.MealPlan => 'MealPlan',
       _i79c4x61.MealRate => 'MealRate',
-      _ilo0onje.PriceCategory => 'PriceCategory',
+      _iywc4zrq.PriceList => 'PriceList',
+      _i0r81qjm.PriceListPrices => 'PriceListPrices',
       _i2s1dsvn.PricingProblem => 'PricingProblem',
       _i0jnw4ju.PricingProblemReason => 'PricingProblemReason',
       _ivym9zqa.RoomRate => 'RoomRate',
-      _i3x806ev.Season => 'Season',
+      _irmv8dws.UnitPrice => 'UnitPrice',
+      _ihus81hy.UnitType => 'UnitType',
+      _iqh2u036.Building => 'Building',
       _ix383f3m.Room => 'Room',
+      _i14ck3rp.RoomFee => 'RoomFee',
       _ => null,
     };
   }
@@ -2715,24 +3072,34 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'ChargeType';
       case _igatvxgq.Fee():
         return 'Fee';
+      case _idwz9zuu.FeePrice():
+        return 'FeePrice';
       case _invqlcyo.FeeUnit():
         return 'FeeUnit';
       case _iahrqsj9.MealPlan():
         return 'MealPlan';
       case _i79c4x61.MealRate():
         return 'MealRate';
-      case _ilo0onje.PriceCategory():
-        return 'PriceCategory';
+      case _iywc4zrq.PriceList():
+        return 'PriceList';
+      case _i0r81qjm.PriceListPrices():
+        return 'PriceListPrices';
       case _i2s1dsvn.PricingProblem():
         return 'PricingProblem';
       case _i0jnw4ju.PricingProblemReason():
         return 'PricingProblemReason';
       case _ivym9zqa.RoomRate():
         return 'RoomRate';
-      case _i3x806ev.Season():
-        return 'Season';
+      case _irmv8dws.UnitPrice():
+        return 'UnitPrice';
+      case _ihus81hy.UnitType():
+        return 'UnitType';
+      case _iqh2u036.Building():
+        return 'Building';
       case _ix383f3m.Room():
         return 'Room';
+      case _i14ck3rp.RoomFee():
+        return 'RoomFee';
     }
     className = _iais.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -2891,6 +3258,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'Fee') {
       return deserialize<_igatvxgq.Fee>(data['data']);
     }
+    if (dataClassName == 'FeePrice') {
+      return deserialize<_idwz9zuu.FeePrice>(data['data']);
+    }
     if (dataClassName == 'FeeUnit') {
       return deserialize<_invqlcyo.FeeUnit>(data['data']);
     }
@@ -2900,8 +3270,11 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'MealRate') {
       return deserialize<_i79c4x61.MealRate>(data['data']);
     }
-    if (dataClassName == 'PriceCategory') {
-      return deserialize<_ilo0onje.PriceCategory>(data['data']);
+    if (dataClassName == 'PriceList') {
+      return deserialize<_iywc4zrq.PriceList>(data['data']);
+    }
+    if (dataClassName == 'PriceListPrices') {
+      return deserialize<_i0r81qjm.PriceListPrices>(data['data']);
     }
     if (dataClassName == 'PricingProblem') {
       return deserialize<_i2s1dsvn.PricingProblem>(data['data']);
@@ -2912,11 +3285,20 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'RoomRate') {
       return deserialize<_ivym9zqa.RoomRate>(data['data']);
     }
-    if (dataClassName == 'Season') {
-      return deserialize<_i3x806ev.Season>(data['data']);
+    if (dataClassName == 'UnitPrice') {
+      return deserialize<_irmv8dws.UnitPrice>(data['data']);
+    }
+    if (dataClassName == 'UnitType') {
+      return deserialize<_ihus81hy.UnitType>(data['data']);
+    }
+    if (dataClassName == 'Building') {
+      return deserialize<_iqh2u036.Building>(data['data']);
     }
     if (dataClassName == 'Room') {
       return deserialize<_ix383f3m.Room>(data['data']);
+    }
+    if (dataClassName == 'RoomFee') {
+      return deserialize<_i14ck3rp.RoomFee>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
@@ -2995,18 +3377,26 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _igvrv9tv.AgeGroup.t;
       case _igatvxgq.Fee:
         return _igatvxgq.Fee.t;
+      case _idwz9zuu.FeePrice:
+        return _idwz9zuu.FeePrice.t;
       case _iahrqsj9.MealPlan:
         return _iahrqsj9.MealPlan.t;
       case _i79c4x61.MealRate:
         return _i79c4x61.MealRate.t;
-      case _ilo0onje.PriceCategory:
-        return _ilo0onje.PriceCategory.t;
+      case _iywc4zrq.PriceList:
+        return _iywc4zrq.PriceList.t;
       case _ivym9zqa.RoomRate:
         return _ivym9zqa.RoomRate.t;
-      case _i3x806ev.Season:
-        return _i3x806ev.Season.t;
+      case _irmv8dws.UnitPrice:
+        return _irmv8dws.UnitPrice.t;
+      case _ihus81hy.UnitType:
+        return _ihus81hy.UnitType.t;
+      case _iqh2u036.Building:
+        return _iqh2u036.Building.t;
       case _ix383f3m.Room:
         return _ix383f3m.Room.t;
+      case _i14ck3rp.RoomFee:
+        return _i14ck3rp.RoomFee.t;
     }
     return null;
   }

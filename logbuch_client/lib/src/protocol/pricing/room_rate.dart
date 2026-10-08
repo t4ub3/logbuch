@@ -12,20 +12,21 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 
+/// What a guest of an age group pays per night in a unit of a type.
 abstract class RoomRate
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
   RoomRate._({
     this.id,
-    required this.seasonId,
-    required this.priceCategoryId,
+    required this.priceListId,
+    required this.unitTypeId,
     required this.ageGroupId,
     required this.pricePerNight,
   });
 
   factory RoomRate({
     int? id,
-    required int seasonId,
-    required int priceCategoryId,
+    required int priceListId,
+    required int unitTypeId,
     required int ageGroupId,
     required int pricePerNight,
   }) = _RoomRateImpl;
@@ -33,8 +34,8 @@ abstract class RoomRate
   factory RoomRate.fromJson(Map<String, dynamic> jsonSerialization) {
     return RoomRate(
       id: jsonSerialization['id'] as int?,
-      seasonId: jsonSerialization['seasonId'] as int,
-      priceCategoryId: jsonSerialization['priceCategoryId'] as int,
+      priceListId: jsonSerialization['priceListId'] as int,
+      unitTypeId: jsonSerialization['unitTypeId'] as int,
       ageGroupId: jsonSerialization['ageGroupId'] as int,
       pricePerNight: jsonSerialization['pricePerNight'] as int,
     );
@@ -45,9 +46,9 @@ abstract class RoomRate
   /// the id will be null.
   int? id;
 
-  int seasonId;
+  int priceListId;
 
-  int priceCategoryId;
+  int unitTypeId;
 
   int ageGroupId;
 
@@ -58,8 +59,8 @@ abstract class RoomRate
   @_isc.useResult
   RoomRate copyWith({
     int? id,
-    int? seasonId,
-    int? priceCategoryId,
+    int? priceListId,
+    int? unitTypeId,
     int? ageGroupId,
     int? pricePerNight,
   });
@@ -68,8 +69,8 @@ abstract class RoomRate
     return {
       '__className__': 'RoomRate',
       if (id != null) 'id': id,
-      'seasonId': seasonId,
-      'priceCategoryId': priceCategoryId,
+      'priceListId': priceListId,
+      'unitTypeId': unitTypeId,
       'ageGroupId': ageGroupId,
       'pricePerNight': pricePerNight,
     };
@@ -80,8 +81,8 @@ abstract class RoomRate
     return {
       '__className__': 'RoomRate',
       if (id != null) 'id': id,
-      'seasonId': seasonId,
-      'priceCategoryId': priceCategoryId,
+      'priceListId': priceListId,
+      'unitTypeId': unitTypeId,
       'ageGroupId': ageGroupId,
       'pricePerNight': pricePerNight,
     };
@@ -98,14 +99,14 @@ class _Undefined {}
 class _RoomRateImpl extends RoomRate {
   _RoomRateImpl({
     int? id,
-    required int seasonId,
-    required int priceCategoryId,
+    required int priceListId,
+    required int unitTypeId,
     required int ageGroupId,
     required int pricePerNight,
   }) : super._(
          id: id,
-         seasonId: seasonId,
-         priceCategoryId: priceCategoryId,
+         priceListId: priceListId,
+         unitTypeId: unitTypeId,
          ageGroupId: ageGroupId,
          pricePerNight: pricePerNight,
        );
@@ -116,15 +117,15 @@ class _RoomRateImpl extends RoomRate {
   @override
   RoomRate copyWith({
     Object? id = _Undefined,
-    int? seasonId,
-    int? priceCategoryId,
+    int? priceListId,
+    int? unitTypeId,
     int? ageGroupId,
     int? pricePerNight,
   }) {
     return RoomRate(
       id: id is int? ? id : this.id,
-      seasonId: seasonId ?? this.seasonId,
-      priceCategoryId: priceCategoryId ?? this.priceCategoryId,
+      priceListId: priceListId ?? this.priceListId,
+      unitTypeId: unitTypeId ?? this.unitTypeId,
       ageGroupId: ageGroupId ?? this.ageGroupId,
       pricePerNight: pricePerNight ?? this.pricePerNight,
     );

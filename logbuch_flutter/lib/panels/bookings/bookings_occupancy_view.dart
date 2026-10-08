@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
+import 'package:logbuch_flutter/panels/admin/rooms_section.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_extensions.dart';
 import 'package:logbuch_flutter/panels/bookings/bookings_month_view.dart';
 import 'package:logbuch_flutter/providers/bookings_provider.dart';
@@ -14,10 +15,35 @@ const _dayWidth = 36.0;
 const _rowHeight = 36.0;
 const _headerHeight = 32.0;
 
+/// The space above and below the bars of a row.
+const _barTop = 5.0;
+const _barBottom = 4.0;
+const _barHeight = _rowHeight - _barTop - _barBottom;
+const _barGap = 2.0;
+
 /// The part of a month during which a booking holds a room, in days from
 /// the first of the month. Guests arrive and depart around the middle of a
 /// day, so that a room can change hands on one day.
 typedef _Stay = ({Booking booking, double start, double end});
+
+/// Puts the [stays] of a room on lines, so that bookings which share the
+/// room at the same time are drawn below each other. Returns the line of
+/// each stay; a room that is not shared only ever has line 0.
+Map<_Stay, int> _lines(List<_Stay> stays) {
+  final ends = <double>[];
+  final lines = <_Stay, int>{};
+  for (final stay in [...stays]..sort((a, b) => a.start.compareTo(b.start))) {
+    var line = ends.indexWhere((end) => end <= stay.start);
+    if (line == -1) {
+      ends.add(stay.end);
+      line = ends.length - 1;
+    } else {
+      ends[line] = stay.end;
+    }
+    lines[stay] = line;
+  }
+  return lines;
+}
 
 /// The rooms as rows and the days of a month as columns, with a bar for
 /// every booking that holds a room. Cancelled bookings hold nothing.
@@ -100,8 +126,20 @@ class _OccupancyGrid extends StatelessWidget {
     final shown = [
       for (final room in rooms)
         if (room.active || stays.containsKey(room.id)) room,
-    ];
+    ]..sort(compareByBuilding);
     if (shown.isEmpty) return Center(child: Text(context.t.rooms.empty));
+    final lines = {
+      for (final room in shown) room.id: _lines(stays[room.id] ?? []),
+    };
+    // A row is as high as the bookings that share its room need.
+    double heightOf(Room room) {
+      final count = lines[room.id]!.values.fold(
+        0,
+        (most, l) => l + 1 > most ? l + 1 : most,
+      );
+      return _rowHeight +
+          (count > 1 ? (count - 1) * (_barHeight + _barGap) : 0);
+    }
 
     final today = DateUtils.dateOnly(DateTime.now());
     final divider = theme.dividerColor;
@@ -118,7 +156,7 @@ class _OccupancyGrid extends StatelessWidget {
                 const SizedBox(height: _headerHeight),
                 for (final room in shown)
                   Container(
-                    height: _rowHeight,
+                    height: heightOf(room),
                     alignment: AlignmentDirectional.centerStart,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
@@ -159,7 +197,7 @@ class _OccupancyGrid extends StatelessWidget {
                     ),
                     for (final room in shown)
                       SizedBox(
-                        height: _rowHeight,
+                        height: heightOf(room),
                         child: CustomPaint(
                           painter: _RowPainter(
                             month: month,
@@ -171,12 +209,13 @@ class _OccupancyGrid extends StatelessWidget {
                           ),
                           child: Stack(
                             children: [
-                              for (final stay in stays[room.id] ?? <_Stay>[])
+                              for (final MapEntry(key: stay, value: line)
+                                  in lines[room.id]!.entries)
                                 Positioned(
                                   left: stay.start * _dayWidth,
                                   width: (stay.end - stay.start) * _dayWidth,
-                                  top: 5,
-                                  bottom: 4,
+                                  top: _barTop + line * (_barHeight + _barGap),
+                                  height: _barHeight,
                                   child: _StayBar(booking: stay.booking),
                                 ),
                             ],

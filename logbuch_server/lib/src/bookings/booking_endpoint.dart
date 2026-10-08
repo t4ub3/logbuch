@@ -6,7 +6,9 @@ import 'package:logbuch_server/src/common/today.dart';
 import 'package:logbuch_server/src/common/validation.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:logbuch_server/src/generated/serverpod.dart';
+import 'package:logbuch_server/src/pricing/price_calculation.dart';
 import 'package:logbuch_server/src/pricing/pricing_data.dart';
+import 'package:logbuch_server/src/rooms/room_endpoint.dart';
 
 class BookingEndpoint extends AppEndpoint {
   Future<List<Booking>> getAll(Session session) async {
@@ -104,7 +106,7 @@ class BookingEndpoint extends AppEndpoint {
 
   /// The active rooms that no booking holds during the nights from [arrival]
   /// to [departure]. The rooms of [exceptBookingId] count as free, so that
-  /// the booking can keep them.
+  /// the booking can keep them, and so do rooms that bookings share.
   Future<List<Room>> availableRooms(
     Session session,
     DateTime arrival,
@@ -123,11 +125,34 @@ class BookingEndpoint extends AppEndpoint {
       session,
       where: (t) => t.active.equals(true),
       orderBy: (t) => t.roomNumber,
-      include: Room.include(priceCategory: PriceCategory.include()),
+      include: roomDetails(),
     );
     return [
       for (final room in rooms)
         if (!taken.containsKey(room.id)) room,
+    ];
+  }
+
+  /// The shared rooms of the booking that more than [maxSharing] bookings
+  /// hold during one of its nights. Sharing is not limited, so this is only
+  /// to warn that it gets crowded.
+  Future<List<Room>> crowdedRooms(Session session, int bookingId) async {
+    final booking = await Booking.db.findById(
+      session,
+      bookingId,
+      include: Booking.include(
+        rooms: BookingRoom.includeList(
+          include: BookingRoom.include(room: roomDetails()),
+        ),
+      ),
+    );
+    if (booking == null) {
+      throw ValidationException(reason: ValidationError.notFound);
+    }
+    final others = await sharedHolds(session, booking);
+    return [
+      for (final hold in booking.rooms ?? <BookingRoom>[])
+        if (mostSharing(booking, hold.roomId, others) > maxSharing) hold.room!,
     ];
   }
 
@@ -267,7 +292,8 @@ class BookingEndpoint extends AppEndpoint {
 
   /// The rooms, by id, that bookings hold during the nights from [arrival]
   /// to [departure]. A room is free again on the day its guests depart, and
-  /// cancelled bookings hold nothing.
+  /// cancelled bookings hold nothing. A room of a shared unit type is never
+  /// taken, as any number of bookings may hold it.
   Future<Map<int, Room>> _takenRooms(
     Session session,
     DateTime arrival,
@@ -281,6 +307,7 @@ class BookingEndpoint extends AppEndpoint {
       where: (t) {
         var taken =
             t.booking.status.notEquals(BookingStatus.cancelled) &
+            t.room.unitType.shared.equals(false) &
             (t.booking.arrival < departure) &
             (t.booking.departure > arrival);
         if (exceptBookingId != null) {
@@ -303,7 +330,7 @@ BookingInclude _details() => Booking.include(
   mealPlan: MealPlan.include(),
   rooms: BookingRoom.includeList(
     include: BookingRoom.include(
-      room: Room.include(priceCategory: PriceCategory.include()),
+      room: roomDetails(),
     ),
   ),
 );

@@ -1,0 +1,11 @@
+### What a fee costs by a price list.
+class: FeePrice
+table: fee_prices
+fields:
+  priceListId: int, relation(parent=price_lists, onDelete=Cascade)
+  feeId: int, relation(parent=fees, onDelete=Cascade)
+  amount: int
+indexes:
+  fee_prices_unique_idx:
+    fields: priceListId, feeId
+    unique: true

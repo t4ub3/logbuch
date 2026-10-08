@@ -2,12 +2,37 @@ import 'package:logbuch_server/src/generated/protocol.dart';
 
 import '../test/integration/test_tools/serverpod_test_tools.dart';
 
-/// What a night costs an adult in a room of a price category, in cents.
+/// What a night costs an adult in a room of a unit type, in cents. Nobody
+/// sleeps in the main bungalow, so it has no such price.
 const _roomPrices = {
   'Haupthaus': 4500,
   'Neubau': 5200,
   'Einzelzimmer': 6800,
   'Komfort (Du + WC)': 6200,
+  'Schlafbungalow': 1200,
+  'Ferienbungalow': 1500,
+};
+
+/// What a bungalow costs per night by itself, in cents.
+const _unitPrices = {
+  'Schlafbungalow': 4500,
+  'Hauptbungalow': 6000,
+  'Ferienbungalow': 7500,
+};
+
+/// What a unit costs a booking that comes for the day only, in cents.
+const _dayUsePrices = {'Hauptbungalow': 12000};
+
+/// The unit types that several bookings may hold at once.
+const _sharedTypes = {'Hauptbungalow'};
+
+const _bungalowCleaning = 'Endreinigung Bungalow';
+
+/// What the fees cost, in cents.
+const _feePrices = {
+  'Endreinigung': 8500,
+  'Bettwäsche': 950,
+  _bungalowCleaning: 4500,
 };
 
 /// What a meal plan costs an adult per night, in cents.
@@ -165,12 +190,9 @@ double _share(AgeGroup group) => switch (group.minAge) {
   _ => 0,
 };
 
-/// The main season costs more than the rest of the year.
-double _seasonFactor(Season season) => switch (season.name) {
-  final name when name.startsWith('Hauptsaison') => 1.1,
-  final name when name.startsWith('Nebensaison') => 0.9,
-  _ => 1,
-};
+/// Prices go up by four percent a year.
+double _yearFactor(PriceList list, DateTime today) =>
+    1 + (list.validFrom.year - today.year).clamp(-1, 1) * 0.04;
 
 /// A price in cents, rounded to 50 cents.
 int _price(int adult, double factor) => (adult * factor / 50).round() * 50;
@@ -178,8 +200,8 @@ int _price(int adult, double factor) => (adult * factor / 50).round() * 50;
 String _fullName(Contact contact) =>
     '${contact.firstName} ${contact.lastName}'.trim();
 
-/// Rooms of a price category that a booking wants to hold.
-typedef _Wish = ({String category, int count, int minBeds});
+/// Rooms of a unit type that a booking wants to hold.
+typedef _Wish = ({String type, int count, int minBeds});
 
 /// The categories of bookings, each with its icon, its color and the words
 /// in the title of a booking that put it into the category.
@@ -216,8 +238,8 @@ const _bookingCategories = [
   ),
 ];
 
-/// Demo data for showing the app: a house with rooms in every price
-/// category and prices for them, contacts, organizations and households,
+/// Demo data for showing the app: a house and bungalows with rooms of every
+/// unit type and prices for them, contacts, organizations and households,
 /// and bookings in every stage around [today], some of them invoiced and
 /// paid, as well as donations and receipts.
 ///
@@ -265,8 +287,10 @@ class DemoData {
 
   Future<void> seed() async {
     await _addOperator();
-    await _addPrices();
+    await _addSetup();
     await _addRooms();
+    await _addFees();
+    await _addPrices();
     await _addContacts();
     await _addBookings();
     await _addDonations();
@@ -304,16 +328,20 @@ class DemoData {
     log('+ operator');
   }
 
-  Future<void> _addPrices() async {
+  /// Unit types, age groups, meal plans and the categories of bookings.
+  Future<void> _addSetup() async {
     final e = endpoints;
 
-    final categories = [...await e.priceCategory.getAll(session)];
-    for (final (index, name) in _roomPrices.keys.indexed) {
-      if (categories.any((category) => category.name == name)) continue;
-      categories.add(
-        await e.priceCategory.add(
-          session,
-          PriceCategory(name: name, sortOrder: index),
+    final types = await e.unitType.getAll(session);
+    final names = {..._roomPrices.keys, ..._unitPrices.keys};
+    for (final (index, name) in names.indexed) {
+      if (types.any((type) => type.name == name)) continue;
+      await e.unitType.add(
+        session,
+        UnitType(
+          name: name,
+          sortOrder: index,
+          shared: _sharedTypes.contains(name),
         ),
       );
     }
@@ -353,136 +381,182 @@ class DemoData {
         BookingCategory(name: name, icon: icon, color: color),
       );
     }
+  }
 
-    final fees = await e.fee.getAll(session);
-    for (final fee in [
-      Fee(
-        name: 'Endreinigung',
-        amount: 8500,
-        unit: FeeUnit.perBooking,
-        taxRate: 700,
-        autoApply: true,
+  /// The fees of every booking, and the final cleaning of the bungalows as
+  /// their surcharge.
+  Future<void> _addFees() async {
+    final fees = await endpoints.fee.getAll(session);
+    final bungalows = [
+      for (final room in await endpoints.room.getAll(session))
+        if (_unitPrices.containsKey(room.unitType?.name)) room.id!,
+    ];
+    for (final (fee, rooms) in [
+      (
+        Fee(
+          name: 'Endreinigung',
+          unit: FeeUnit.perBooking,
+          taxRate: 700,
+          autoApply: true,
+        ),
+        <int>[],
       ),
-      Fee(
-        name: 'Bettwäsche',
-        amount: 950,
-        unit: FeeUnit.perPerson,
-        taxRate: 700,
-        autoApply: true,
+      (
+        Fee(
+          name: 'Bettwäsche',
+          unit: FeeUnit.perPerson,
+          taxRate: 700,
+          autoApply: true,
+        ),
+        <int>[],
+      ),
+      (
+        Fee(name: _bungalowCleaning, unit: FeeUnit.perRoom, taxRate: 700),
+        bungalows,
       ),
     ]) {
       if (fees.every((known) => known.name != fee.name)) {
-        await e.fee.add(session, fee);
+        await endpoints.fee.add(session, fee, rooms);
       }
     }
+  }
 
-    // Seasons for last year, this year and the next, wherever none covers
-    // the time yet.
-    final seasons = [...await e.season.getAll(session)];
-    for (final year in [today.year - 1, today.year, today.year + 1]) {
-      for (final season in [
-        Season(
-          name: 'Nebensaison Frühjahr $year',
-          validFrom: DateTime.utc(year),
-          validTo: DateTime.utc(year, 3, 31),
-        ),
-        Season(
-          name: 'Hauptsaison $year',
-          validFrom: DateTime.utc(year, 4),
-          validTo: DateTime.utc(year, 10, 31),
-        ),
-        Season(
-          name: 'Nebensaison Winter $year',
-          validFrom: DateTime.utc(year, 11),
-          validTo: DateTime.utc(year, 12, 31),
-        ),
-      ]) {
-        final overlaps = seasons.any(
-          (known) =>
-              !known.validFrom.isAfter(season.validTo) &&
-              !known.validTo.isBefore(season.validFrom),
+  /// A price list for last year, this year and the next, unless there are
+  /// price lists, and in every list the prices it has none for yet.
+  Future<void> _addPrices() async {
+    final e = endpoints;
+    final types = await e.unitType.getAll(session);
+    final fees = await e.fee.getAll(session);
+
+    var lists = await e.priceList.getAll(session);
+    if (lists.isEmpty) {
+      for (final year in [today.year - 1, today.year, today.year + 1]) {
+        await e.priceList.add(
+          session,
+          PriceList(name: 'Preise $year', validFrom: DateTime.utc(year)),
         );
-        if (!overlaps) seasons.add(await e.season.add(session, season));
       }
+      lists = await e.priceList.getAll(session);
     }
 
-    // Every season gets the prices it has none for yet.
-    for (final season in seasons) {
-      final factor = _seasonFactor(season);
+    for (final list in lists) {
+      final factor = _yearFactor(list, today);
+      final known = await e.priceList.getPrices(session, list.id!);
 
-      final roomRates = await e.roomRate.getBySeason(session, season.id!);
       final pricedRooms = {
-        for (final rate in roomRates) (rate.priceCategoryId, rate.ageGroupId),
+        for (final rate in known.roomRates) (rate.unitTypeId, rate.ageGroupId),
       };
-      final newRoomRates = [
-        for (final category in categories)
-          for (final ageGroup in _ageGroups)
-            if (!pricedRooms.contains((category.id, ageGroup.id)))
-              RoomRate(
-                seasonId: season.id!,
-                priceCategoryId: category.id!,
-                ageGroupId: ageGroup.id!,
-                pricePerNight: _price(
-                  _roomPrices[category.name] ?? 4800,
-                  _share(ageGroup) * factor,
+      final roomRates = [
+        for (final type in types)
+          if (_roomPrices[type.name] case final adult?)
+            for (final ageGroup in _ageGroups)
+              if (!pricedRooms.contains((type.id, ageGroup.id)))
+                RoomRate(
+                  priceListId: list.id!,
+                  unitTypeId: type.id!,
+                  ageGroupId: ageGroup.id!,
+                  pricePerNight: _price(adult, _share(ageGroup) * factor),
                 ),
-              ),
       ];
-      if (newRoomRates.isNotEmpty) {
-        await e.roomRate.saveForSeason(session, season.id!, [
-          ...roomRates,
-          ...newRoomRates,
-        ]);
-      }
 
-      final mealRates = await e.mealRate.getBySeason(session, season.id!);
-      final pricedMeals = {
-        for (final rate in mealRates) (rate.mealPlanId, rate.ageGroupId),
+      final pricedUnits = {
+        for (final price in known.unitPrices) price.unitTypeId,
       };
-      final newMealRates = [
-        for (final plan in _mealPlans.values)
-          for (final ageGroup in _ageGroups)
-            if (!pricedMeals.contains((plan.id, ageGroup.id)))
-              MealRate(
-                seasonId: season.id!,
-                mealPlanId: plan.id!,
-                ageGroupId: ageGroup.id!,
-                pricePerNight: _price(
-                  _mealPrices[plan.name] ?? 2000,
-                  _share(ageGroup),
-                ),
-              ),
+      final unitPrices = [
+        for (final type in types)
+          if (_unitPrices[type.name] case final perNight?
+              when !pricedUnits.contains(type.id))
+            UnitPrice(
+              priceListId: list.id!,
+              unitTypeId: type.id!,
+              pricePerNight: _price(perNight, factor),
+              dayUsePrice: switch (_dayUsePrices[type.name]) {
+                final dayUse? => _price(dayUse, factor),
+                null => null,
+              },
+            ),
       ];
-      if (newMealRates.isNotEmpty) {
-        await e.mealRate.saveForSeason(session, season.id!, [
-          ...mealRates,
-          ...newMealRates,
-        ]);
-      }
+
+      final pricedMeals = {
+        for (final rate in known.mealRates) (rate.mealPlanId, rate.ageGroupId),
+      };
+      final mealRates = [
+        for (final plan in _mealPlans.values)
+          if (_mealPrices[plan.name] case final adult?)
+            for (final ageGroup in _ageGroups)
+              if (!pricedMeals.contains((plan.id, ageGroup.id)))
+                MealRate(
+                  priceListId: list.id!,
+                  mealPlanId: plan.id!,
+                  ageGroupId: ageGroup.id!,
+                  pricePerNight: _price(adult, _share(ageGroup) * factor),
+                ),
+      ];
+
+      final pricedFees = {for (final price in known.feePrices) price.feeId};
+      final feePrices = [
+        for (final fee in fees)
+          if (_feePrices[fee.name] case final amount?
+              when !pricedFees.contains(fee.id))
+            FeePrice(
+              priceListId: list.id!,
+              feeId: fee.id!,
+              amount: _price(amount, factor),
+            ),
+      ];
+
+      final news = [...roomRates, ...unitPrices, ...mealRates, ...feePrices];
+      if (news.isEmpty) continue;
+      await e.priceList.savePrices(
+        session,
+        list.id!,
+        PriceListPrices(
+          roomRates: [...known.roomRates, ...roomRates],
+          unitPrices: [...known.unitPrices, ...unitPrices],
+          mealRates: [...known.mealRates, ...mealRates],
+          feePrices: [...known.feePrices, ...feePrices],
+        ),
+      );
     }
-    log('+ prices for ${seasons.length} seasons');
+    log('+ prices in ${lists.length} price lists');
   }
 
   Future<void> _addRooms() async {
-    final categories = {
-      for (final category in await endpoints.priceCategory.getAll(session))
-        category.name: category.id!,
+    final types = {
+      for (final type in await endpoints.unitType.getAll(session))
+        type.name: type.id!,
     };
+    final buildings = {
+      for (final building in await endpoints.building.getAll(session))
+        building.name: building.id!,
+    };
+    for (final (index, name) in [
+      'Haupthaus',
+      'Neubau',
+      'Bungalowdorf',
+      'Ferienbungalows',
+    ].indexed) {
+      buildings[name] ??= (await endpoints.building.add(
+        session,
+        Building(name: name, sortOrder: index),
+      )).id!;
+    }
+
     Room newRoom(
       String number,
       int beds,
       String building,
-      String floor,
-      String category, {
+      String? floor,
+      String type, {
       bool crib = false,
       bool active = true,
       String? notes,
     }) => Room(
       roomNumber: number,
       bedAmount: beds,
-      building: building,
+      buildingId: buildings[building]!,
       floor: floor,
-      priceCategoryId: categories[category]!,
+      unitTypeId: types[type]!,
       cribPossible: crib,
       active: active,
       notes: notes,
@@ -529,6 +603,28 @@ class DemoData {
         active: false,
         notes: 'Wird renoviert, voraussichtlich bis zum Jahresende.',
       ),
+      // Bungalows for groups that cook for themselves: four to sleep in
+      // around one with the kitchen, and two for a family each.
+      for (var n = 1; n <= 4; n++)
+        newRoom('B$n', 6, 'Bungalowdorf', null, 'Schlafbungalow', crib: true),
+      newRoom(
+        'Hauptbungalow',
+        0,
+        'Bungalowdorf',
+        null,
+        'Hauptbungalow',
+        notes: 'Küche, Bäder und Gemeinschaftsraum des Bungalowdorfs.',
+      ),
+      for (var n = 1; n <= 2; n++)
+        newRoom(
+          'F$n',
+          5,
+          'Ferienbungalows',
+          null,
+          'Ferienbungalow',
+          crib: true,
+          notes: 'Mit eigener Küche und eigenem Bad.',
+        ),
     ];
 
     final known = {
@@ -539,13 +635,14 @@ class DemoData {
     for (final room in wanted) {
       final existing = known[room.roomNumber];
       if (existing == null) {
-        await endpoints.room.add(session, room);
+        await endpoints.room.add(session, room, const []);
         added++;
-      } else if (existing.building == null && existing.floor == null) {
+      } else if (existing.buildingId == null && existing.floor == null) {
         // Says where the room is, which was left open so far.
         await endpoints.room.update(
           session,
-          existing.copyWith(building: room.building, floor: room.floor),
+          existing.copyWith(buildingId: room.buildingId, floor: room.floor),
+          [for (final fee in existing.fees ?? <RoomFee>[]) fee.feeId],
         );
       }
     }
@@ -719,7 +816,7 @@ class DemoData {
   }
 
   /// Lets [booking] hold rooms that are free during its nights: for each of
-  /// the [wishes] as many rooms of a price category as there are, up to the
+  /// the [wishes] as many rooms of a unit type as there are, up to the
   /// number that is wished for.
   Future<Booking> _hold(Booking booking, List<_Wish> wishes) async {
     final free = await endpoints.booking.availableRooms(
@@ -734,7 +831,7 @@ class DemoData {
         free
             .where(
               (room) =>
-                  room.priceCategory?.name == wish.category &&
+                  room.unitType?.name == wish.type &&
                   room.bedAmount >= wish.minBeds &&
                   !rooms.contains(room),
             )
@@ -886,6 +983,7 @@ class DemoData {
     await _addYogaRetreat();
     await _addHikingWeekend(club);
     await _addTeamDays(kita);
+    await _addBungalowBookings();
     await _addPlannedBookings(workshop, musicSchool, scouts);
   }
 
@@ -910,8 +1008,8 @@ class DemoData {
     );
     if (booking == null) return;
     booking = await _hold(booking, [
-      (category: 'Neubau', count: 6, minBeds: 1),
-      (category: 'Haupthaus', count: 1, minBeds: 3),
+      (type: 'Neubau', count: 6, minBeds: 1),
+      (type: 'Haupthaus', count: 1, minBeds: 3),
     ]);
 
     // All families but the grandparents come, each as its household.
@@ -1013,8 +1111,8 @@ class DemoData {
     );
     if (booking == null) return;
     booking = await _hold(booking, [
-      (category: 'Einzelzimmer', count: 2, minBeds: 1),
-      (category: 'Haupthaus', count: 7, minBeds: 2),
+      (type: 'Einzelzimmer', count: 2, minBeds: 1),
+      (type: 'Haupthaus', count: 7, minBeds: 2),
     ]);
 
     // The teachers get the single rooms. Three pupils signed up late and
@@ -1063,8 +1161,8 @@ class DemoData {
     );
     if (booking == null) return;
     booking = await _hold(booking, [
-      (category: 'Komfort (Du + WC)', count: 4, minBeds: 2),
-      (category: 'Einzelzimmer', count: 2, minBeds: 1),
+      (type: 'Komfort (Du + WC)', count: 4, minBeds: 2),
+      (type: 'Einzelzimmer', count: 2, minBeds: 1),
     ]);
 
     final beds = _Beds(booking);
@@ -1099,7 +1197,7 @@ class DemoData {
     );
     if (booking == null) return;
     booking = await _hold(booking, [
-      (category: 'Komfort (Du + WC)', count: 4, minBeds: 2),
+      (type: 'Komfort (Du + WC)', count: 4, minBeds: 2),
     ]);
     await _guests(
       await _group(booking, 'Teilnehmende'),
@@ -1152,7 +1250,7 @@ class DemoData {
     );
     if (booking == null) return;
     booking = await _hold(booking, [
-      (category: 'Haupthaus', count: 4, minBeds: 3),
+      (type: 'Haupthaus', count: 4, minBeds: 3),
     ]);
     await _guests(
       await _group(booking, 'Wanderabteilung'),
@@ -1208,7 +1306,7 @@ class DemoData {
     );
     if (booking == null) return;
     booking = await _hold(booking, [
-      (category: 'Komfort (Du + WC)', count: 4, minBeds: 2),
+      (type: 'Komfort (Du + WC)', count: 4, minBeds: 2),
     ]);
     await _guests(
       await _group(booking, 'Team'),
@@ -1220,6 +1318,92 @@ class DemoData {
     final folio = (await _folios(booking)).first;
     if (await _invoice(folio)) {
       await _pay(folio, 40000, _day(-30), reference: 'Abschlag Teamtage');
+    }
+  }
+
+  /// In the bungalows soon: two families who cook for themselves and share
+  /// the main bungalow with a band for two of their nights, and a party
+  /// that only comes for the day.
+  Future<void> _addBungalowBookings() async {
+    var weekend = await _book(
+      Booking(
+        title: 'Familienwochenende im Bungalowdorf',
+        arrival: _day(9),
+        departure: _day(12),
+        leadId: _contacts['Agnieszka Nowak']!.id!,
+        status: BookingStatus.confirmed,
+        billingMode: BillingMode.perGroup,
+        expectedGuestCount: 8,
+        notes: 'Selbstversorger. Reisen am Freitagabend an.',
+      ),
+    );
+    if (weekend != null) {
+      weekend = await _hold(weekend, [
+        (type: 'Schlafbungalow', count: 2, minBeds: 4),
+        (type: 'Hauptbungalow', count: 1, minBeds: 0),
+      ]);
+      for (final (family, payer) in [
+        ('Nowak', 'Agnieszka'),
+        ('Lindner', 'Claudia'),
+      ]) {
+        final group = await endpoints.guest.addHousehold(
+          session,
+          weekend.id!,
+          _households['Familie $family']!.id!,
+        );
+        await endpoints.guest.updateGroup(
+          session,
+          group.copyWith(payerId: _contacts['$payer $family']!.id),
+        );
+      }
+      // Each family has a bungalow of its own.
+      final beds = _Beds(weekend);
+      for (final group in await endpoints.guest.getByBooking(
+        session,
+        weekend.id!,
+      )) {
+        final guests = group.guests!;
+        final room = beds.roomFor(guests.length);
+        if (room != null) {
+          await endpoints.guest.assign(session, [
+            for (final guest in guests) guest.id!,
+          ], room.id);
+        }
+      }
+    }
+
+    final musician = await _adult('Lukas Sommer');
+    final band = await _book(
+      Booking(
+        title: 'Probenwochenende Jugendband Nordlicht',
+        arrival: _day(10),
+        departure: _day(12),
+        leadId: musician.id!,
+        status: BookingStatus.confirmed,
+        expectedGuestCount: 6,
+        notes: 'Probt im Hauptbungalow, abgestimmt mit den Familien.',
+      ),
+    );
+    if (band != null) {
+      await _hold(band, [
+        (type: 'Schlafbungalow', count: 1, minBeds: 4),
+        (type: 'Hauptbungalow', count: 1, minBeds: 0),
+      ]);
+    }
+
+    final party = await _book(
+      Booking(
+        title: 'Familienfeier Krüger',
+        arrival: _day(20),
+        departure: _day(20),
+        leadId: _contacts['Sabine Krüger']!.id!,
+        status: BookingStatus.confirmed,
+        expectedGuestCount: 30,
+        notes: 'Geburtstagsfeier im Hauptbungalow, nur tagsüber.',
+      ),
+    );
+    if (party != null) {
+      await _hold(party, [(type: 'Hauptbungalow', count: 1, minBeds: 0)]);
     }
   }
 
@@ -1247,9 +1431,9 @@ class DemoData {
     );
     if (retreat != null) {
       await _hold(retreat, [
-        (category: 'Einzelzimmer', count: 4, minBeds: 1),
-        (category: 'Komfort (Du + WC)', count: 4, minBeds: 2),
-        (category: 'Haupthaus', count: 1, minBeds: 2),
+        (type: 'Einzelzimmer', count: 4, minBeds: 1),
+        (type: 'Komfort (Du + WC)', count: 4, minBeds: 2),
+        (type: 'Haupthaus', count: 1, minBeds: 2),
       ]);
     }
 
@@ -1271,8 +1455,8 @@ class DemoData {
     );
     if (camp != null) {
       await _hold(camp, [
-        (category: 'Neubau', count: 6, minBeds: 1),
-        (category: 'Haupthaus', count: 5, minBeds: 2),
+        (type: 'Neubau', count: 6, minBeds: 1),
+        (type: 'Haupthaus', count: 5, minBeds: 2),
       ]);
     }
 
@@ -1296,9 +1480,9 @@ class DemoData {
     );
     if (orchestra != null) {
       await _hold(orchestra, [
-        (category: 'Neubau', count: 6, minBeds: 1),
-        (category: 'Haupthaus', count: 4, minBeds: 2),
-        (category: 'Einzelzimmer', count: 2, minBeds: 1),
+        (type: 'Neubau', count: 6, minBeds: 1),
+        (type: 'Haupthaus', count: 4, minBeds: 2),
+        (type: 'Einzelzimmer', count: 2, minBeds: 1),
       ]);
     }
 

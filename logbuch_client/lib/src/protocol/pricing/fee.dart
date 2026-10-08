@@ -10,43 +10,51 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:logbuch_client/src/protocol/protocol.dart' as _i7rf0d0e;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import '../pricing/fee_unit.dart' as _ivlcb7ri;
+import '../rooms/room_fee.dart' as _iv47he65;
 
+/// A surcharge or fee. What it costs is in the price lists; a list without
+/// an amount for it does not charge it.
 abstract class Fee
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
   Fee._({
     this.id,
     required this.name,
-    required this.amount,
     required this.unit,
     this.ageGroupId,
     int? taxRate,
     bool? autoApply,
+    this.rooms,
   }) : taxRate = taxRate ?? 0,
        autoApply = autoApply ?? false;
 
   factory Fee({
     int? id,
     required String name,
-    required int amount,
     required _ivlcb7ri.FeeUnit unit,
     int? ageGroupId,
     int? taxRate,
     bool? autoApply,
+    List<_iv47he65.RoomFee>? rooms,
   }) = _FeeImpl;
 
   factory Fee.fromJson(Map<String, dynamic> jsonSerialization) {
     return Fee(
       id: jsonSerialization['id'] as int?,
       name: jsonSerialization['name'] as String,
-      amount: jsonSerialization['amount'] as int,
       unit: _ivlcb7ri.FeeUnit.fromJson((jsonSerialization['unit'] as String)),
       ageGroupId: jsonSerialization['ageGroupId'] as int?,
       taxRate: jsonSerialization['taxRate'] as int?,
       autoApply: jsonSerialization['autoApply'] == null
           ? null
           : _isc.BoolJsonExtension.fromJson(jsonSerialization['autoApply']),
+      rooms: jsonSerialization['rooms'] == null
+          ? null
+          : _i7rf0d0e.Protocol().deserialize<List<_iv47he65.RoomFee>>(
+              jsonSerialization['rooms'],
+            ),
     );
   }
 
@@ -57,15 +65,17 @@ abstract class Fee
 
   String name;
 
-  int amount;
-
   _ivlcb7ri.FeeUnit unit;
 
   int? ageGroupId;
 
   int taxRate;
 
+  /// Charged to every booking. Otherwise the fee is a surcharge of the
+  /// rooms it is assigned to.
   bool autoApply;
+
+  List<_iv47he65.RoomFee>? rooms;
 
   /// Returns a shallow copy of this [Fee]
   /// with some or all fields replaced by the given arguments.
@@ -73,11 +83,11 @@ abstract class Fee
   Fee copyWith({
     int? id,
     String? name,
-    int? amount,
     _ivlcb7ri.FeeUnit? unit,
     int? ageGroupId,
     int? taxRate,
     bool? autoApply,
+    List<_iv47he65.RoomFee>? rooms,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -85,11 +95,11 @@ abstract class Fee
       '__className__': 'Fee',
       if (id != null) 'id': id,
       'name': name,
-      'amount': amount,
       'unit': unit.toJson(),
       if (ageGroupId != null) 'ageGroupId': ageGroupId,
       'taxRate': taxRate,
       'autoApply': autoApply,
+      if (rooms != null) 'rooms': rooms?.toJson(valueToJson: (v) => v.toJson()),
     };
   }
 
@@ -99,11 +109,12 @@ abstract class Fee
       '__className__': 'Fee',
       if (id != null) 'id': id,
       'name': name,
-      'amount': amount,
       'unit': unit.toJson(),
       if (ageGroupId != null) 'ageGroupId': ageGroupId,
       'taxRate': taxRate,
       'autoApply': autoApply,
+      if (rooms != null)
+        'rooms': rooms?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
     };
   }
 
@@ -119,19 +130,19 @@ class _FeeImpl extends Fee {
   _FeeImpl({
     int? id,
     required String name,
-    required int amount,
     required _ivlcb7ri.FeeUnit unit,
     int? ageGroupId,
     int? taxRate,
     bool? autoApply,
+    List<_iv47he65.RoomFee>? rooms,
   }) : super._(
          id: id,
          name: name,
-         amount: amount,
          unit: unit,
          ageGroupId: ageGroupId,
          taxRate: taxRate,
          autoApply: autoApply,
+         rooms: rooms,
        );
 
   /// Returns a shallow copy of this [Fee]
@@ -141,20 +152,22 @@ class _FeeImpl extends Fee {
   Fee copyWith({
     Object? id = _Undefined,
     String? name,
-    int? amount,
     _ivlcb7ri.FeeUnit? unit,
     Object? ageGroupId = _Undefined,
     int? taxRate,
     bool? autoApply,
+    Object? rooms = _Undefined,
   }) {
     return Fee(
       id: id is int? ? id : this.id,
       name: name ?? this.name,
-      amount: amount ?? this.amount,
       unit: unit ?? this.unit,
       ageGroupId: ageGroupId is int? ? ageGroupId : this.ageGroupId,
       taxRate: taxRate ?? this.taxRate,
       autoApply: autoApply ?? this.autoApply,
+      rooms: rooms is List<_iv47he65.RoomFee>?
+          ? rooms
+          : this.rooms?.map((e0) => e0.copyWith()).toList(),
     );
   }
 }

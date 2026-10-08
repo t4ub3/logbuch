@@ -1,0 +1,7 @@
+### All prices of a price list.
+class: PriceListPrices
+fields:
+  roomRates: List<RoomRate>
+  unitPrices: List<UnitPrice>
+  mealRates: List<MealRate>
+  feePrices: List<FeePrice>

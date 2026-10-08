@@ -17,7 +17,7 @@ final _operator = Operator(
 );
 
 Room _room(String number, int beds) =>
-    Room(roomNumber: number, bedAmount: beds, priceCategoryId: 1);
+    Room(roomNumber: number, bedAmount: beds, unitTypeId: 1);
 
 Booking _booking({
   BookingStatus status = BookingStatus.confirmed,

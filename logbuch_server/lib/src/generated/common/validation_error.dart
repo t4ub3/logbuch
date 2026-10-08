@@ -16,11 +16,12 @@ enum ValidationError implements _is.SerializableModel {
   nameRequired,
   invalidDate,
   invalidDateRange,
-  seasonOverlap,
+  priceListDateTaken,
   invalidAgeRange,
   ageGroupOverlap,
   invalidAmount,
   invalidTaxRate,
+  invalidFeeScope,
   invalidBedAmount,
   invalidGuestCount,
   duplicateRate,
@@ -48,8 +49,8 @@ enum ValidationError implements _is.SerializableModel {
         return ValidationError.invalidDate;
       case 'invalidDateRange':
         return ValidationError.invalidDateRange;
-      case 'seasonOverlap':
-        return ValidationError.seasonOverlap;
+      case 'priceListDateTaken':
+        return ValidationError.priceListDateTaken;
       case 'invalidAgeRange':
         return ValidationError.invalidAgeRange;
       case 'ageGroupOverlap':
@@ -58,6 +59,8 @@ enum ValidationError implements _is.SerializableModel {
         return ValidationError.invalidAmount;
       case 'invalidTaxRate':
         return ValidationError.invalidTaxRate;
+      case 'invalidFeeScope':
+        return ValidationError.invalidFeeScope;
       case 'invalidBedAmount':
         return ValidationError.invalidBedAmount;
       case 'invalidGuestCount':

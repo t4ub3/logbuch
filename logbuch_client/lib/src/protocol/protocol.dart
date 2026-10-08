@@ -34,13 +34,11 @@ import 'package:logbuch_client/src/protocol/pricing/age_group.dart'
 import 'package:logbuch_client/src/protocol/pricing/fee.dart' as _iaal8fsz;
 import 'package:logbuch_client/src/protocol/pricing/meal_plan.dart'
     as _iy1yfvqt;
-import 'package:logbuch_client/src/protocol/pricing/meal_rate.dart'
-    as _i8b25r61;
-import 'package:logbuch_client/src/protocol/pricing/price_category.dart'
-    as _il8lwbsk;
-import 'package:logbuch_client/src/protocol/pricing/room_rate.dart'
-    as _ijssj09l;
-import 'package:logbuch_client/src/protocol/pricing/season.dart' as _id21ndqx;
+import 'package:logbuch_client/src/protocol/pricing/price_list.dart'
+    as _ivembrbw;
+import 'package:logbuch_client/src/protocol/pricing/unit_type.dart'
+    as _in0tyb01;
+import 'package:logbuch_client/src/protocol/rooms/building.dart' as _iqh700fx;
 import 'package:logbuch_client/src/protocol/rooms/room.dart' as _i5smwbna;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -90,15 +88,20 @@ import 'pricing/booking_price.dart' as _i53999gr;
 import 'pricing/charge_line.dart' as _idyrztp6;
 import 'pricing/charge_type.dart' as _iodpb345;
 import 'pricing/fee.dart' as _igatvxgq;
+import 'pricing/fee_price.dart' as _idwz9zuu;
 import 'pricing/fee_unit.dart' as _invqlcyo;
 import 'pricing/meal_plan.dart' as _iahrqsj9;
 import 'pricing/meal_rate.dart' as _i79c4x61;
-import 'pricing/price_category.dart' as _ilo0onje;
+import 'pricing/price_list.dart' as _iywc4zrq;
+import 'pricing/price_list_prices.dart' as _i0r81qjm;
 import 'pricing/pricing_problem.dart' as _i2s1dsvn;
 import 'pricing/pricing_problem_reason.dart' as _i0jnw4ju;
 import 'pricing/room_rate.dart' as _ivym9zqa;
-import 'pricing/season.dart' as _i3x806ev;
+import 'pricing/unit_price.dart' as _irmv8dws;
+import 'pricing/unit_type.dart' as _ihus81hy;
+import 'rooms/building.dart' as _iqh2u036;
 import 'rooms/room.dart' as _ix383f3m;
+import 'rooms/room_fee.dart' as _i14ck3rp;
 export 'auth/app_user.dart';
 export 'auth/user_role.dart';
 export 'billing/charge.dart';
@@ -142,15 +145,20 @@ export 'pricing/booking_price.dart';
 export 'pricing/charge_line.dart';
 export 'pricing/charge_type.dart';
 export 'pricing/fee.dart';
+export 'pricing/fee_price.dart';
 export 'pricing/fee_unit.dart';
 export 'pricing/meal_plan.dart';
 export 'pricing/meal_rate.dart';
-export 'pricing/price_category.dart';
+export 'pricing/price_list.dart';
+export 'pricing/price_list_prices.dart';
 export 'pricing/pricing_problem.dart';
 export 'pricing/pricing_problem_reason.dart';
 export 'pricing/room_rate.dart';
-export 'pricing/season.dart';
+export 'pricing/unit_price.dart';
+export 'pricing/unit_type.dart';
+export 'rooms/building.dart';
 export 'rooms/room.dart';
+export 'rooms/room_fee.dart';
 export 'client.dart';
 
 class Protocol extends _isc.SerializationManager {
@@ -316,6 +324,9 @@ class Protocol extends _isc.SerializationManager {
     if (t == _igatvxgq.Fee) {
       return _igatvxgq.Fee.fromJson(data) as T;
     }
+    if (t == _idwz9zuu.FeePrice) {
+      return _idwz9zuu.FeePrice.fromJson(data) as T;
+    }
     if (t == _invqlcyo.FeeUnit) {
       return _invqlcyo.FeeUnit.fromJson(data) as T;
     }
@@ -325,8 +336,11 @@ class Protocol extends _isc.SerializationManager {
     if (t == _i79c4x61.MealRate) {
       return _i79c4x61.MealRate.fromJson(data) as T;
     }
-    if (t == _ilo0onje.PriceCategory) {
-      return _ilo0onje.PriceCategory.fromJson(data) as T;
+    if (t == _iywc4zrq.PriceList) {
+      return _iywc4zrq.PriceList.fromJson(data) as T;
+    }
+    if (t == _i0r81qjm.PriceListPrices) {
+      return _i0r81qjm.PriceListPrices.fromJson(data) as T;
     }
     if (t == _i2s1dsvn.PricingProblem) {
       return _i2s1dsvn.PricingProblem.fromJson(data) as T;
@@ -337,11 +351,20 @@ class Protocol extends _isc.SerializationManager {
     if (t == _ivym9zqa.RoomRate) {
       return _ivym9zqa.RoomRate.fromJson(data) as T;
     }
-    if (t == _i3x806ev.Season) {
-      return _i3x806ev.Season.fromJson(data) as T;
+    if (t == _irmv8dws.UnitPrice) {
+      return _irmv8dws.UnitPrice.fromJson(data) as T;
+    }
+    if (t == _ihus81hy.UnitType) {
+      return _ihus81hy.UnitType.fromJson(data) as T;
+    }
+    if (t == _iqh2u036.Building) {
+      return _iqh2u036.Building.fromJson(data) as T;
     }
     if (t == _ix383f3m.Room) {
       return _ix383f3m.Room.fromJson(data) as T;
+    }
+    if (t == _i14ck3rp.RoomFee) {
+      return _i14ck3rp.RoomFee.fromJson(data) as T;
     }
     if (t == _isc.getType<_ij0177b8.AppUser?>()) {
       return (data != null ? _ij0177b8.AppUser.fromJson(data) : null) as T;
@@ -494,6 +517,9 @@ class Protocol extends _isc.SerializationManager {
     if (t == _isc.getType<_igatvxgq.Fee?>()) {
       return (data != null ? _igatvxgq.Fee.fromJson(data) : null) as T;
     }
+    if (t == _isc.getType<_idwz9zuu.FeePrice?>()) {
+      return (data != null ? _idwz9zuu.FeePrice.fromJson(data) : null) as T;
+    }
     if (t == _isc.getType<_invqlcyo.FeeUnit?>()) {
       return (data != null ? _invqlcyo.FeeUnit.fromJson(data) : null) as T;
     }
@@ -503,8 +529,11 @@ class Protocol extends _isc.SerializationManager {
     if (t == _isc.getType<_i79c4x61.MealRate?>()) {
       return (data != null ? _i79c4x61.MealRate.fromJson(data) : null) as T;
     }
-    if (t == _isc.getType<_ilo0onje.PriceCategory?>()) {
-      return (data != null ? _ilo0onje.PriceCategory.fromJson(data) : null)
+    if (t == _isc.getType<_iywc4zrq.PriceList?>()) {
+      return (data != null ? _iywc4zrq.PriceList.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_i0r81qjm.PriceListPrices?>()) {
+      return (data != null ? _i0r81qjm.PriceListPrices.fromJson(data) : null)
           as T;
     }
     if (t == _isc.getType<_i2s1dsvn.PricingProblem?>()) {
@@ -520,11 +549,20 @@ class Protocol extends _isc.SerializationManager {
     if (t == _isc.getType<_ivym9zqa.RoomRate?>()) {
       return (data != null ? _ivym9zqa.RoomRate.fromJson(data) : null) as T;
     }
-    if (t == _isc.getType<_i3x806ev.Season?>()) {
-      return (data != null ? _i3x806ev.Season.fromJson(data) : null) as T;
+    if (t == _isc.getType<_irmv8dws.UnitPrice?>()) {
+      return (data != null ? _irmv8dws.UnitPrice.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ihus81hy.UnitType?>()) {
+      return (data != null ? _ihus81hy.UnitType.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_iqh2u036.Building?>()) {
+      return (data != null ? _iqh2u036.Building.fromJson(data) : null) as T;
     }
     if (t == _isc.getType<_ix383f3m.Room?>()) {
       return (data != null ? _ix383f3m.Room.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_i14ck3rp.RoomFee?>()) {
+      return (data != null ? _i14ck3rp.RoomFee.fromJson(data) : null) as T;
     }
     if (t == List<_iwk2mful.Charge>) {
       return (data as List)
@@ -662,6 +700,44 @@ class Protocol extends _isc.SerializationManager {
               .toList()
           as T;
     }
+    if (t == List<_i14ck3rp.RoomFee>) {
+      return (data as List)
+              .map((e) => deserialize<_i14ck3rp.RoomFee>(e))
+              .toList()
+          as T;
+    }
+    if (t == _isc.getType<List<_i14ck3rp.RoomFee>?>()) {
+      return (data != null
+              ? (data as List)
+                    .map((e) => deserialize<_i14ck3rp.RoomFee>(e))
+                    .toList()
+              : null)
+          as T;
+    }
+    if (t == List<_ivym9zqa.RoomRate>) {
+      return (data as List)
+              .map((e) => deserialize<_ivym9zqa.RoomRate>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_irmv8dws.UnitPrice>) {
+      return (data as List)
+              .map((e) => deserialize<_irmv8dws.UnitPrice>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i79c4x61.MealRate>) {
+      return (data as List)
+              .map((e) => deserialize<_i79c4x61.MealRate>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_idwz9zuu.FeePrice>) {
+      return (data as List)
+              .map((e) => deserialize<_idwz9zuu.FeePrice>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_il34w39i.AppUser>) {
       return (data as List)
               .map((e) => deserialize<_il34w39i.AppUser>(e))
@@ -749,27 +825,21 @@ class Protocol extends _isc.SerializationManager {
               .toList()
           as T;
     }
-    if (t == List<_i8b25r61.MealRate>) {
+    if (t == List<_ivembrbw.PriceList>) {
       return (data as List)
-              .map((e) => deserialize<_i8b25r61.MealRate>(e))
+              .map((e) => deserialize<_ivembrbw.PriceList>(e))
               .toList()
           as T;
     }
-    if (t == List<_il8lwbsk.PriceCategory>) {
+    if (t == List<_in0tyb01.UnitType>) {
       return (data as List)
-              .map((e) => deserialize<_il8lwbsk.PriceCategory>(e))
+              .map((e) => deserialize<_in0tyb01.UnitType>(e))
               .toList()
           as T;
     }
-    if (t == List<_ijssj09l.RoomRate>) {
+    if (t == List<_iqh700fx.Building>) {
       return (data as List)
-              .map((e) => deserialize<_ijssj09l.RoomRate>(e))
-              .toList()
-          as T;
-    }
-    if (t == List<_id21ndqx.Season>) {
-      return (data as List)
-              .map((e) => deserialize<_id21ndqx.Season>(e))
+              .map((e) => deserialize<_iqh700fx.Building>(e))
               .toList()
           as T;
     }
@@ -827,15 +897,20 @@ class Protocol extends _isc.SerializationManager {
       _idyrztp6.ChargeLine => 'ChargeLine',
       _iodpb345.ChargeType => 'ChargeType',
       _igatvxgq.Fee => 'Fee',
+      _idwz9zuu.FeePrice => 'FeePrice',
       _invqlcyo.FeeUnit => 'FeeUnit',
       _iahrqsj9.MealPlan => 'MealPlan',
       _i79c4x61.MealRate => 'MealRate',
-      _ilo0onje.PriceCategory => 'PriceCategory',
+      _iywc4zrq.PriceList => 'PriceList',
+      _i0r81qjm.PriceListPrices => 'PriceListPrices',
       _i2s1dsvn.PricingProblem => 'PricingProblem',
       _i0jnw4ju.PricingProblemReason => 'PricingProblemReason',
       _ivym9zqa.RoomRate => 'RoomRate',
-      _i3x806ev.Season => 'Season',
+      _irmv8dws.UnitPrice => 'UnitPrice',
+      _ihus81hy.UnitType => 'UnitType',
+      _iqh2u036.Building => 'Building',
       _ix383f3m.Room => 'Room',
+      _i14ck3rp.RoomFee => 'RoomFee',
       _ => null,
     };
   }
@@ -936,24 +1011,34 @@ class Protocol extends _isc.SerializationManager {
         return 'ChargeType';
       case _igatvxgq.Fee():
         return 'Fee';
+      case _idwz9zuu.FeePrice():
+        return 'FeePrice';
       case _invqlcyo.FeeUnit():
         return 'FeeUnit';
       case _iahrqsj9.MealPlan():
         return 'MealPlan';
       case _i79c4x61.MealRate():
         return 'MealRate';
-      case _ilo0onje.PriceCategory():
-        return 'PriceCategory';
+      case _iywc4zrq.PriceList():
+        return 'PriceList';
+      case _i0r81qjm.PriceListPrices():
+        return 'PriceListPrices';
       case _i2s1dsvn.PricingProblem():
         return 'PricingProblem';
       case _i0jnw4ju.PricingProblemReason():
         return 'PricingProblemReason';
       case _ivym9zqa.RoomRate():
         return 'RoomRate';
-      case _i3x806ev.Season():
-        return 'Season';
+      case _irmv8dws.UnitPrice():
+        return 'UnitPrice';
+      case _ihus81hy.UnitType():
+        return 'UnitType';
+      case _iqh2u036.Building():
+        return 'Building';
       case _ix383f3m.Room():
         return 'Room';
+      case _i14ck3rp.RoomFee():
+        return 'RoomFee';
     }
     className = _iaic.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -1105,6 +1190,9 @@ class Protocol extends _isc.SerializationManager {
     if (dataClassName == 'Fee') {
       return deserialize<_igatvxgq.Fee>(data['data']);
     }
+    if (dataClassName == 'FeePrice') {
+      return deserialize<_idwz9zuu.FeePrice>(data['data']);
+    }
     if (dataClassName == 'FeeUnit') {
       return deserialize<_invqlcyo.FeeUnit>(data['data']);
     }
@@ -1114,8 +1202,11 @@ class Protocol extends _isc.SerializationManager {
     if (dataClassName == 'MealRate') {
       return deserialize<_i79c4x61.MealRate>(data['data']);
     }
-    if (dataClassName == 'PriceCategory') {
-      return deserialize<_ilo0onje.PriceCategory>(data['data']);
+    if (dataClassName == 'PriceList') {
+      return deserialize<_iywc4zrq.PriceList>(data['data']);
+    }
+    if (dataClassName == 'PriceListPrices') {
+      return deserialize<_i0r81qjm.PriceListPrices>(data['data']);
     }
     if (dataClassName == 'PricingProblem') {
       return deserialize<_i2s1dsvn.PricingProblem>(data['data']);
@@ -1126,11 +1217,20 @@ class Protocol extends _isc.SerializationManager {
     if (dataClassName == 'RoomRate') {
       return deserialize<_ivym9zqa.RoomRate>(data['data']);
     }
-    if (dataClassName == 'Season') {
-      return deserialize<_i3x806ev.Season>(data['data']);
+    if (dataClassName == 'UnitPrice') {
+      return deserialize<_irmv8dws.UnitPrice>(data['data']);
+    }
+    if (dataClassName == 'UnitType') {
+      return deserialize<_ihus81hy.UnitType>(data['data']);
+    }
+    if (dataClassName == 'Building') {
+      return deserialize<_iqh2u036.Building>(data['data']);
     }
     if (dataClassName == 'Room') {
       return deserialize<_ix383f3m.Room>(data['data']);
+    }
+    if (dataClassName == 'RoomFee') {
+      return deserialize<_i14ck3rp.RoomFee>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);

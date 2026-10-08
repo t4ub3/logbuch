@@ -53,13 +53,13 @@ import 'package:logbuch_server/src/generated/pricing/booking_price.dart'
 import 'package:logbuch_server/src/generated/pricing/fee.dart' as _ishmp5re;
 import 'package:logbuch_server/src/generated/pricing/meal_plan.dart'
     as _ie35qe72;
-import 'package:logbuch_server/src/generated/pricing/meal_rate.dart'
-    as _ii7pox79;
-import 'package:logbuch_server/src/generated/pricing/price_category.dart'
-    as _iqby8hww;
-import 'package:logbuch_server/src/generated/pricing/room_rate.dart'
-    as _iglzf0wc;
-import 'package:logbuch_server/src/generated/pricing/season.dart' as _ityrq9rl;
+import 'package:logbuch_server/src/generated/pricing/price_list.dart'
+    as _ic4bgbrp;
+import 'package:logbuch_server/src/generated/pricing/price_list_prices.dart'
+    as _ilzxb4ig;
+import 'package:logbuch_server/src/generated/pricing/unit_type.dart'
+    as _ic12qaye;
+import 'package:logbuch_server/src/generated/rooms/building.dart' as _i5t9xicf;
 import 'package:logbuch_server/src/generated/rooms/room.dart' as _iu0pobb2;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
@@ -232,15 +232,13 @@ class TestEndpoints {
 
   late final _MealPlanEndpoint mealPlan;
 
-  late final _MealRateEndpoint mealRate;
-
-  late final _PriceCategoryEndpoint priceCategory;
+  late final _PriceListEndpoint priceList;
 
   late final _PricingEndpoint pricing;
 
-  late final _RoomRateEndpoint roomRate;
+  late final _UnitTypeEndpoint unitType;
 
-  late final _SeasonEndpoint season;
+  late final _BuildingEndpoint building;
 
   late final _RoomEndpoint room;
 }
@@ -320,11 +318,7 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
-    mealRate = _MealRateEndpoint(
-      endpoints,
-      serializationManager,
-    );
-    priceCategory = _PriceCategoryEndpoint(
+    priceList = _PriceListEndpoint(
       endpoints,
       serializationManager,
     );
@@ -332,11 +326,11 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
-    roomRate = _RoomRateEndpoint(
+    unitType = _UnitTypeEndpoint(
       endpoints,
       serializationManager,
     );
-    season = _SeasonEndpoint(
+    building = _BuildingEndpoint(
       endpoints,
       serializationManager,
     );
@@ -1416,6 +1410,37 @@ class _BookingEndpoint {
             'departure': departure,
             'exceptBookingId': exceptBookingId,
           }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_iu0pobb2.Room>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_iu0pobb2.Room>> crowdedRooms(
+    _ist.TestSessionBuilder sessionBuilder,
+    int bookingId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'booking',
+            method: 'crowdedRooms',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'booking',
+          methodName: 'crowdedRooms',
+          parameters: _ist.testObjectToJson({'bookingId': bookingId}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -2797,6 +2822,7 @@ class _FeeEndpoint {
   _ida.Future<_ishmp5re.Fee> add(
     _ist.TestSessionBuilder sessionBuilder,
     _ishmp5re.Fee fee,
+    List<int> roomIds,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -2809,7 +2835,10 @@ class _FeeEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'fee',
           methodName: 'add',
-          parameters: _ist.testObjectToJson({'fee': fee}),
+          parameters: _ist.testObjectToJson({
+            'fee': fee,
+            'roomIds': roomIds,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -2828,6 +2857,7 @@ class _FeeEndpoint {
   _ida.Future<_ishmp5re.Fee> update(
     _ist.TestSessionBuilder sessionBuilder,
     _ishmp5re.Fee fee,
+    List<int> roomIds,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -2840,7 +2870,10 @@ class _FeeEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'fee',
           methodName: 'update',
-          parameters: _ist.testObjectToJson({'fee': fee}),
+          parameters: _ist.testObjectToJson({
+            'fee': fee,
+            'roomIds': roomIds,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -3022,8 +3055,8 @@ class _MealPlanEndpoint {
   }
 }
 
-class _MealRateEndpoint {
-  _MealRateEndpoint(
+class _PriceListEndpoint {
+  _PriceListEndpoint(
     this._endpointDispatch,
     this._serializationManager,
   );
@@ -3032,96 +3065,19 @@ class _MealRateEndpoint {
 
   final _is.SerializationManager _serializationManager;
 
-  _ida.Future<List<_ii7pox79.MealRate>> getBySeason(
-    _ist.TestSessionBuilder sessionBuilder,
-    int seasonId,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'mealRate',
-            method: 'getBySeason',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'mealRate',
-          methodName: 'getBySeason',
-          parameters: _ist.testObjectToJson({'seasonId': seasonId}),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<List<_ii7pox79.MealRate>>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _ida.Future<List<_ii7pox79.MealRate>> saveForSeason(
-    _ist.TestSessionBuilder sessionBuilder,
-    int seasonId,
-    List<_ii7pox79.MealRate> rates,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'mealRate',
-            method: 'saveForSeason',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'mealRate',
-          methodName: 'saveForSeason',
-          parameters: _ist.testObjectToJson({
-            'seasonId': seasonId,
-            'rates': rates,
-          }),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<List<_ii7pox79.MealRate>>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-}
-
-class _PriceCategoryEndpoint {
-  _PriceCategoryEndpoint(
-    this._endpointDispatch,
-    this._serializationManager,
-  );
-
-  final _is.EndpointDispatch _endpointDispatch;
-
-  final _is.SerializationManager _serializationManager;
-
-  _ida.Future<List<_iqby8hww.PriceCategory>> getAll(
+  _ida.Future<List<_ic4bgbrp.PriceList>> getAll(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'priceCategory',
+            endpoint: 'priceList',
             method: 'getAll',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'priceCategory',
+          endpointPath: 'priceList',
           methodName: 'getAll',
           parameters: _ist.testObjectToJson({}),
           serializationManager: _serializationManager,
@@ -3131,7 +3087,7 @@ class _PriceCategoryEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<List<_iqby8hww.PriceCategory>>);
+                as _ida.Future<List<_ic4bgbrp.PriceList>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3139,22 +3095,22 @@ class _PriceCategoryEndpoint {
     });
   }
 
-  _ida.Future<_iqby8hww.PriceCategory> add(
+  _ida.Future<_ic4bgbrp.PriceList> add(
     _ist.TestSessionBuilder sessionBuilder,
-    _iqby8hww.PriceCategory category,
+    _ic4bgbrp.PriceList list,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'priceCategory',
+            endpoint: 'priceList',
             method: 'add',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'priceCategory',
+          endpointPath: 'priceList',
           methodName: 'add',
-          parameters: _ist.testObjectToJson({'category': category}),
+          parameters: _ist.testObjectToJson({'list': list}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -3162,7 +3118,7 @@ class _PriceCategoryEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<_iqby8hww.PriceCategory>);
+                as _ida.Future<_ic4bgbrp.PriceList>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3170,22 +3126,22 @@ class _PriceCategoryEndpoint {
     });
   }
 
-  _ida.Future<_iqby8hww.PriceCategory> update(
+  _ida.Future<_ic4bgbrp.PriceList> update(
     _ist.TestSessionBuilder sessionBuilder,
-    _iqby8hww.PriceCategory category,
+    _ic4bgbrp.PriceList list,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'priceCategory',
+            endpoint: 'priceList',
             method: 'update',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'priceCategory',
+          endpointPath: 'priceList',
           methodName: 'update',
-          parameters: _ist.testObjectToJson({'category': category}),
+          parameters: _ist.testObjectToJson({'list': list}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -3193,7 +3149,7 @@ class _PriceCategoryEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<_iqby8hww.PriceCategory>);
+                as _ida.Future<_ic4bgbrp.PriceList>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3208,13 +3164,13 @@ class _PriceCategoryEndpoint {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'priceCategory',
+            endpoint: 'priceList',
             method: 'delete',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'priceCategory',
+          endpointPath: 'priceList',
           methodName: 'delete',
           parameters: _ist.testObjectToJson({'id': id}),
           serializationManager: _serializationManager,
@@ -3225,6 +3181,72 @@ class _PriceCategoryEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_ilzxb4ig.PriceListPrices> getPrices(
+    _ist.TestSessionBuilder sessionBuilder,
+    int priceListId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'priceList',
+            method: 'getPrices',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'priceList',
+          methodName: 'getPrices',
+          parameters: _ist.testObjectToJson({'priceListId': priceListId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ilzxb4ig.PriceListPrices>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_ilzxb4ig.PriceListPrices> savePrices(
+    _ist.TestSessionBuilder sessionBuilder,
+    int priceListId,
+    _ilzxb4ig.PriceListPrices prices,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'priceList',
+            method: 'savePrices',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'priceList',
+          methodName: 'savePrices',
+          parameters: _ist.testObjectToJson({
+            'priceListId': priceListId,
+            'prices': prices,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ilzxb4ig.PriceListPrices>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3275,8 +3297,8 @@ class _PricingEndpoint {
   }
 }
 
-class _RoomRateEndpoint {
-  _RoomRateEndpoint(
+class _UnitTypeEndpoint {
+  _UnitTypeEndpoint(
     this._endpointDispatch,
     this._serializationManager,
   );
@@ -3285,96 +3307,19 @@ class _RoomRateEndpoint {
 
   final _is.SerializationManager _serializationManager;
 
-  _ida.Future<List<_iglzf0wc.RoomRate>> getBySeason(
-    _ist.TestSessionBuilder sessionBuilder,
-    int seasonId,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'roomRate',
-            method: 'getBySeason',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'roomRate',
-          methodName: 'getBySeason',
-          parameters: _ist.testObjectToJson({'seasonId': seasonId}),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<List<_iglzf0wc.RoomRate>>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _ida.Future<List<_iglzf0wc.RoomRate>> saveForSeason(
-    _ist.TestSessionBuilder sessionBuilder,
-    int seasonId,
-    List<_iglzf0wc.RoomRate> rates,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'roomRate',
-            method: 'saveForSeason',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'roomRate',
-          methodName: 'saveForSeason',
-          parameters: _ist.testObjectToJson({
-            'seasonId': seasonId,
-            'rates': rates,
-          }),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<List<_iglzf0wc.RoomRate>>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-}
-
-class _SeasonEndpoint {
-  _SeasonEndpoint(
-    this._endpointDispatch,
-    this._serializationManager,
-  );
-
-  final _is.EndpointDispatch _endpointDispatch;
-
-  final _is.SerializationManager _serializationManager;
-
-  _ida.Future<List<_ityrq9rl.Season>> getAll(
+  _ida.Future<List<_ic12qaye.UnitType>> getAll(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'season',
+            endpoint: 'unitType',
             method: 'getAll',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'season',
+          endpointPath: 'unitType',
           methodName: 'getAll',
           parameters: _ist.testObjectToJson({}),
           serializationManager: _serializationManager,
@@ -3384,7 +3329,7 @@ class _SeasonEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<List<_ityrq9rl.Season>>);
+                as _ida.Future<List<_ic12qaye.UnitType>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3392,22 +3337,22 @@ class _SeasonEndpoint {
     });
   }
 
-  _ida.Future<_ityrq9rl.Season> add(
+  _ida.Future<_ic12qaye.UnitType> add(
     _ist.TestSessionBuilder sessionBuilder,
-    _ityrq9rl.Season season,
+    _ic12qaye.UnitType type,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'season',
+            endpoint: 'unitType',
             method: 'add',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'season',
+          endpointPath: 'unitType',
           methodName: 'add',
-          parameters: _ist.testObjectToJson({'season': season}),
+          parameters: _ist.testObjectToJson({'type': type}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -3415,7 +3360,7 @@ class _SeasonEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<_ityrq9rl.Season>);
+                as _ida.Future<_ic12qaye.UnitType>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3423,22 +3368,22 @@ class _SeasonEndpoint {
     });
   }
 
-  _ida.Future<_ityrq9rl.Season> update(
+  _ida.Future<_ic12qaye.UnitType> update(
     _ist.TestSessionBuilder sessionBuilder,
-    _ityrq9rl.Season season,
+    _ic12qaye.UnitType type,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'season',
+            endpoint: 'unitType',
             method: 'update',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'season',
+          endpointPath: 'unitType',
           methodName: 'update',
-          parameters: _ist.testObjectToJson({'season': season}),
+          parameters: _ist.testObjectToJson({'type': type}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -3446,7 +3391,7 @@ class _SeasonEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<_ityrq9rl.Season>);
+                as _ida.Future<_ic12qaye.UnitType>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -3461,13 +3406,147 @@ class _SeasonEndpoint {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'season',
+            endpoint: 'unitType',
             method: 'delete',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'season',
+          endpointPath: 'unitType',
+          methodName: 'delete',
+          parameters: _ist.testObjectToJson({'id': id}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _BuildingEndpoint {
+  _BuildingEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<List<_i5t9xicf.Building>> getAll(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'building',
+            method: 'getAll',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'building',
+          methodName: 'getAll',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_i5t9xicf.Building>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_i5t9xicf.Building> add(
+    _ist.TestSessionBuilder sessionBuilder,
+    _i5t9xicf.Building building,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'building',
+            method: 'add',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'building',
+          methodName: 'add',
+          parameters: _ist.testObjectToJson({'building': building}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_i5t9xicf.Building>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_i5t9xicf.Building> update(
+    _ist.TestSessionBuilder sessionBuilder,
+    _i5t9xicf.Building building,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'building',
+            method: 'update',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'building',
+          methodName: 'update',
+          parameters: _ist.testObjectToJson({'building': building}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_i5t9xicf.Building>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<void> delete(
+    _ist.TestSessionBuilder sessionBuilder,
+    int id,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'building',
+            method: 'delete',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'building',
           methodName: 'delete',
           parameters: _ist.testObjectToJson({'id': id}),
           serializationManager: _serializationManager,
@@ -3560,6 +3639,7 @@ class _RoomEndpoint {
   _ida.Future<_iu0pobb2.Room> add(
     _ist.TestSessionBuilder sessionBuilder,
     _iu0pobb2.Room room,
+    List<int> feeIds,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -3572,7 +3652,10 @@ class _RoomEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'room',
           methodName: 'add',
-          parameters: _ist.testObjectToJson({'room': room}),
+          parameters: _ist.testObjectToJson({
+            'room': room,
+            'feeIds': feeIds,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -3591,6 +3674,7 @@ class _RoomEndpoint {
   _ida.Future<_iu0pobb2.Room> update(
     _ist.TestSessionBuilder sessionBuilder,
     _iu0pobb2.Room room,
+    List<int> feeIds,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -3603,7 +3687,10 @@ class _RoomEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'room',
           methodName: 'update',
-          parameters: _ist.testObjectToJson({'room': room}),
+          parameters: _ist.testObjectToJson({
+            'room': room,
+            'feeIds': feeIds,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =

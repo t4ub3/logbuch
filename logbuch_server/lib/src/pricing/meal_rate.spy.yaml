@@ -1,11 +1,11 @@
 class: MealRate
 table: meal_rates
 fields:
-  seasonId: int, relation(parent=seasons, onDelete=Cascade)
+  priceListId: int, relation(parent=price_lists, onDelete=Cascade)
   mealPlanId: int, relation(parent=meal_plans, onDelete=Cascade)
   ageGroupId: int, relation(parent=age_groups, onDelete=Cascade)
   pricePerNight: int
 indexes:
   meal_rates_unique_idx:
-    fields: seasonId, mealPlanId, ageGroupId
+    fields: priceListId, mealPlanId, ageGroupId
     unique: true

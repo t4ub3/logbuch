@@ -18,7 +18,7 @@ class PricingData {
   final List<GuestGroup> groups;
   final List<AgeGroup> ageGroups;
 
-  /// What the booking costs by the rates and fees as they are now.
+  /// What the booking costs by the price lists as they are now.
   final BookingPrice price;
 
   /// Reads the booking and prices it, see [calculatePrice]. Null if there
@@ -34,7 +34,10 @@ class PricingData {
       include: Booking.include(
         mealPlan: MealPlan.include(),
         rooms: BookingRoom.includeList(
-          include: BookingRoom.include(room: Room.include()),
+          orderBy: (t) => t.id,
+          include: BookingRoom.include(
+            room: Room.include(unitType: UnitType.include()),
+          ),
         ),
       ),
       transaction: transaction,
@@ -62,21 +65,51 @@ class PricingData {
       price: calculatePrice(
         booking: booking,
         guests: [for (final group in groups) ...?group.guests],
-        seasons: await Season.db.find(session, transaction: transaction),
+        priceLists: await PriceList.db.find(session, transaction: transaction),
         ageGroups: ageGroups,
-        priceCategories: await PriceCategory.db.find(
-          session,
-          transaction: transaction,
-        ),
+        unitTypes: await UnitType.db.find(session, transaction: transaction),
         mealPlan: booking.mealPlan,
         roomRates: await RoomRate.db.find(session, transaction: transaction),
+        unitPrices: await UnitPrice.db.find(session, transaction: transaction),
         mealRates: await MealRate.db.find(session, transaction: transaction),
         fees: await Fee.db.find(
           session,
           orderBy: (t) => t.name,
+          include: Fee.include(rooms: RoomFee.includeList()),
+          transaction: transaction,
+        ),
+        feePrices: await FeePrice.db.find(session, transaction: transaction),
+        sharedHolds: await sharedHolds(
+          session,
+          booking,
           transaction: transaction,
         ),
       ),
     );
   }
+}
+
+/// The holds of other bookings, with those bookings, on the rooms of
+/// [booking] that bookings share. Cancelled bookings hold nothing.
+///
+/// [booking] must come with the rooms it holds and their unit types.
+Future<List<BookingRoom>> sharedHolds(
+  Session session,
+  Booking booking, {
+  Transaction? transaction,
+}) async {
+  final shared = {
+    for (final hold in booking.rooms ?? <BookingRoom>[])
+      if (hold.room?.unitType?.shared ?? false) hold.roomId,
+  };
+  if (shared.isEmpty) return [];
+  return BookingRoom.db.find(
+    session,
+    where: (t) =>
+        t.roomId.inSet(shared) &
+        t.bookingId.notEquals(booking.id) &
+        t.booking.status.notEquals(BookingStatus.cancelled),
+    include: BookingRoom.include(booking: Booking.include()),
+    transaction: transaction,
+  );
 }

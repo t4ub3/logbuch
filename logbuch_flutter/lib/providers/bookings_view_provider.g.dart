@@ -161,7 +161,7 @@ final class DisplayedYearProvider
   }
 }
 
-String _$displayedYearHash() => r'6bcd2276ff81ccd6423b69930ac125203cf2b649';
+String _$displayedYearHash() => r'cddfac4794922c982c81f3aefd98235f5d03c104';
 
 /// The year shown in the yearly calendar.
 

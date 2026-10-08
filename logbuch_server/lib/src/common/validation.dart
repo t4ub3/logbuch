@@ -18,6 +18,13 @@ void requireDateOnly(DateTime date) {
   }
 }
 
+/// Tax rates are stored in basis points, so 700 is 7 %.
+void requireTaxRate(int taxRate) {
+  if (taxRate < 0 || taxRate > 10000) {
+    throw ValidationException(reason: ValidationError.invalidTaxRate);
+  }
+}
+
 /// Amounts are stored in cents and must not be negative.
 void requireAmount(int amount) {
   if (amount < 0) {

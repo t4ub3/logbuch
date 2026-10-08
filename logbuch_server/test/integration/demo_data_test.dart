@@ -34,33 +34,73 @@ void main() {
       expect(notes.where((note) => note.contains('!')), isEmpty);
     });
 
-    test('then there are rooms and prices for every price category', () async {
+    test('then there are rooms and prices for every unit type', () async {
       final rooms = await endpoints.room.getAll(sessionBuilder);
-      final categories = await endpoints.priceCategory.getAll(sessionBuilder);
+      final types = await endpoints.unitType.getAll(sessionBuilder);
       final ageGroups = await endpoints.ageGroup.getAll(sessionBuilder);
       final plans = await endpoints.mealPlan.getAll(sessionBuilder);
-      final seasons = await endpoints.season.getAll(sessionBuilder);
+      final fees = await endpoints.fee.getAll(sessionBuilder);
+      final lists = await endpoints.priceList.getAll(sessionBuilder);
 
-      expect(categories, hasLength(4));
-      for (final category in categories) {
+      expect(types, hasLength(7));
+      for (final type in types) {
         expect(
-          rooms.where((room) => room.priceCategoryId == category.id),
+          rooms.where((room) => room.unitTypeId == type.id),
           isNotEmpty,
-          reason: category.name,
+          reason: type.name,
         );
       }
-      // Three seasons for each of three years, all of them priced in full.
-      expect(seasons, hasLength(9));
-      for (final season in seasons) {
-        expect(
-          await endpoints.roomRate.getBySeason(sessionBuilder, season.id!),
-          hasLength(categories.length * ageGroups.length),
+      expect(rooms.where((room) => room.buildingId == null), isEmpty);
+      // The final cleaning is a surcharge of the seven bungalows.
+      expect(rooms.where((room) => room.fees!.isNotEmpty), hasLength(7));
+
+      // A list for each of three years, all of them priced in full: guests
+      // pay in every unit type but the main bungalow, and the bungalows
+      // have a price of their own.
+      expect(lists, hasLength(3));
+      for (final list in lists) {
+        final prices = await endpoints.priceList.getPrices(
+          sessionBuilder,
+          list.id!,
         );
-        expect(
-          await endpoints.mealRate.getBySeason(sessionBuilder, season.id!),
-          hasLength(plans.length * ageGroups.length),
-        );
+        expect(prices.roomRates, hasLength(6 * ageGroups.length));
+        expect(prices.unitPrices, hasLength(3));
+        expect(prices.mealRates, hasLength(plans.length * ageGroups.length));
+        expect(prices.feePrices, hasLength(fees.length));
       }
+    });
+
+    test('then the bungalows are booked, shared and used for a day', () async {
+      Future<BookingPrice> priceOf(String title) async => endpoints.pricing
+          .calculate(sessionBuilder, (await booking(title)).id!);
+
+      final weekend = await priceOf('Familienwochenende im Bungalowdorf');
+      final band = await priceOf('Probenwochenende Jugendband Nordlicht');
+      final party = await priceOf('Familienfeier Krüger');
+
+      expect(weekend.problems, isEmpty);
+      expect(band.problems, isEmpty);
+      expect(party.problems, isEmpty);
+      // The families have the main bungalow to themselves for a night and
+      // share it with the band for two.
+      String shared(BookingPrice price) => price.lines
+          .where((line) => line.description.contains('Hauptbungalow ·'))
+          .map((line) => line.quantity)
+          .join(' + ');
+      expect(shared(weekend), '1 + 2');
+      expect(shared(band), '2');
+      expect(
+        await endpoints.billing.getFolios(
+          sessionBuilder,
+          (await booking('Familienwochenende im Bungalowdorf')).id!,
+        ),
+        // Each family pays its bungalow and its part of the shared one.
+        hasLength(2),
+      );
+      expect(
+        party.lines.map((line) => line.description),
+        contains('Hauptbungalow · Hauptbungalow'),
+      );
     });
 
     test('then there is a booking in every stage', () async {
@@ -195,7 +235,8 @@ void main() {
         (await endpoints.booking.getAll(sessionBuilder)).length,
         (await endpoints.household.getAll(sessionBuilder)).length,
         (await endpoints.organization.getAll(sessionBuilder)).length,
-        (await endpoints.season.getAll(sessionBuilder)).length,
+        (await endpoints.priceList.getAll(sessionBuilder)).length,
+        (await endpoints.building.getAll(sessionBuilder)).length,
         (await endpoints.fee.getAll(sessionBuilder)).length,
         (await endpoints.donation.getByYear(sessionBuilder, today.year)).length,
       ];

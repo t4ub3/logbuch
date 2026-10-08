@@ -16,7 +16,7 @@ abstract class MealRate
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
   MealRate._({
     this.id,
-    required this.seasonId,
+    required this.priceListId,
     required this.mealPlanId,
     required this.ageGroupId,
     required this.pricePerNight,
@@ -24,7 +24,7 @@ abstract class MealRate
 
   factory MealRate({
     int? id,
-    required int seasonId,
+    required int priceListId,
     required int mealPlanId,
     required int ageGroupId,
     required int pricePerNight,
@@ -33,7 +33,7 @@ abstract class MealRate
   factory MealRate.fromJson(Map<String, dynamic> jsonSerialization) {
     return MealRate(
       id: jsonSerialization['id'] as int?,
-      seasonId: jsonSerialization['seasonId'] as int,
+      priceListId: jsonSerialization['priceListId'] as int,
       mealPlanId: jsonSerialization['mealPlanId'] as int,
       ageGroupId: jsonSerialization['ageGroupId'] as int,
       pricePerNight: jsonSerialization['pricePerNight'] as int,
@@ -45,7 +45,7 @@ abstract class MealRate
   /// the id will be null.
   int? id;
 
-  int seasonId;
+  int priceListId;
 
   int mealPlanId;
 
@@ -58,7 +58,7 @@ abstract class MealRate
   @_isc.useResult
   MealRate copyWith({
     int? id,
-    int? seasonId,
+    int? priceListId,
     int? mealPlanId,
     int? ageGroupId,
     int? pricePerNight,
@@ -68,7 +68,7 @@ abstract class MealRate
     return {
       '__className__': 'MealRate',
       if (id != null) 'id': id,
-      'seasonId': seasonId,
+      'priceListId': priceListId,
       'mealPlanId': mealPlanId,
       'ageGroupId': ageGroupId,
       'pricePerNight': pricePerNight,
@@ -80,7 +80,7 @@ abstract class MealRate
     return {
       '__className__': 'MealRate',
       if (id != null) 'id': id,
-      'seasonId': seasonId,
+      'priceListId': priceListId,
       'mealPlanId': mealPlanId,
       'ageGroupId': ageGroupId,
       'pricePerNight': pricePerNight,
@@ -98,13 +98,13 @@ class _Undefined {}
 class _MealRateImpl extends MealRate {
   _MealRateImpl({
     int? id,
-    required int seasonId,
+    required int priceListId,
     required int mealPlanId,
     required int ageGroupId,
     required int pricePerNight,
   }) : super._(
          id: id,
-         seasonId: seasonId,
+         priceListId: priceListId,
          mealPlanId: mealPlanId,
          ageGroupId: ageGroupId,
          pricePerNight: pricePerNight,
@@ -116,14 +116,14 @@ class _MealRateImpl extends MealRate {
   @override
   MealRate copyWith({
     Object? id = _Undefined,
-    int? seasonId,
+    int? priceListId,
     int? mealPlanId,
     int? ageGroupId,
     int? pricePerNight,
   }) {
     return MealRate(
       id: id is int? ? id : this.id,
-      seasonId: seasonId ?? this.seasonId,
+      priceListId: priceListId ?? this.priceListId,
       mealPlanId: mealPlanId ?? this.mealPlanId,
       ageGroupId: ageGroupId ?? this.ageGroupId,
       pricePerNight: pricePerNight ?? this.pricePerNight,

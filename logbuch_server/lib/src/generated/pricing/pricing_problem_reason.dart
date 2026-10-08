@@ -16,9 +16,10 @@ enum PricingProblemReason implements _is.SerializableModel {
   datesMissing,
   ageUnknown,
   roomMissing,
-  seasonMissing,
+  priceListMissing,
   roomRateMissing,
-  mealRateMissing;
+  mealRateMissing,
+  dayUsePriceMissing;
 
   static PricingProblemReason fromJson(String name) {
     switch (name) {
@@ -28,12 +29,14 @@ enum PricingProblemReason implements _is.SerializableModel {
         return PricingProblemReason.ageUnknown;
       case 'roomMissing':
         return PricingProblemReason.roomMissing;
-      case 'seasonMissing':
-        return PricingProblemReason.seasonMissing;
+      case 'priceListMissing':
+        return PricingProblemReason.priceListMissing;
       case 'roomRateMissing':
         return PricingProblemReason.roomRateMissing;
       case 'mealRateMissing':
         return PricingProblemReason.mealRateMissing;
+      case 'dayUsePriceMissing':
+        return PricingProblemReason.dayUsePriceMissing;
       default:
         throw ArgumentError(
           'Value "$name" cannot be converted to "PricingProblemReason"',
