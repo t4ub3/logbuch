@@ -150,7 +150,7 @@ class _Translations$bookings$de extends Translations$bookings$en {
 	@override String get billingMode => 'Rechnungen';
 	@override late final _Translations$bookings$billingModes$de billingModes = _Translations$bookings$billingModes$de._(_root);
 	@override String get expectedGuests => 'Erwartete Gäste';
-	@override String get optionExpiresAt => 'Option gültig bis';
+	@override String get optionExpiresAt => 'Angebot gültig bis';
 	@override String get notes => 'Notizen';
 	@override String get roomsNeedDates => 'Bitte zuerst den Zeitraum der Buchung festlegen, um Zimmer auszuwählen.';
 	@override String get noFreeRooms => 'In diesem Zeitraum sind keine Zimmer frei.';
@@ -404,8 +404,8 @@ class _Translations$dashboard$de extends Translations$dashboard$en {
 		one: '${n} Zimmer',
 		other: '${n} Zimmer',
 	);
-	@override String get options => 'Bald ablaufende Optionen';
-	@override String get noOptions => 'In den nächsten 14 Tagen läuft keine Option ab.';
+	@override String get options => 'Bald ablaufende Angebote';
+	@override String get noOptions => 'In den nächsten 14 Tagen läuft kein Angebot ab.';
 	@override String expires({required Object date}) => 'Läuft ab am ${date}';
 	@override String expired({required Object date}) => 'Abgelaufen am ${date}';
 	@override String get balances => 'Unbezahlte Rechnungen';
@@ -457,7 +457,7 @@ class _Translations$bookings$statuses$de extends Translations$bookings$statuses$
 
 	// Translations
 	@override String get inquiry => 'Anfrage';
-	@override String get option => 'Option';
+	@override String get option => 'Angebot';
 	@override String get confirmed => 'Bestätigt';
 	@override String get checkedIn => 'Angereist';
 	@override String get completed => 'Abgeschlossen';
@@ -569,7 +569,7 @@ class _Translations$admin$errors$de extends Translations$admin$errors$en {
 	@override String get alreadyReceipted => 'Diese Spende steht auf einer Bestätigung und kann nicht mehr geändert werden.';
 	@override String get operatorIncomplete => 'Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen.';
 	@override String get alreadyGuest => 'Aus diesem Haushalt kann niemand hinzugefügt werden: Er hat keine Mitglieder, oder alle sind bereits Gäste der Buchung.';
-	@override String get notConfirmed => 'Eine Bestätigung gibt es nur für Buchungen, die eine Option oder bestätigt sind.';
+	@override String get notConfirmed => 'Eine Bestätigung gibt es nur für Buchungen, die ein Angebot haben oder bestätigt sind.';
 }
 
 // Path: admin.rooms
@@ -837,7 +837,7 @@ extension on TranslationsDe {
 			'bookings.phone' => 'Telefon',
 			'bookings.status' => 'Status',
 			'bookings.statuses.inquiry' => 'Anfrage',
-			'bookings.statuses.option' => 'Option',
+			'bookings.statuses.option' => 'Angebot',
 			'bookings.statuses.confirmed' => 'Bestätigt',
 			'bookings.statuses.checkedIn' => 'Angereist',
 			'bookings.statuses.completed' => 'Abgeschlossen',
@@ -864,7 +864,7 @@ extension on TranslationsDe {
 			'bookings.billingModes.perGroup' => 'Eine Rechnung pro Gruppe',
 			'bookings.billingModes.perGuest' => 'Eine Rechnung pro Gast',
 			'bookings.expectedGuests' => 'Erwartete Gäste',
-			'bookings.optionExpiresAt' => 'Option gültig bis',
+			'bookings.optionExpiresAt' => 'Angebot gültig bis',
 			'bookings.notes' => 'Notizen',
 			'bookings.roomsNeedDates' => 'Bitte zuerst den Zeitraum der Buchung festlegen, um Zimmer auszuwählen.',
 			'bookings.noFreeRooms' => 'In diesem Zeitraum sind keine Zimmer frei.',
@@ -1038,7 +1038,7 @@ extension on TranslationsDe {
 			'admin.errors.alreadyReceipted' => 'Diese Spende steht auf einer Bestätigung und kann nicht mehr geändert werden.',
 			'admin.errors.operatorIncomplete' => 'Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen.',
 			'admin.errors.alreadyGuest' => 'Aus diesem Haushalt kann niemand hinzugefügt werden: Er hat keine Mitglieder, oder alle sind bereits Gäste der Buchung.',
-			'admin.errors.notConfirmed' => 'Eine Bestätigung gibt es nur für Buchungen, die eine Option oder bestätigt sind.',
+			'admin.errors.notConfirmed' => 'Eine Bestätigung gibt es nur für Buchungen, die ein Angebot haben oder bestätigt sind.',
 			'admin.rooms.add' => 'Neues Zimmer',
 			'admin.rooms.edit' => 'Zimmer bearbeiten',
 			'admin.rooms.number' => 'Zimmernummer',
@@ -1172,8 +1172,8 @@ extension on TranslationsDe {
 			'dashboard.roomsOccupied' => ({required Object occupied, required Object total}) => '${occupied} von ${total} Zimmern belegt',
 			'dashboard.guestsTonight' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, zero: 'Keine Gäste im Haus', one: '${n} Gast im Haus', other: '${n} Gäste im Haus', ), 
 			'dashboard.roomCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, one: '${n} Zimmer', other: '${n} Zimmer', ), 
-			'dashboard.options' => 'Bald ablaufende Optionen',
-			'dashboard.noOptions' => 'In den nächsten 14 Tagen läuft keine Option ab.',
+			'dashboard.options' => 'Bald ablaufende Angebote',
+			'dashboard.noOptions' => 'In den nächsten 14 Tagen läuft kein Angebot ab.',
 			'dashboard.expires' => ({required Object date}) => 'Läuft ab am ${date}',
 			'dashboard.expired' => ({required Object date}) => 'Abgelaufen am ${date}',
 			'dashboard.balances' => 'Unbezahlte Rechnungen',

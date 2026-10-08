@@ -248,7 +248,7 @@ class DemoData {
   final _mealPlans = <String, MealPlan>{};
   final _categories = <String, BookingCategory>{};
   var _ageGroups = <AgeGroup>[];
-  var _titles = <String>{};
+  var _bookings = <String, Booking>{};
   var _people = 0;
 
   /// The day [offset] days after [today].
@@ -683,8 +683,6 @@ class DemoData {
 
   // Bookings.
 
-  /// Creates [booking], unless a booking with its title exists: then that
-  /// is left as it is and null is returned.
   /// The category whose words are in the title of a booking.
   BookingCategory? _categoryOf(String title) {
     for (final (name, _, _, words) in _bookingCategories) {
@@ -693,16 +691,31 @@ class DemoData {
     return null;
   }
 
+  /// Creates [booking], unless a booking with its title exists: then that
+  /// is left as it is and null is returned. Only a category is added to it,
+  /// if it has none, since bookings made before there were categories have
+  /// none.
   Future<Booking?> _book(Booking booking) async {
-    if (!_titles.add(booking.title)) {
-      log('· ${booking.title} is there already');
+    final category = _categoryOf(booking.title);
+    if (_bookings[booking.title] case final existing?) {
+      if (existing.categoryId == null && category != null) {
+        log('~ ${booking.title} is in ${category.name} now');
+        await endpoints.booking.update(
+          session,
+          existing.copyWith(categoryId: category.id),
+        );
+      } else {
+        log('· ${booking.title} is there already');
+      }
       return null;
     }
     log('+ ${booking.title}');
-    return endpoints.booking.add(
+    final added = await endpoints.booking.add(
       session,
-      booking.copyWith(categoryId: _categoryOf(booking.title)?.id),
+      booking.copyWith(categoryId: category?.id),
     );
+    _bookings[added.title] = added;
+    return added;
   }
 
   /// Lets [booking] hold rooms that are free during its nights: for each of
@@ -813,9 +826,9 @@ class DemoData {
   );
 
   Future<void> _addBookings() async {
-    _titles = {
+    _bookings = {
       for (final booking in await endpoints.booking.getAll(session))
-        booking.title,
+        booking.title: booking,
     };
 
     final school = await _organization(

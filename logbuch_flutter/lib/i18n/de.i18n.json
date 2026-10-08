@@ -50,7 +50,7 @@
         "status": "Status",
         "statuses": {
             "inquiry": "Anfrage",
-            "option": "Option",
+            "option": "Angebot",
             "confirmed": "Bestätigt",
             "checkedIn": "Angereist",
             "completed": "Abgeschlossen",
@@ -80,7 +80,7 @@
             "perGuest": "Eine Rechnung pro Gast"
         },
         "expectedGuests": "Erwartete Gäste",
-        "optionExpiresAt": "Option gültig bis",
+        "optionExpiresAt": "Angebot gültig bis",
         "notes": "Notizen",
         "roomsNeedDates": "Bitte zuerst den Zeitraum der Buchung festlegen, um Zimmer auszuwählen.",
         "noFreeRooms": "In diesem Zeitraum sind keine Zimmer frei.",
@@ -284,7 +284,7 @@
             "alreadyReceipted": "Diese Spende steht auf einer Bestätigung und kann nicht mehr geändert werden.",
             "operatorIncomplete": "Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen.",
             "alreadyGuest": "Aus diesem Haushalt kann niemand hinzugefügt werden: Er hat keine Mitglieder, oder alle sind bereits Gäste der Buchung.",
-            "notConfirmed": "Eine Bestätigung gibt es nur für Buchungen, die eine Option oder bestätigt sind."
+            "notConfirmed": "Eine Bestätigung gibt es nur für Buchungen, die ein Angebot haben oder bestätigt sind."
         },
         "rooms": {
             "add": "Neues Zimmer",
@@ -466,8 +466,8 @@
             "one": "{n} Zimmer",
             "other": "{n} Zimmer"
         },
-        "options": "Bald ablaufende Optionen",
-        "noOptions": "In den nächsten 14 Tagen läuft keine Option ab.",
+        "options": "Bald ablaufende Angebote",
+        "noOptions": "In den nächsten 14 Tagen läuft kein Angebot ab.",
         "expires": "Läuft ab am {date}",
         "expired": "Abgelaufen am {date}",
         "balances": "Unbezahlte Rechnungen",

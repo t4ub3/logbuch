@@ -205,5 +205,24 @@ void main() {
 
       expect(await counts(), before);
     });
+
+    test(
+      'when it is added again then a booking without a category gets one',
+      () async {
+        final trip = (await endpoints.booking.getAll(
+          sessionBuilder,
+        )).firstWhere((b) => b.title.contains('Klassenfahrt'));
+        final categoryId = trip.categoryId;
+        await endpoints.booking.update(
+          sessionBuilder,
+          trip.copyWith(categoryId: null),
+        );
+        expect((await booking(trip.title)).categoryId, isNull);
+
+        await seed();
+
+        expect((await booking(trip.title)).categoryId, categoryId);
+      },
+    );
   });
 }

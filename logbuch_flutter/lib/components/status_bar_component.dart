@@ -16,6 +16,7 @@ class StatusBarComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    const double dividerIndent = 6;
 
     return Material(
       color: colorScheme.dimmedPrimary,
@@ -24,7 +25,12 @@ class StatusBarComponent extends StatelessWidget {
         child: Row(
           children: [
             const Expanded(child: _StatusNotice()),
-            VerticalDivider(width: 1, color: colorScheme.onSurface),
+            VerticalDivider(
+              width: 1,
+              color: colorScheme.onSurface,
+              indent: dividerIndent,
+              endIndent: dividerIndent,
+            ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 8),
               child: _AccountMenu(),
