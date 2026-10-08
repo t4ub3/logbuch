@@ -46,7 +46,7 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp(
       title: "Log|Buch",
-      debugShowCheckedModeBanner: false,
+      //debugShowCheckedModeBanner: true,
       theme: createYaruLightTheme(primaryColor: accentColor),
       darkTheme: createYaruDarkTheme(primaryColor: accentColor),
       themeMode: themeMode,
