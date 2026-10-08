@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -92,6 +94,14 @@ class _YearGrid extends StatelessWidget {
   static const _labelWidth = 56.0;
   static const _minCellWidth = 24.0;
 
+  /// The space above the bars, for the number of the day.
+  static const _numberHeight = 18.0;
+
+  /// Bars get no thinner than their title needs, and no thicker than looks
+  /// right for a single booking in a month.
+  static const _minLaneHeight = 16.0;
+  static const _maxLaneHeight = 22.0;
+
   final int year;
 
   /// 0 = Sunday, 1 = Monday. DateTime.weekday % 7 uses the same numbering.
@@ -101,6 +111,17 @@ class _YearGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const minWidth = _labelWidth + _columns * _minCellWidth;
+    final lanes = [
+      for (var m = 1; m <= 12; m++)
+        assignLanes(
+          bookings,
+          DateTime(year, m),
+          DateTime(year, m, DateUtils.getDaysInMonth(year, m)),
+        ),
+    ];
+    // All months have room for as many lanes as the busiest one, so the
+    // bars are equally high throughout the year.
+    final laneCount = max(1, lanes.map((l) => l.length).fold(0, max));
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -109,14 +130,12 @@ class _YearGrid extends StatelessWidget {
           child: Column(
             children: [
               _buildWeekdayHeader(context),
-              for (var m = 1; m <= 12; m++)
-                Expanded(
-                  child: _MonthRow(
-                    month: DateTime(year, m),
-                    firstWeekday: firstWeekday,
-                    bookings: bookings,
-                  ),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) =>
+                      _buildMonths(constraints.maxHeight, lanes, laneCount),
                 ),
+              ),
             ],
           ),
         );
@@ -129,6 +148,46 @@ class _YearGrid extends StatelessWidget {
           child: SizedBox(width: minWidth + 16, child: grid),
         );
       },
+    );
+  }
+
+  /// The months share the [height] there is. Where that leaves too little
+  /// room for the bars to show their titles, the months scroll instead.
+  Widget _buildMonths(
+    double height,
+    List<List<List<Booking>>> lanes,
+    int laneCount,
+  ) {
+    const minRowHeight = _numberHeight + 2;
+    final fitted = height / 12;
+    final needed = minRowHeight + laneCount * _minLaneHeight;
+    final rowHeight = max(fitted, needed);
+    final laneHeight = min(
+      (rowHeight - minRowHeight) / laneCount,
+      _maxLaneHeight,
+    );
+
+    Widget month(int m) => _MonthRow(
+      month: DateTime(year, m),
+      firstWeekday: firstWeekday,
+      lanes: lanes[m - 1],
+      laneHeight: laneHeight,
+    );
+
+    if (fitted >= needed) {
+      return Column(
+        children: [
+          for (var m = 1; m <= 12; m++) Expanded(child: month(m)),
+        ],
+      );
+    }
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          for (var m = 1; m <= 12; m++)
+            SizedBox(height: rowHeight, child: month(m)),
+        ],
+      ),
     );
   }
 
@@ -159,12 +218,16 @@ class _MonthRow extends ConsumerWidget {
   const _MonthRow({
     required this.month,
     required this.firstWeekday,
-    required this.bookings,
+    required this.lanes,
+    required this.laneHeight,
   });
 
   final DateTime month;
   final int firstWeekday;
-  final List<Booking> bookings;
+
+  /// The lanes of this month, see [assignLanes].
+  final List<List<Booking>> lanes;
+  final double laneHeight;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -172,11 +235,8 @@ class _MonthRow extends ConsumerWidget {
     final locale = Localizations.localeOf(context).toLanguageTag();
     final leadingDays = (month.weekday % 7 - firstWeekday) % 7;
     final daysInMonth = DateUtils.getDaysInMonth(month.year, month.month);
-    final lanes = assignLanes(
-      bookings,
-      month,
-      DateTime(month.year, month.month, daysInMonth),
-    );
+    final first = month;
+    final last = DateTime(month.year, month.month, daysInMonth);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -200,20 +260,85 @@ class _MonthRow extends ConsumerWidget {
             ),
           ),
         ),
-        for (var i = 0; i < _YearGrid._columns; i++)
-          Expanded(
-            child: i < leadingDays || i >= leadingDays + daysInMonth
-                ? const _EmptyCell()
-                : _DayCell(
-                    day: DateTime(
-                      month.year,
-                      month.month,
-                      i - leadingDays + 1,
-                    ),
-                    lanes: lanes,
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final cellWidth = constraints.maxWidth / _YearGrid._columns;
+              double columnOf(DateTime day) =>
+                  (leadingDays + day.day - 1) * cellWidth;
+
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (var i = 0; i < _YearGrid._columns; i++)
+                        Expanded(
+                          child:
+                              i < leadingDays || i >= leadingDays + daysInMonth
+                              ? const _EmptyCell()
+                              : _DayCell(
+                                  day: DateTime(
+                                    month.year,
+                                    month.month,
+                                    i - leadingDays + 1,
+                                  ),
+                                ),
+                        ),
+                    ],
                   ),
+                  // Each booking is one bar across its days in this month,
+                  // long enough to show its title.
+                  for (final (index, lane) in lanes.indexed)
+                    for (final booking in lane)
+                      if (!booking.startDay!.isAfter(last) &&
+                          !booking.endDay!.isBefore(first))
+                        _positionedBar(
+                          booking: booking,
+                          top: _YearGrid._numberHeight + index * laneHeight,
+                          left: columnOf(
+                            booking.startDay!.isBefore(first)
+                                ? first
+                                : booking.startDay!,
+                          ),
+                          right:
+                              columnOf(
+                                booking.endDay!.isAfter(last)
+                                    ? last
+                                    : booking.endDay!,
+                              ) +
+                              cellWidth,
+                          isStart: !booking.startDay!.isBefore(first),
+                          isEnd: !booking.endDay!.isAfter(last),
+                        ),
+                ],
+              );
+            },
           ),
+        ),
       ],
+    );
+  }
+
+  /// A bar from [left] to [right], inset where the booking begins or ends.
+  Widget _positionedBar({
+    required Booking booking,
+    required double top,
+    required double left,
+    required double right,
+    required bool isStart,
+    required bool isEnd,
+  }) {
+    final start = left + (isStart ? 2 : 0);
+    final end = right - (isEnd ? 2 : 0);
+
+    return Positioned(
+      top: top,
+      left: start,
+      width: end - start,
+      height: laneHeight,
+      child: _BookingBar(booking: booking, isStart: isStart, isEnd: isEnd),
     );
   }
 }
@@ -235,10 +360,9 @@ class _EmptyCell extends StatelessWidget {
 }
 
 class _DayCell extends StatelessWidget {
-  const _DayCell({required this.day, required this.lanes});
+  const _DayCell({required this.day});
 
   final DateTime day;
-  final List<List<Booking>> lanes;
 
   @override
   Widget build(BuildContext context) {
@@ -253,46 +377,10 @@ class _DayCell extends StatelessWidget {
             : null,
         border: Border.all(color: theme.dividerColor, width: 0.5),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 2),
-              child: _DayNumber(day: day),
-            ),
-          ),
-          // Lanes share the remaining height and get thinner when a month
-          // has many overlapping bookings.
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (final lane in lanes)
-                  Flexible(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 7),
-                      child: _laneBar(lane),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.only(top: 2, right: 2),
+      alignment: Alignment.topRight,
+      child: _DayNumber(day: day),
     );
-  }
-
-  Widget _laneBar(List<Booking> lane) {
-    for (final booking in lane) {
-      if (booking.coversDay(day)) {
-        return _BookingBar(booking: booking, day: day);
-      }
-    }
-    return const SizedBox.expand();
   }
 }
 
@@ -325,15 +413,21 @@ class _DayNumber extends StatelessWidget {
 }
 
 class _BookingBar extends StatelessWidget {
-  const _BookingBar({required this.booking, required this.day});
+  const _BookingBar({
+    required this.booking,
+    required this.isStart,
+    required this.isEnd,
+  });
 
   final Booking booking;
-  final DateTime day;
+
+  /// Whether the booking begins or ends in this month. Bars that go on in
+  /// the month before or after are square at that end.
+  final bool isStart;
+  final bool isEnd;
 
   @override
   Widget build(BuildContext context) {
-    final isStart = booking.startDay == day;
-    final isEnd = booking.endDay == day;
     const radius = Radius.circular(3);
 
     return GestureDetector(
@@ -347,18 +441,24 @@ class _BookingBar extends StatelessWidget {
             booking.leadLabel(context),
           ].nonNulls.join('\n'),
           child: Container(
-            // Bars run edge to edge between days so multi-day bookings read as
-            // one continuous bar; they are only rounded and inset at their ends.
-            margin: EdgeInsets.only(
-              top: 1,
-              left: isStart ? 2 : 0,
-              right: isEnd ? 2 : 0,
-            ),
+            margin: const EdgeInsets.only(top: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            alignment: Alignment.centerLeft,
             decoration: BoxDecoration(
               color: booking.color,
               borderRadius: BorderRadius.horizontal(
                 left: isStart ? radius : Radius.zero,
                 right: isEnd ? radius : Radius.zero,
+              ),
+            ),
+            child: Text(
+              booking.title,
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.fade,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: Colors.white,
+                height: 1,
               ),
             ),
           ),

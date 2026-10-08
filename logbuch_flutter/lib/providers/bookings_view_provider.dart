@@ -42,4 +42,6 @@ class DisplayedYear extends _$DisplayedYear {
   void next() => state++;
 
   void today() => state = DateTime.now().year;
+
+  void show(int year) => state = year;
 }

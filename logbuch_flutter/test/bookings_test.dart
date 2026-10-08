@@ -453,6 +453,19 @@ void main() {
       expect(find.text('New booking'), findsOneWidget);
     });
 
+    testWidgets('names the bookings in the yearly view', (tester) async {
+      await pumpApp(tester, const BookingsPanel(), filledClient());
+      final panel = ProviderScope.containerOf(
+        tester.element(find.byType(BookingsPanel)),
+      );
+      panel.read(selectedBookingsViewProvider.notifier).select(.year);
+      panel.read(displayedYearProvider.notifier).show(2026);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Class trip'), findsOneWidget);
+      expect(find.text('Choir weekend'), findsOneWidget);
+    });
+
     testWidgets('shows which booking holds which room', (tester) async {
       await pumpApp(tester, const BookingsPanel(), filledClient());
       final panel = ProviderScope.containerOf(

@@ -167,7 +167,14 @@ class _DayCell extends StatelessWidget {
     required this.lanes,
   });
 
-  static const _maxBars = 3;
+  /// Rarely are more bookings in the house at once, so the bars are made
+  /// as high as four of them fit below the day number.
+  static const _lanesToFit = 4;
+  static const _minBarHeight = 18.0;
+  static const _maxBarHeight = 30.0;
+
+  /// Room for the line that tells how many bookings are not shown.
+  static const _moreHeight = 16.0;
 
   final DateTime day;
   final bool inMonth;
@@ -183,7 +190,6 @@ class _DayCell extends StatelessWidget {
     final dayBookings = [
       for (final lane in lanes) lane.where((b) => b.coversDay(day)).firstOrNull,
     ];
-    final hidden = dayBookings.skip(_maxBars).nonNulls.length;
 
     return Container(
       decoration: BoxDecoration(
@@ -193,40 +199,63 @@ class _DayCell extends StatelessWidget {
         border: Border.all(color: theme.dividerColor, width: 0.5),
       ),
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: ClipRect(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 4),
-                child: _DayNumber(
-                  day: day,
-                  isToday: isToday,
-                  inMonth: inMonth,
-                ),
-              ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: _DayNumber(day: day, isToday: isToday, inMonth: inMonth),
             ),
-            // Empty lanes keep their space so bars line up across the week.
-            for (final booking in dayBookings.take(_maxBars))
-              booking == null
-                  ? const SizedBox(height: _BookingBar.height)
-                  : _BookingBar(
-                      booking: booking,
-                      day: day,
-                      isRowStart: isRowStart,
-                    ),
-            if (hidden > 0)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Text(
-                  context.t.bookings.more(n: hidden),
-                  style: theme.textTheme.labelSmall,
-                ),
-              ),
-          ],
-        ),
+          ),
+          Expanded(
+            // Every day of a week has the same height and the same lanes,
+            // so its bars come out alike and line up across the week.
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final room = constraints.maxHeight;
+                final barHeight = (room / _lanesToFit).clamp(
+                  _minBarHeight,
+                  _maxBarHeight,
+                );
+                var shown = (room / barHeight).floor();
+                if (shown < lanes.length) {
+                  shown = ((room - _moreHeight) / barHeight).floor();
+                }
+                final hidden = dayBookings.skip(shown).nonNulls.length;
+
+                return ClipRect(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Empty lanes keep their space so bars line up across
+                      // the week.
+                      for (final booking in dayBookings.take(shown))
+                        booking == null
+                            ? SizedBox(height: barHeight)
+                            : _BookingBar(
+                                booking: booking,
+                                day: day,
+                                isRowStart: isRowStart,
+                                height: barHeight,
+                              ),
+                      if (hidden > 0)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Text(
+                            context.t.bookings.more(n: hidden),
+                            maxLines: 1,
+                            style: theme.textTheme.labelSmall,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -273,20 +302,22 @@ class _BookingBar extends StatelessWidget {
     required this.booking,
     required this.day,
     required this.isRowStart,
+    required this.height,
   });
-
-  /// Height including the gap above the bar.
-  static const height = 18.0;
 
   final Booking booking;
   final DateTime day;
   final bool isRowStart;
+
+  /// Height including the gap above the bar.
+  final double height;
 
   @override
   Widget build(BuildContext context) {
     final isStart = booking.startDay == day;
     final isEnd = booking.endDay == day;
     const radius = Radius.circular(4);
+    final textTheme = Theme.of(context).textTheme;
 
     return GestureDetector(
       onTap: () => openBookingTab(context, booking),
@@ -322,9 +353,9 @@ class _BookingBar extends StatelessWidget {
               isStart || isRowStart ? booking.title : '',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(
-                context,
-              ).textTheme.labelSmall?.copyWith(color: Colors.white),
+              style:
+                  (height < 24 ? textTheme.labelSmall : textTheme.labelMedium)
+                      ?.copyWith(color: Colors.white),
             ),
           ),
         ),
