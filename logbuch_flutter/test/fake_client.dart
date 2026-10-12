@@ -453,6 +453,12 @@ class FakeBilling extends Fake implements EndpointBilling {
     ];
   }
 
+  /// The invoices that count as outdated, whatever the booking.
+  var outdated = <OutdatedShare>[];
+
+  @override
+  Future<List<OutdatedShare>> outdatedShares(int bookingId) async => outdated;
+
   @override
   Future<List<Folio>> getFolios(int bookingId) async => [
     for (final folio in folios)

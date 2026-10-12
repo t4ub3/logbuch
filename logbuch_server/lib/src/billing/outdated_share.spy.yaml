@@ -1,0 +1,9 @@
+### An invoice that charges a room which bookings share for another split
+### than the one in force now, for example because it was written before
+### another booking joined.
+class: OutdatedShare
+fields:
+  ### The booking the invoice belongs to, without its relations.
+  booking: Booking
+  room: Room
+  invoiceNumber: String

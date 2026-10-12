@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:logbuch_server/src/auth/roles.dart';
 import 'package:logbuch_server/src/billing/folio_distribution.dart';
 import 'package:logbuch_server/src/billing/invoice_pdf.dart';
+import 'package:logbuch_server/src/billing/outdated_shares.dart';
 import 'package:logbuch_server/src/common/today.dart';
 import 'package:logbuch_server/src/common/validation.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
@@ -221,6 +222,87 @@ class BillingEndpoint extends AppEndpoint {
     return getInvoicePdf(session, folioId);
   }
 
+  /// The invoices that charge a room which bookings share for another split
+  /// than the one in force now: those of the booking, and those of the
+  /// bookings it shares such a room with for at least a night.
+  ///
+  /// An invoice stays as it was written, so this is only to warn that the
+  /// parts of the bookings do not add up to the price of the room anymore.
+  Future<List<OutdatedShare>> outdatedShares(
+    Session session,
+    int bookingId,
+  ) async {
+    final own = await PricingData.load(session, bookingId);
+    if (own == null) {
+      throw ValidationException(reason: ValidationError.notFound);
+    }
+    final ownRooms = {
+      for (final hold in own.booking.rooms ?? <BookingRoom>[]) hold.roomId,
+    };
+    final sharing = {
+      for (final hold in await sharedHolds(session, own.booking))
+        if (_overlap(own.booking, hold.booking!)) hold.bookingId,
+    };
+
+    final outdated = <OutdatedShare>[];
+    for (final data in [
+      own,
+      for (final id in sharing.toList()..sort())
+        ?await PricingData.load(session, id),
+    ]) {
+      final folios = await Folio.db.find(
+        session,
+        where: (t) =>
+            t.bookingId.equals(data.booking.id) &
+            t.invoiceNumber.notEquals(null),
+        orderBy: (t) => t.id,
+        include: Folio.include(charges: Charge.includeList()),
+      );
+      if (folios.isEmpty) continue;
+      final byPayer = distributeLines(
+        booking: data.booking,
+        groups: data.groups,
+        ageGroups: data.ageGroups,
+        lines: data.price.lines,
+      );
+      final holds = data.booking.rooms ?? <BookingRoom>[];
+      for (final folio in folios) {
+        final stale = outdatedHolds(
+          invoiced: folio.charges ?? [],
+          current: byPayer[folio.payerId] ?? [],
+        );
+        for (final hold in holds) {
+          // Of another booking, only the rooms it shares with this one.
+          if (!stale.contains(hold.id) || !ownRooms.contains(hold.roomId)) {
+            continue;
+          }
+          outdated.add(
+            OutdatedShare(
+              booking: data.booking.copyWith(rooms: null, mealPlan: null),
+              room: hold.room!,
+              invoiceNumber: folio.invoiceNumber!,
+            ),
+          );
+        }
+      }
+    }
+    return outdated;
+  }
+
+  /// Whether the two bookings have a night in common.
+  bool _overlap(Booking a, Booking b) {
+    final (aFrom, aTo, bFrom, bTo) = (
+      a.arrival,
+      a.departure,
+      b.arrival,
+      b.departure,
+    );
+    if (aFrom == null || aTo == null || bFrom == null || bTo == null) {
+      return false;
+    }
+    return aFrom.isBefore(bTo) && bFrom.isBefore(aTo);
+  }
+
   /// Records money received for a folio. A negative amount is a refund.
   Future<Payment> addPayment(Session session, Payment payment) async {
     requireAdmin(session);
@@ -407,6 +489,8 @@ class BillingEndpoint extends AppEndpoint {
         Charge(
           folioId: folio.id!,
           guestId: line.guestId,
+          bookingRoomId: line.bookingRoomId,
+          sharers: line.sharers,
           type: line.type,
           description: line.description,
           quantity: line.quantity,
@@ -439,6 +523,8 @@ class BillingEndpoint extends AppEndpoint {
 
   bool _sameCharge(Charge a, Charge b) =>
       a.guestId == b.guestId &&
+      a.bookingRoomId == b.bookingRoomId &&
+      a.sharers == b.sharers &&
       a.type == b.type &&
       a.description == b.description &&
       a.quantity == b.quantity &&

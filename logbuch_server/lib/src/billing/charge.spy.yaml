@@ -7,6 +7,12 @@ fields:
   ### Null for what is charged per booking or per room, and for charges
   ### added by hand.
   guest: Guest?, relation(optional, onDelete=SetNull)
+  ### The room of the booking that a charge without a guest is for, see
+  ### `ChargeLine`. Null as well once the booking gave the room up.
+  bookingRoom: BookingRoom?, relation(optional, onDelete=SetNull)
+  ### How many bookings split the price of the room for these nights. Null
+  ### unless it is more than one.
+  sharers: int?
   type: ChargeType
   description: String
   quantity: int

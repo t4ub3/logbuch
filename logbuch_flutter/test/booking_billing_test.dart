@@ -254,4 +254,61 @@ void main() {
     expect(find.textContaining('Nothing to bill yet.'), findsOneWidget);
     expect(inCard('Billing', find.byTooltip('Edit')), findsNothing);
   });
+
+  testWidgets('invoices that charge a shared room as it was shared before '
+      'are named with the rooms and the folios', (tester) async {
+    final client = filledClient();
+    final trip = client.booking.bookings.first;
+    final hall = Room(
+      id: 9,
+      roomNumber: 'Hall',
+      bedAmount: 0,
+      unitTypeId: 3,
+      unitType: UnitType(id: 3, name: 'Hall', shared: true),
+    );
+    client.booking.bookings = [
+      trip.copyWith(
+        rooms: [
+          ...?trip.rooms,
+          BookingRoom(id: 90, bookingId: trip.id!, roomId: 9, room: hall),
+        ],
+      ),
+    ];
+    client.billing.outdated = [
+      OutdatedShare(booking: trip, room: hall, invoiceNumber: '2026-0001'),
+      OutdatedShare(
+        booking: Booking(id: 2, title: 'Choir weekend', leadId: 1),
+        room: hall,
+        invoiceNumber: '2026-0002',
+      ),
+    ];
+    await _pumpBooking(tester, client);
+
+    for (final card in ['Rooms', 'Billing']) {
+      expect(
+        inCard(
+          card,
+          find.textContaining('Invoice 2026-0001 charges Room Hall'),
+        ),
+        findsOneWidget,
+        reason: card,
+      );
+      expect(
+        inCard(
+          card,
+          find.textContaining('Invoice 2026-0002 of “Choir weekend” charges'),
+        ),
+        findsOneWidget,
+        reason: card,
+      );
+    }
+  });
+
+  testWidgets('a booking whose invoices are up to date is not warned', (
+    tester,
+  ) async {
+    await _pumpBooking(tester, filledClient());
+
+    expect(find.textContaining('as it was shared'), findsNothing);
+  });
 }

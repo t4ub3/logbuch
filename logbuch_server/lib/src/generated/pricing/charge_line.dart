@@ -26,6 +26,7 @@ abstract class ChargeLine
     required this.unitPrice,
     required this.total,
     required this.taxRate,
+    this.sharers,
     this.periodFrom,
     this.periodTo,
   });
@@ -39,6 +40,7 @@ abstract class ChargeLine
     required int unitPrice,
     required int total,
     required int taxRate,
+    int? sharers,
     DateTime? periodFrom,
     DateTime? periodTo,
   }) = _ChargeLineImpl;
@@ -55,6 +57,7 @@ abstract class ChargeLine
       unitPrice: jsonSerialization['unitPrice'] as int,
       total: jsonSerialization['total'] as int,
       taxRate: jsonSerialization['taxRate'] as int,
+      sharers: jsonSerialization['sharers'] as int?,
       periodFrom: jsonSerialization['periodFrom'] == null
           ? null
           : _is.DateTimeJsonExtension.fromJson(jsonSerialization['periodFrom']),
@@ -85,6 +88,10 @@ abstract class ChargeLine
   int taxRate;
 
   /// First night and day after the last night of a line charged per night.
+  /// How many bookings split the price of the room for these nights. Null
+  /// unless it is more than one.
+  int? sharers;
+
   DateTime? periodFrom;
 
   DateTime? periodTo;
@@ -101,6 +108,7 @@ abstract class ChargeLine
     int? unitPrice,
     int? total,
     int? taxRate,
+    int? sharers,
     DateTime? periodFrom,
     DateTime? periodTo,
   });
@@ -116,6 +124,7 @@ abstract class ChargeLine
       'unitPrice': unitPrice,
       'total': total,
       'taxRate': taxRate,
+      if (sharers != null) 'sharers': sharers,
       if (periodFrom != null) 'periodFrom': periodFrom?.toJson(),
       if (periodTo != null) 'periodTo': periodTo?.toJson(),
     };
@@ -133,6 +142,7 @@ abstract class ChargeLine
       'unitPrice': unitPrice,
       'total': total,
       'taxRate': taxRate,
+      if (sharers != null) 'sharers': sharers,
       if (periodFrom != null) 'periodFrom': periodFrom?.toJson(),
       if (periodTo != null) 'periodTo': periodTo?.toJson(),
     };
@@ -156,6 +166,7 @@ class _ChargeLineImpl extends ChargeLine {
     required int unitPrice,
     required int total,
     required int taxRate,
+    int? sharers,
     DateTime? periodFrom,
     DateTime? periodTo,
   }) : super._(
@@ -167,6 +178,7 @@ class _ChargeLineImpl extends ChargeLine {
          unitPrice: unitPrice,
          total: total,
          taxRate: taxRate,
+         sharers: sharers,
          periodFrom: periodFrom,
          periodTo: periodTo,
        );
@@ -184,6 +196,7 @@ class _ChargeLineImpl extends ChargeLine {
     int? unitPrice,
     int? total,
     int? taxRate,
+    Object? sharers = _Undefined,
     Object? periodFrom = _Undefined,
     Object? periodTo = _Undefined,
   }) {
@@ -196,6 +209,7 @@ class _ChargeLineImpl extends ChargeLine {
       unitPrice: unitPrice ?? this.unitPrice,
       total: total ?? this.total,
       taxRate: taxRate ?? this.taxRate,
+      sharers: sharers is int? ? sharers : this.sharers,
       periodFrom: periodFrom is DateTime? ? periodFrom : this.periodFrom,
       periodTo: periodTo is DateTime? ? periodTo : this.periodTo,
     );

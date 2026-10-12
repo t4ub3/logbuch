@@ -192,6 +192,8 @@ class _Translations$bookings$de extends Translations$bookings$en {
 	@override String get everybodyAssigned => 'Alle haben ein Zimmer.';
 	@override String get noRoomsHeld => 'Die Buchung hat noch keine Zimmer.';
 	@override String crowdedRooms({required Object rooms}) => '${rooms}: In einigen dieser Nächte teilen sich mehr als zwei Buchungen die Unterkunft.';
+	@override String outdatedOwnShare({required Object number, required Object room}) => 'Rechnung ${number} berechnet ${room} so, wie die Unterkunft geteilt war, als die Rechnung geschrieben wurde. Inzwischen teilen die Buchungen sie anders, sodass ihre Anteile nicht mehr den Preis ergeben.';
+	@override String outdatedOtherShare({required Object number, required Object booking, required Object room}) => 'Rechnung ${number} von „${booking}“ berechnet ${room} so, wie die Unterkunft geteilt war, als die Rechnung geschrieben wurde. Inzwischen teilen die Buchungen sie anders, sodass ihre Anteile nicht mehr den Preis ergeben.';
 	@override String get moveTo => 'Verschieben nach';
 	@override String bedsUsed({required Object used, required Object beds}) => '${used} von ${beds} Betten';
 	@override String get roomFull => 'Voll';
@@ -932,6 +934,8 @@ extension on TranslationsDe {
 			'bookings.everybodyAssigned' => 'Alle haben ein Zimmer.',
 			'bookings.noRoomsHeld' => 'Die Buchung hat noch keine Zimmer.',
 			'bookings.crowdedRooms' => ({required Object rooms}) => '${rooms}: In einigen dieser Nächte teilen sich mehr als zwei Buchungen die Unterkunft.',
+			'bookings.outdatedOwnShare' => ({required Object number, required Object room}) => 'Rechnung ${number} berechnet ${room} so, wie die Unterkunft geteilt war, als die Rechnung geschrieben wurde. Inzwischen teilen die Buchungen sie anders, sodass ihre Anteile nicht mehr den Preis ergeben.',
+			'bookings.outdatedOtherShare' => ({required Object number, required Object booking, required Object room}) => 'Rechnung ${number} von „${booking}“ berechnet ${room} so, wie die Unterkunft geteilt war, als die Rechnung geschrieben wurde. Inzwischen teilen die Buchungen sie anders, sodass ihre Anteile nicht mehr den Preis ergeben.',
 			'bookings.moveTo' => 'Verschieben nach',
 			'bookings.bedsUsed' => ({required Object used, required Object beds}) => '${used} von ${beds} Betten',
 			'bookings.roomFull' => 'Voll',

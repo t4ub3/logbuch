@@ -122,6 +122,8 @@
         "everybodyAssigned": "Everybody has a room.",
         "noRoomsHeld": "The booking holds no rooms yet.",
         "crowdedRooms": "More than two bookings share {rooms} during some of these nights.",
+        "outdatedOwnShare": "Invoice {number} charges {room} as it was shared when the invoice was written. The bookings share it differently now, so their parts no longer add up to its price.",
+        "outdatedOtherShare": "Invoice {number} of “{booking}” charges {room} as it was shared when the invoice was written. The bookings share it differently now, so their parts no longer add up to its price.",
         "moveTo": "Move to",
         "bedsUsed": "{used} of {beds} beds",
         "roomFull": "Full",

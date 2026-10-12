@@ -582,6 +582,25 @@ class Endpoints extends _is.EndpointDispatch {
                     params['folioId'],
                   ),
         ),
+        'outdatedShares': _is.MethodConnector(
+          name: 'outdatedShares',
+          params: {
+            'bookingId': _is.ParameterDescription(
+              name: 'bookingId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['billing'] as _irc9lmoc.BillingEndpoint)
+                  .outdatedShares(
+                    session,
+                    params['bookingId'],
+                  ),
+        ),
         'addPayment': _is.MethodConnector(
           name: 'addPayment',
           params: {

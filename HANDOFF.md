@@ -1,29 +1,34 @@
 # Handoff: buildings, unit types and price lists
 
-State on 2026-10-08, evening. Nothing is committed; everything below is in the working tree.
+State on 2026-10-12. The restructuring is committed (`7d0346b`); what was done on 2026-10-12 is in the working tree, not committed.
 
 ## Where we stand
 
-The restructuring for the first customer is written and tested, but **not yet applied to the development database and not yet seen running**.
+- The migration to price lists ran on the development database. Server and app logs are clean.
+- Clicked through in the running app: the admin area (four groups, room and fee dialogs with the surcharge assignment, price list editor), the occupancy plan, month view, and the Rooms, Price and Billing cards of bookings in the houses and in the bungalows.
+- Found and fixed on the way: the form of a room that is in a building failed to open while the buildings were still loading (`rooms_section.dart`, with a test).
+- The demo database has the bungalows now (`serverpod run seed`): Bungalowdorf with B1 to B4 and the shared Hauptbungalow, Ferienbungalows F1 and F2, their prices in all seven lists and three bookings. Backup from before: `logbuch_server/.serverpod/logbuch_before_bungalows.dump`.
+- New: an invoice that charges a shared room for another split than the current one is flagged on the Rooms and Billing cards of the bookings involved (`BillingEndpoint.outdatedShares`, migration `20261012065419629-charge-shares`). See `AGENTS.md`.
 
-- `serverpod start` stopped during the work and then failed to boot with "Database does not match target state", because the code had the new models and the database did not.
-- The migration now exists: `logbuch_server/migrations/20261008144207598-unit-types-price-lists`. It was created with the CLI (`serverpod create-migration --force`), since the server could not start at all.
-- The next `serverpod start` applies it on boot. That has not happened yet.
+## Next steps
 
-## Next steps, in order
+1. Commit the working tree.
+2. See the new warning in the running app. Nothing in the demo data triggers it: it needs a booking that is invoiced and then joined by another one in the Hauptbungalow.
 
-1. Start `serverpod start` and confirm it boots. It applies the migration.
-2. Check `tail_server_logs` and `tail_flutter_logs` (through the MCP bridge, see memory `serverpod-mcp-via-stdio-bridge`), then `hot_restart`.
-3. Click through the app: the admin area (four groups, price list editor, surcharges on rooms and fees), a booking's Rooms and Price cards, the occupancy plan.
-4. Decide the two open questions below.
-5. Commit. The dimmed calendar bars from the start of the session are also uncommitted (`dimmed_accent.dart`, month and year view).
+## Decided on 2026-10-12
+
+- **Price lists from seasons:** the seven lists stay as the migration made them. They can be renamed or deleted by hand.
+- **Invoices and sharing:** flagged, not blocked. Invoices written before 2026-10-12 are never flagged, as their charges do not say which room they are for.
 
 ## Open decisions
 
-- **Bungalows in the demo database:** it has none yet. `serverpod run seed` (in `logbuch_server`) would add four buildings, seven bungalows, their prices and three bungalow bookings, and keep everything else. Not run yet; waiting for a yes.
-- **Price lists from seasons:** the migration turns each of the seven seasons into a price list with the same name and start date, so no price changes. Alternative: collapse them into one list per year, which shifts open (not invoiced) folios by about ±10 %.
-- **Invoices and sharing:** if a booking is invoiced and another booking later joins the main bungalow for the same nights, the first invoice stays at full price while the second pays half. Should that be blocked or flagged?
 - **Single room surcharge:** for now a property of the room. To be checked with the customer whether it should also apply when one guest sleeps alone in a double room.
+
+## Seen in the app, not changed
+
+- A room whose unit type and building have the same name reads "Haupthaus · Haupthaus" in the list of rooms.
+- Bungalows are called "Zimmer B1" and "Zimmer Hauptbungalow" wherever a room is named.
+- The fees Beamer, Comfort Zimmer and Endreinigung from before the migration are charged to nobody, as before. Comfort Zimmer can now be assigned to rooms; the other two are per booking.
 
 ## What was decided with the customer's structure in mind
 
@@ -38,12 +43,14 @@ The restructuring for the first customer is written and tested, but **not yet ap
 ## What was built
 
 Server (`logbuch_server`):
+
 - New models: `Building`, `UnitType` (replaces `PriceCategory`), `PriceList` (replaces `Season`), `UnitPrice`, `FeePrice`, `RoomFee`, `PriceListPrices`. `RoomRate` and `MealRate` now hang on a price list; `Fee` lost its amount.
 - New endpoints: `BuildingEndpoint`, `UnitTypeEndpoint`, `PriceListEndpoint` (replaces the season, room rate and meal rate endpoints). `RoomEndpoint` and `FeeEndpoint` take the surcharge assignment. `BookingEndpoint.crowdedRooms` is new.
 - `lib/src/pricing/price_calculation.dart` is rewritten; `lib/src/billing/folio_distribution.dart` splits room charges.
 - `tool/demo_data.dart` creates buildings, bungalows, price lists and bungalow bookings.
 
 Flutter (`logbuch_flutter`):
+
 - Admin area in four groups: House (buildings, rooms), Prices (unit types, age groups, meal plans, surcharges and fees, price lists), Bookings, Organisation.
 - `lib/panels/admin/price_lists_section.dart` is the one place where amounts are entered.
 - Booking page: warning for crowded shared rooms, new pricing problems. Occupancy plan sorts rooms by building and draws bookings that share a room on separate lines.
@@ -59,11 +66,10 @@ Flutter (`logbuch_flutter`):
 
 ## Verified
 
-- Server: `dart analyze` clean, all 246 tests pass (`dart test`), including the demo data seed on an empty database.
-- Flutter: `dart analyze` clean, all 107 tests pass (`flutter test`).
+- Server: `dart analyze` clean, all 258 tests pass (`dart test`), including the demo data seed on an empty database.
+- Flutter: `dart analyze` clean, all 110 tests pass (`flutter test`).
 - Migration: run on a copy of the development database. 30 rooms, 140 room rates, 105 meal rates, 3 fees, 91 guests and 287 charges came through, no booking lost a room, and the schema equals one built from `definition.sql` (apart from a column order in `bookings` that was there before).
-
-Not verified: the migration on the real database, and anything in the running app.
+- In the running app on the development database: see "Where we stand".
 
 ## Safety net
 

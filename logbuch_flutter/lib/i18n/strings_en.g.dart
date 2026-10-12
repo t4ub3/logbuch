@@ -385,6 +385,12 @@ class Translations$bookings$en {
 	/// en: 'More than two bookings share {rooms} during some of these nights.'
 	String crowdedRooms({required Object rooms}) => 'More than two bookings share ${rooms} during some of these nights.';
 
+	/// en: 'Invoice {number} charges {room} as it was shared when the invoice was written. The bookings share it differently now, so their parts no longer add up to its price.'
+	String outdatedOwnShare({required Object number, required Object room}) => 'Invoice ${number} charges ${room} as it was shared when the invoice was written. The bookings share it differently now, so their parts no longer add up to its price.';
+
+	/// en: 'Invoice {number} of “{booking}” charges {room} as it was shared when the invoice was written. The bookings share it differently now, so their parts no longer add up to its price.'
+	String outdatedOtherShare({required Object number, required Object booking, required Object room}) => 'Invoice ${number} of “${booking}” charges ${room} as it was shared when the invoice was written. The bookings share it differently now, so their parts no longer add up to its price.';
+
 	/// en: 'Move to'
 	String get moveTo => 'Move to';
 
@@ -1797,6 +1803,8 @@ extension on Translations {
 			'bookings.everybodyAssigned' => 'Everybody has a room.',
 			'bookings.noRoomsHeld' => 'The booking holds no rooms yet.',
 			'bookings.crowdedRooms' => ({required Object rooms}) => 'More than two bookings share ${rooms} during some of these nights.',
+			'bookings.outdatedOwnShare' => ({required Object number, required Object room}) => 'Invoice ${number} charges ${room} as it was shared when the invoice was written. The bookings share it differently now, so their parts no longer add up to its price.',
+			'bookings.outdatedOtherShare' => ({required Object number, required Object booking, required Object room}) => 'Invoice ${number} of “${booking}” charges ${room} as it was shared when the invoice was written. The bookings share it differently now, so their parts no longer add up to its price.',
 			'bookings.moveTo' => 'Move to',
 			'bookings.bedsUsed' => ({required Object used, required Object beds}) => '${used} of ${beds} beds',
 			'bookings.roomFull' => 'Full',

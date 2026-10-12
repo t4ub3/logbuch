@@ -18,6 +18,8 @@ import 'package:logbuch_client/src/protocol/auth/user_role.dart' as _iesc6ap1;
 import 'package:logbuch_client/src/protocol/billing/charge.dart' as _is60kra1;
 import 'package:logbuch_client/src/protocol/billing/donation.dart' as _ibol987g;
 import 'package:logbuch_client/src/protocol/billing/folio.dart' as _in6c8fr8;
+import 'package:logbuch_client/src/protocol/billing/outdated_share.dart'
+    as _ig1bbub7;
 import 'package:logbuch_client/src/protocol/billing/payment.dart' as _iwxc7te6;
 import 'package:logbuch_client/src/protocol/bookings/booking_category.dart'
     as _i7p8ds8x;
@@ -410,6 +412,19 @@ class EndpointBilling extends EndpointApp {
         'billing',
         'renewInvoicePdf',
         {'folioId': folioId},
+      );
+
+  /// The invoices that charge a room which bookings share for another split
+  /// than the one in force now: those of the booking, and those of the
+  /// bookings it shares such a room with for at least a night.
+  ///
+  /// An invoice stays as it was written, so this is only to warn that the
+  /// parts of the bookings do not add up to the price of the room anymore.
+  _ida.Future<List<_ig1bbub7.OutdatedShare>> outdatedShares(int bookingId) =>
+      caller.callServerEndpoint<List<_ig1bbub7.OutdatedShare>>(
+        'billing',
+        'outdatedShares',
+        {'bookingId': bookingId},
       );
 
   /// Records money received for a folio. A negative amount is a refund.

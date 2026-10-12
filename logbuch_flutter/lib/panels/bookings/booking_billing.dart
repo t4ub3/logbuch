@@ -7,6 +7,7 @@ import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
 import 'package:logbuch_flutter/panels/admin/admin_widgets.dart';
 import 'package:logbuch_flutter/panels/bookings/amount_row.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
+import 'package:logbuch_flutter/panels/bookings/outdated_shares.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_price.dart';
 import 'package:logbuch_flutter/panels/contacts/contacts_section.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
@@ -81,6 +82,7 @@ class BookingBillingCard extends ConsumerWidget {
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    OutdatedSharesWarning(bookingId: bookingId),
                     for (final (index, folio) in folios.indexed) ...[
                       if (index > 0) const Divider(height: 24),
                       DefaultTextStyle.merge(

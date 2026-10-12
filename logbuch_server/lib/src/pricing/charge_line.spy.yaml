@@ -15,5 +15,8 @@ fields:
   ### In basis points.
   taxRate: int
   ### First night and day after the last night of a line charged per night.
+  ### How many bookings split the price of the room for these nights. Null
+  ### unless it is more than one.
+  sharers: int?
   periodFrom: DateTime?
   periodTo: DateTime?

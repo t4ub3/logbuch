@@ -14,6 +14,7 @@
 import 'package:logbuch_server/src/generated/protocol.dart' as _iil9w69f;
 import 'package:serverpod/serverpod.dart' as _is;
 import '../billing/folio.dart' as _i7r42ton;
+import '../bookings/booking_room.dart' as _icgf4f53;
 import '../guests/guest.dart' as _inwk3jth;
 import '../pricing/charge_type.dart' as _iiq5obzg;
 
@@ -26,6 +27,9 @@ abstract class Charge implements _is.TableRow<int?>, _is.ProtocolSerialization {
     this.folio,
     this.guestId,
     this.guest,
+    this.bookingRoomId,
+    this.bookingRoom,
+    this.sharers,
     required this.type,
     required this.description,
     required this.quantity,
@@ -42,6 +46,9 @@ abstract class Charge implements _is.TableRow<int?>, _is.ProtocolSerialization {
     _i7r42ton.Folio? folio,
     int? guestId,
     _inwk3jth.Guest? guest,
+    int? bookingRoomId,
+    _icgf4f53.BookingRoom? bookingRoom,
+    int? sharers,
     required _iiq5obzg.ChargeType type,
     required String description,
     required int quantity,
@@ -67,6 +74,13 @@ abstract class Charge implements _is.TableRow<int?>, _is.ProtocolSerialization {
           : _iil9w69f.Protocol().deserialize<_inwk3jth.Guest>(
               jsonSerialization['guest'],
             ),
+      bookingRoomId: jsonSerialization['bookingRoomId'] as int?,
+      bookingRoom: jsonSerialization['bookingRoom'] == null
+          ? null
+          : _iil9w69f.Protocol().deserialize<_icgf4f53.BookingRoom>(
+              jsonSerialization['bookingRoom'],
+            ),
+      sharers: jsonSerialization['sharers'] as int?,
       type: _iiq5obzg.ChargeType.fromJson(
         (jsonSerialization['type'] as String),
       ),
@@ -101,6 +115,16 @@ abstract class Charge implements _is.TableRow<int?>, _is.ProtocolSerialization {
   /// added by hand.
   _inwk3jth.Guest? guest;
 
+  int? bookingRoomId;
+
+  /// The room of the booking that a charge without a guest is for, see
+  /// `ChargeLine`. Null as well once the booking gave the room up.
+  _icgf4f53.BookingRoom? bookingRoom;
+
+  /// How many bookings split the price of the room for these nights. Null
+  /// unless it is more than one.
+  int? sharers;
+
   _iiq5obzg.ChargeType type;
 
   String description;
@@ -130,6 +154,9 @@ abstract class Charge implements _is.TableRow<int?>, _is.ProtocolSerialization {
     _i7r42ton.Folio? folio,
     int? guestId,
     _inwk3jth.Guest? guest,
+    int? bookingRoomId,
+    _icgf4f53.BookingRoom? bookingRoom,
+    int? sharers,
     _iiq5obzg.ChargeType? type,
     String? description,
     int? quantity,
@@ -148,6 +175,9 @@ abstract class Charge implements _is.TableRow<int?>, _is.ProtocolSerialization {
       if (folio != null) 'folio': folio?.toJson(),
       if (guestId != null) 'guestId': guestId,
       if (guest != null) 'guest': guest?.toJson(),
+      if (bookingRoomId != null) 'bookingRoomId': bookingRoomId,
+      if (bookingRoom != null) 'bookingRoom': bookingRoom?.toJson(),
+      if (sharers != null) 'sharers': sharers,
       'type': type.toJson(),
       'description': description,
       'quantity': quantity,
@@ -168,6 +198,9 @@ abstract class Charge implements _is.TableRow<int?>, _is.ProtocolSerialization {
       if (folio != null) 'folio': folio?.toJsonForProtocol(),
       if (guestId != null) 'guestId': guestId,
       if (guest != null) 'guest': guest?.toJsonForProtocol(),
+      if (bookingRoomId != null) 'bookingRoomId': bookingRoomId,
+      if (bookingRoom != null) 'bookingRoom': bookingRoom?.toJsonForProtocol(),
+      if (sharers != null) 'sharers': sharers,
       'type': type.toJson(),
       'description': description,
       'quantity': quantity,
@@ -182,10 +215,12 @@ abstract class Charge implements _is.TableRow<int?>, _is.ProtocolSerialization {
   static ChargeInclude include({
     _i7r42ton.FolioInclude? folio,
     _inwk3jth.GuestInclude? guest,
+    _icgf4f53.BookingRoomInclude? bookingRoom,
   }) {
     return ChargeInclude._(
       folio: folio,
       guest: guest,
+      bookingRoom: bookingRoom,
     );
   }
 
@@ -222,6 +257,9 @@ class _ChargeImpl extends Charge {
     _i7r42ton.Folio? folio,
     int? guestId,
     _inwk3jth.Guest? guest,
+    int? bookingRoomId,
+    _icgf4f53.BookingRoom? bookingRoom,
+    int? sharers,
     required _iiq5obzg.ChargeType type,
     required String description,
     required int quantity,
@@ -236,6 +274,9 @@ class _ChargeImpl extends Charge {
          folio: folio,
          guestId: guestId,
          guest: guest,
+         bookingRoomId: bookingRoomId,
+         bookingRoom: bookingRoom,
+         sharers: sharers,
          type: type,
          description: description,
          quantity: quantity,
@@ -256,6 +297,9 @@ class _ChargeImpl extends Charge {
     Object? folio = _Undefined,
     Object? guestId = _Undefined,
     Object? guest = _Undefined,
+    Object? bookingRoomId = _Undefined,
+    Object? bookingRoom = _Undefined,
+    Object? sharers = _Undefined,
     _iiq5obzg.ChargeType? type,
     String? description,
     int? quantity,
@@ -271,6 +315,11 @@ class _ChargeImpl extends Charge {
       folio: folio is _i7r42ton.Folio? ? folio : this.folio?.copyWith(),
       guestId: guestId is int? ? guestId : this.guestId,
       guest: guest is _inwk3jth.Guest? ? guest : this.guest?.copyWith(),
+      bookingRoomId: bookingRoomId is int? ? bookingRoomId : this.bookingRoomId,
+      bookingRoom: bookingRoom is _icgf4f53.BookingRoom?
+          ? bookingRoom
+          : this.bookingRoom?.copyWith(),
+      sharers: sharers is int? ? sharers : this.sharers,
       type: type ?? this.type,
       description: description ?? this.description,
       quantity: quantity ?? this.quantity,
@@ -293,6 +342,16 @@ class ChargeUpdateTable extends _is.UpdateTable<ChargeTable> {
 
   _is.ColumnValue<int, int> guestId(int? value) => _is.ColumnValue(
     table.guestId,
+    value,
+  );
+
+  _is.ColumnValue<int, int> bookingRoomId(int? value) => _is.ColumnValue(
+    table.bookingRoomId,
+    value,
+  );
+
+  _is.ColumnValue<int, int> sharers(int? value) => _is.ColumnValue(
+    table.sharers,
     value,
   );
 
@@ -352,6 +411,14 @@ class ChargeTable extends _is.Table<int?> {
       'guestId',
       this,
     );
+    bookingRoomId = _is.ColumnInt(
+      'bookingRoomId',
+      this,
+    );
+    sharers = _is.ColumnInt(
+      'sharers',
+      this,
+    );
     type = _is.ColumnEnum(
       'type',
       this,
@@ -399,6 +466,16 @@ class ChargeTable extends _is.Table<int?> {
   /// added by hand.
   _inwk3jth.GuestTable? _guest;
 
+  late final _is.ColumnInt bookingRoomId;
+
+  /// The room of the booking that a charge without a guest is for, see
+  /// `ChargeLine`. Null as well once the booking gave the room up.
+  _icgf4f53.BookingRoomTable? _bookingRoom;
+
+  /// How many bookings split the price of the room for these nights. Null
+  /// unless it is more than one.
+  late final _is.ColumnInt sharers;
+
   late final _is.ColumnEnum<_iiq5obzg.ChargeType> type;
 
   late final _is.ColumnString description;
@@ -442,11 +519,26 @@ class ChargeTable extends _is.Table<int?> {
     return _guest!;
   }
 
+  _icgf4f53.BookingRoomTable get bookingRoom {
+    if (_bookingRoom != null) return _bookingRoom!;
+    _bookingRoom = _is.createRelationTable(
+      relationFieldName: 'bookingRoom',
+      field: Charge.t.bookingRoomId,
+      foreignField: _icgf4f53.BookingRoom.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _icgf4f53.BookingRoomTable(tableRelation: foreignTableRelation),
+    );
+    return _bookingRoom!;
+  }
+
   @override
   List<_is.Column> get columns => [
     id,
     folioId,
     guestId,
+    bookingRoomId,
+    sharers,
     type,
     description,
     quantity,
@@ -465,6 +557,9 @@ class ChargeTable extends _is.Table<int?> {
     if (relationField == 'guest') {
       return guest;
     }
+    if (relationField == 'bookingRoom') {
+      return bookingRoom;
+    }
     return null;
   }
 }
@@ -473,19 +568,24 @@ class ChargeInclude extends _is.IncludeObject {
   ChargeInclude._({
     _i7r42ton.FolioInclude? folio,
     _inwk3jth.GuestInclude? guest,
+    _icgf4f53.BookingRoomInclude? bookingRoom,
   }) {
     _folio = folio;
     _guest = guest;
+    _bookingRoom = bookingRoom;
   }
 
   _i7r42ton.FolioInclude? _folio;
 
   _inwk3jth.GuestInclude? _guest;
 
+  _icgf4f53.BookingRoomInclude? _bookingRoom;
+
   @override
   Map<String, _is.Include?> get includes => {
     'folio': _folio,
     'guest': _guest,
+    'bookingRoom': _bookingRoom,
   };
 
   @override
@@ -964,6 +1064,29 @@ class ChargeAttachRowRepository {
       transaction: transaction,
     );
   }
+
+  /// Creates a relation between the given [Charge] and [BookingRoom]
+  /// by setting the [Charge]'s foreign key `bookingRoomId` to refer to the [BookingRoom].
+  Future<void> bookingRoom(
+    _is.DatabaseSession session,
+    Charge charge,
+    _icgf4f53.BookingRoom bookingRoom, {
+    _is.Transaction? transaction,
+  }) async {
+    if (charge.id == null) {
+      throw ArgumentError.notNull('charge.id');
+    }
+    if (bookingRoom.id == null) {
+      throw ArgumentError.notNull('bookingRoom.id');
+    }
+
+    var $charge = charge.copyWith(bookingRoomId: bookingRoom.id);
+    await session.db.updateRow<Charge>(
+      $charge,
+      columns: [Charge.t.bookingRoomId],
+      transaction: transaction,
+    );
+  }
 }
 
 class ChargeDetachRowRepository {
@@ -987,6 +1110,28 @@ class ChargeDetachRowRepository {
     await session.db.updateRow<Charge>(
       $charge,
       columns: [Charge.t.guestId],
+      transaction: transaction,
+    );
+  }
+
+  /// Detaches the relation between this [Charge] and the [BookingRoom] set in `bookingRoom`
+  /// by setting the [Charge]'s foreign key `bookingRoomId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> bookingRoom(
+    _is.DatabaseSession session,
+    Charge charge, {
+    _is.Transaction? transaction,
+  }) async {
+    if (charge.id == null) {
+      throw ArgumentError.notNull('charge.id');
+    }
+
+    var $charge = charge.copyWith(bookingRoomId: null);
+    await session.db.updateRow<Charge>(
+      $charge,
+      columns: [Charge.t.bookingRoomId],
       transaction: transaction,
     );
   }

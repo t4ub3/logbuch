@@ -20,6 +20,8 @@ import 'package:logbuch_server/src/generated/billing/charge.dart' as _ik0w9o9c;
 import 'package:logbuch_server/src/generated/billing/donation.dart'
     as _imjtz2ad;
 import 'package:logbuch_server/src/generated/billing/folio.dart' as _iuuqib0o;
+import 'package:logbuch_server/src/generated/billing/outdated_share.dart'
+    as _i488uogk;
 import 'package:logbuch_server/src/generated/billing/payment.dart' as _ijoeqr7q;
 import 'package:logbuch_server/src/generated/bookings/booking_category.dart'
     as _i2rq02p1;
@@ -954,6 +956,37 @@ class _BillingEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<_idt.ByteData>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_i488uogk.OutdatedShare>> outdatedShares(
+    _ist.TestSessionBuilder sessionBuilder,
+    int bookingId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'billing',
+            method: 'outdatedShares',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'billing',
+          methodName: 'outdatedShares',
+          parameters: _ist.testObjectToJson({'bookingId': bookingId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_i488uogk.OutdatedShare>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

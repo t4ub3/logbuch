@@ -183,6 +183,23 @@ void main() {
     expect(client.room.addedFeeIds, [2]);
   });
 
+  testWidgets('the form of a room opens with the building it is in', (
+    tester,
+  ) async {
+    await _pumpAdmin(tester, filledClient());
+
+    // The buildings are only loaded once the form asks for them.
+    await tester.tap(find.text('Room 102'));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Edit room'), findsOneWidget);
+    expect(
+      find.widgetWithText(DropdownButtonFormField<int?>, 'Annex'),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('a rejected record keeps its dialog open with the reason', (
     tester,
   ) async {

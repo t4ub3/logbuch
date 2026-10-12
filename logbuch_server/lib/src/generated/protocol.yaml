@@ -20,6 +20,7 @@ billing:
   - invoice:
   - getInvoicePdf:
   - renewInvoicePdf:
+  - outdatedShares:
   - addPayment:
   - deletePayment:
   - donate:

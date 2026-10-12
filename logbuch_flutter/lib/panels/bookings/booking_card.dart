@@ -6,6 +6,7 @@ import 'package:logbuch_flutter/providers/crowded_rooms_provider.dart';
 import 'package:logbuch_flutter/providers/folios_provider.dart';
 import 'package:logbuch_flutter/providers/guest_groups_provider.dart';
 import 'package:logbuch_flutter/providers/kitchen_overview_provider.dart';
+import 'package:logbuch_flutter/providers/outdated_shares_provider.dart';
 import 'package:yaru/yaru.dart';
 
 /// A part of a booking on its page, such as its rooms: a section with a [title]
@@ -241,5 +242,6 @@ Future<void> showBookingOverlay(
   ref.invalidate(kitchenOverviewProvider(bookingId));
   ref.invalidate(bookingPriceProvider(bookingId));
   ref.invalidate(crowdedRoomsProvider(bookingId));
+  ref.invalidate(outdatedSharesProvider(bookingId));
   ref.invalidate(foliosProvider(bookingId));
 }

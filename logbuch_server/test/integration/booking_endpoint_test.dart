@@ -416,6 +416,7 @@ void main() {
 
     group('and a hall that bookings share', () {
       late Room hall;
+      late UnitPrice hallPrice;
 
       Future<Booking> addWithHall(String title, int arrival, int departure) {
         return addOctober(title, arrival, departure).then(
@@ -433,6 +434,29 @@ void main() {
           room.roomNumber,
       ];
 
+      /// Invoices the one folio of the booking and returns its number.
+      Future<String> invoice(Booking booking) async {
+        final folios = await endpoints.billing.getFolios(
+          sessionBuilder,
+          booking.id!,
+        );
+        final invoiced = await endpoints.billing.invoice(
+          sessionBuilder,
+          folios.single.id!,
+        );
+        return invoiced.invoiceNumber!;
+      }
+
+      /// The invoices that the booking is warned about.
+      Future<List<String>> outdated(Booking booking) async => [
+        for (final share in await endpoints.billing.outdatedShares(
+          sessionBuilder,
+          booking.id!,
+        ))
+          '${share.booking.title} ${share.invoiceNumber} '
+              '${share.room.roomNumber}',
+      ];
+
       setUp(() async {
         final shared = await endpoints.unitType.add(
           sessionBuilder,
@@ -447,18 +471,15 @@ void main() {
           sessionBuilder,
           PriceList(name: '2026', validFrom: DateTime.utc(2026)),
         );
+        hallPrice = UnitPrice(
+          priceListId: list.id!,
+          unitTypeId: shared.id!,
+          pricePerNight: 5000,
+        );
         await endpoints.priceList.savePrices(
           sessionBuilder,
           list.id!,
-          prices(
-            unitPrices: [
-              UnitPrice(
-                priceListId: list.id!,
-                unitTypeId: shared.id!,
-                pricePerNight: 5000,
-              ),
-            ],
-          ),
+          prices(unitPrices: [hallPrice]),
         );
       });
 
@@ -532,6 +553,63 @@ void main() {
         expect(await crowded(party), ['Hall']);
         // On its night only the choir is there as well.
         expect(await crowded(later), isEmpty);
+      });
+
+      test('when a booking joins after the other was invoiced '
+          'then both are told that the invoice is outdated', () async {
+        final camp = await addWithHall('Camp', 12, 16);
+        final number = await invoice(camp);
+        expect(await outdated(camp), isEmpty);
+
+        final choir = await addWithHall('Choir', 14, 18);
+        final later = await addWithHall('Later', 16, 18);
+
+        expect(await outdated(camp), ['Camp $number Hall']);
+        expect(await outdated(choir), ['Camp $number Hall']);
+        // It has no night in common with the camp.
+        expect(await outdated(later), isEmpty);
+
+        // The invoice itself stays as it was written.
+        final folios = await endpoints.billing.getFolios(
+          sessionBuilder,
+          camp.id!,
+        );
+        expect(folios.single.charges!.single.total, 20000);
+      });
+
+      test('when a booking is invoiced while it shares the hall '
+          'then the invoice is up to date until the sharing changes', () async {
+        final camp = await addWithHall('Camp', 12, 16);
+        final choir = await addWithHall('Choir', 14, 18);
+        final number = await invoice(camp);
+        expect(await outdated(camp), isEmpty);
+        expect(await outdated(choir), isEmpty);
+
+        // A new price is not what this is about.
+        await endpoints.priceList.savePrices(
+          sessionBuilder,
+          hallPrice.priceListId,
+          prices(unitPrices: [hallPrice.copyWith(pricePerNight: 6000)]),
+        );
+        expect(await outdated(camp), isEmpty);
+
+        await endpoints.booking.update(
+          sessionBuilder,
+          choir.copyWith(status: BookingStatus.cancelled),
+        );
+        expect(await outdated(camp), ['Camp $number Hall']);
+      });
+
+      test('when an invoiced booking gives the hall up '
+          'then nothing is outdated', () async {
+        final camp = await addWithHall('Camp', 12, 16);
+        await invoice(camp);
+        final choir = await addWithHall('Choir', 14, 18);
+
+        await endpoints.booking.setRooms(sessionBuilder, camp.id!, []);
+
+        expect(await outdated(camp), isEmpty);
+        expect(await outdated(choir), isEmpty);
       });
     });
   });

@@ -171,21 +171,30 @@ class _RoomDialogState extends ConsumerState<_RoomDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              // "No building" is the null entry.
-              child: DropdownButtonFormField<int?>(
-                isExpanded: true,
-                initialValue: _buildingId,
-                decoration: InputDecoration(labelText: t.building),
-                items: [
-                  DropdownMenuItem(value: null, child: Text(t.noBuilding)),
-                  for (final building in buildings.value ?? <Building>[])
-                    DropdownMenuItem(
-                      value: building.id,
-                      child: Text(building.name),
-                    ),
-                ],
-                onChanged: (id) => setState(() => _buildingId = id),
-              ),
+              // The field has to wait for the buildings: it must not be
+              // built without the entry of the building the room is in.
+              child: switch (buildings) {
+                // "No building" is the null entry.
+                AsyncData(value: final buildings) =>
+                  DropdownButtonFormField<int?>(
+                    isExpanded: true,
+                    initialValue: _buildingId,
+                    decoration: InputDecoration(labelText: t.building),
+                    items: [
+                      DropdownMenuItem(value: null, child: Text(t.noBuilding)),
+                      for (final building in buildings)
+                        DropdownMenuItem(
+                          value: building.id,
+                          child: Text(building.name),
+                        ),
+                    ],
+                    onChanged: (id) => setState(() => _buildingId = id),
+                  ),
+                AsyncError(:final error) => Text(
+                  context.t.common.loadFailed(error: error),
+                ),
+                _ => const Center(child: CircularProgressIndicator()),
+              },
             ),
             const SizedBox(width: 16),
             Expanded(

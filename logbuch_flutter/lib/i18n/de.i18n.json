@@ -122,6 +122,8 @@
         "everybodyAssigned": "Alle haben ein Zimmer.",
         "noRoomsHeld": "Die Buchung hat noch keine Zimmer.",
         "crowdedRooms": "{rooms}: In einigen dieser Nächte teilen sich mehr als zwei Buchungen die Unterkunft.",
+        "outdatedOwnShare": "Rechnung {number} berechnet {room} so, wie die Unterkunft geteilt war, als die Rechnung geschrieben wurde. Inzwischen teilen die Buchungen sie anders, sodass ihre Anteile nicht mehr den Preis ergeben.",
+        "outdatedOtherShare": "Rechnung {number} von „{booking}“ berechnet {room} so, wie die Unterkunft geteilt war, als die Rechnung geschrieben wurde. Inzwischen teilen die Buchungen sie anders, sodass ihre Anteile nicht mehr den Preis ergeben.",
         "moveTo": "Verschieben nach",
         "bedsUsed": "{used} von {beds} Betten",
         "roomFull": "Voll",

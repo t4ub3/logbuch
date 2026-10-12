@@ -300,6 +300,7 @@ BookingPrice calculatePrice({
             share,
             type.taxRate,
             bookingRoomId: hold.id,
+            sharers: part.sharers > 1 ? part.sharers : null,
           ),
         );
       }
@@ -500,9 +501,11 @@ ChargeLine _nights(
   int taxRate, {
   int? guestId,
   int? bookingRoomId,
+  int? sharers,
 }) => ChargeLine(
   guestId: guestId,
   bookingRoomId: bookingRoomId,
+  sharers: sharers,
   type: type,
   description: description,
   quantity: segment.nights,

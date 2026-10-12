@@ -15,6 +15,8 @@ import 'package:logbuch_server/src/generated/auth/app_user.dart' as _ikienaka;
 import 'package:logbuch_server/src/generated/billing/donation.dart'
     as _imjtz2ad;
 import 'package:logbuch_server/src/generated/billing/folio.dart' as _iuuqib0o;
+import 'package:logbuch_server/src/generated/billing/outdated_share.dart'
+    as _i488uogk;
 import 'package:logbuch_server/src/generated/bookings/booking_category.dart'
     as _i2rq02p1;
 import 'package:logbuch_server/src/generated/bookings/bookings.dart'
@@ -56,6 +58,7 @@ import 'billing/donation_source.dart' as _i6k4nn25;
 import 'billing/folio.dart' as _i94y90vb;
 import 'billing/folio_status.dart' as _ieyyblrs;
 import 'billing/invoice_document.dart' as _i46ek8jf;
+import 'billing/outdated_share.dart' as _ifklc0z4;
 import 'billing/payment.dart' as _ifq0dbbu;
 import 'billing/payment_method.dart' as _irhicyww;
 import 'bookings/billing_mode.dart' as _iyrhfm9w;
@@ -114,6 +117,7 @@ export 'billing/donation_source.dart';
 export 'billing/folio.dart';
 export 'billing/folio_status.dart';
 export 'billing/invoice_document.dart';
+export 'billing/outdated_share.dart';
 export 'billing/payment.dart';
 export 'billing/payment_method.dart';
 export 'bookings/billing_mode.dart';
@@ -511,6 +515,18 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'int?',
         ),
         _isp.ColumnDefinition(
+          name: 'bookingRoomId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'sharers',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _isp.ColumnDefinition(
           name: 'type',
           columnType: _isp.ColumnType.text,
           isNullable: false,
@@ -574,6 +590,16 @@ class Protocol extends _is.DatabaseSerializationManager {
           constraintName: 'charges_fk_1',
           columns: ['guestId'],
           referenceTable: 'guests',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.setNull,
+          matchType: null,
+        ),
+        _isp.ForeignKeyDefinition(
+          constraintName: 'charges_fk_2',
+          columns: ['bookingRoomId'],
+          referenceTable: 'booking_rooms',
           referenceTableSchema: 'public',
           referenceColumns: ['id'],
           onUpdate: _isp.ForeignKeyAction.noAction,
@@ -2267,6 +2293,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _i46ek8jf.InvoiceDocument) {
       return _i46ek8jf.InvoiceDocument.fromJson(data) as T;
     }
+    if (t == _ifklc0z4.OutdatedShare) {
+      return _ifklc0z4.OutdatedShare.fromJson(data) as T;
+    }
     if (t == _ifq0dbbu.Payment) {
       return _ifq0dbbu.Payment.fromJson(data) as T;
     }
@@ -2441,6 +2470,10 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_i46ek8jf.InvoiceDocument?>()) {
       return (data != null ? _i46ek8jf.InvoiceDocument.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_ifklc0z4.OutdatedShare?>()) {
+      return (data != null ? _ifklc0z4.OutdatedShare.fromJson(data) : null)
           as T;
     }
     if (t == _is.getType<_ifq0dbbu.Payment?>()) {
@@ -2803,6 +2836,12 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data as List).map((e) => deserialize<_iuuqib0o.Folio>(e)).toList()
           as T;
     }
+    if (t == List<_i488uogk.OutdatedShare>) {
+      return (data as List)
+              .map((e) => deserialize<_i488uogk.OutdatedShare>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_i2rq02p1.BookingCategory>) {
       return (data as List)
               .map((e) => deserialize<_i2rq02p1.BookingCategory>(e))
@@ -2920,6 +2959,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _i94y90vb.Folio => 'Folio',
       _ieyyblrs.FolioStatus => 'FolioStatus',
       _i46ek8jf.InvoiceDocument => 'InvoiceDocument',
+      _ifklc0z4.OutdatedShare => 'OutdatedShare',
       _ifq0dbbu.Payment => 'Payment',
       _irhicyww.PaymentMethod => 'PaymentMethod',
       _iyrhfm9w.BillingMode => 'BillingMode',
@@ -3000,6 +3040,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'FolioStatus';
       case _i46ek8jf.InvoiceDocument():
         return 'InvoiceDocument';
+      case _ifklc0z4.OutdatedShare():
+        return 'OutdatedShare';
       case _ifq0dbbu.Payment():
         return 'Payment';
       case _irhicyww.PaymentMethod():
@@ -3149,6 +3191,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'InvoiceDocument') {
       return deserialize<_i46ek8jf.InvoiceDocument>(data['data']);
+    }
+    if (dataClassName == 'OutdatedShare') {
+      return deserialize<_ifklc0z4.OutdatedShare>(data['data']);
     }
     if (dataClassName == 'Payment') {
       return deserialize<_ifq0dbbu.Payment>(data['data']);

@@ -13,6 +13,7 @@
 import 'package:logbuch_client/src/protocol/protocol.dart' as _i7rf0d0e;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import '../billing/folio.dart' as _i7r42ton;
+import '../bookings/booking_room.dart' as _icgf4f53;
 import '../guests/guest.dart' as _inwk3jth;
 import '../pricing/charge_type.dart' as _iiq5obzg;
 
@@ -26,6 +27,9 @@ abstract class Charge
     this.folio,
     this.guestId,
     this.guest,
+    this.bookingRoomId,
+    this.bookingRoom,
+    this.sharers,
     required this.type,
     required this.description,
     required this.quantity,
@@ -42,6 +46,9 @@ abstract class Charge
     _i7r42ton.Folio? folio,
     int? guestId,
     _inwk3jth.Guest? guest,
+    int? bookingRoomId,
+    _icgf4f53.BookingRoom? bookingRoom,
+    int? sharers,
     required _iiq5obzg.ChargeType type,
     required String description,
     required int quantity,
@@ -67,6 +74,13 @@ abstract class Charge
           : _i7rf0d0e.Protocol().deserialize<_inwk3jth.Guest>(
               jsonSerialization['guest'],
             ),
+      bookingRoomId: jsonSerialization['bookingRoomId'] as int?,
+      bookingRoom: jsonSerialization['bookingRoom'] == null
+          ? null
+          : _i7rf0d0e.Protocol().deserialize<_icgf4f53.BookingRoom>(
+              jsonSerialization['bookingRoom'],
+            ),
+      sharers: jsonSerialization['sharers'] as int?,
       type: _iiq5obzg.ChargeType.fromJson(
         (jsonSerialization['type'] as String),
       ),
@@ -101,6 +115,16 @@ abstract class Charge
   /// added by hand.
   _inwk3jth.Guest? guest;
 
+  int? bookingRoomId;
+
+  /// The room of the booking that a charge without a guest is for, see
+  /// `ChargeLine`. Null as well once the booking gave the room up.
+  _icgf4f53.BookingRoom? bookingRoom;
+
+  /// How many bookings split the price of the room for these nights. Null
+  /// unless it is more than one.
+  int? sharers;
+
   _iiq5obzg.ChargeType type;
 
   String description;
@@ -127,6 +151,9 @@ abstract class Charge
     _i7r42ton.Folio? folio,
     int? guestId,
     _inwk3jth.Guest? guest,
+    int? bookingRoomId,
+    _icgf4f53.BookingRoom? bookingRoom,
+    int? sharers,
     _iiq5obzg.ChargeType? type,
     String? description,
     int? quantity,
@@ -145,6 +172,9 @@ abstract class Charge
       if (folio != null) 'folio': folio?.toJson(),
       if (guestId != null) 'guestId': guestId,
       if (guest != null) 'guest': guest?.toJson(),
+      if (bookingRoomId != null) 'bookingRoomId': bookingRoomId,
+      if (bookingRoom != null) 'bookingRoom': bookingRoom?.toJson(),
+      if (sharers != null) 'sharers': sharers,
       'type': type.toJson(),
       'description': description,
       'quantity': quantity,
@@ -165,6 +195,9 @@ abstract class Charge
       if (folio != null) 'folio': folio?.toJsonForProtocol(),
       if (guestId != null) 'guestId': guestId,
       if (guest != null) 'guest': guest?.toJsonForProtocol(),
+      if (bookingRoomId != null) 'bookingRoomId': bookingRoomId,
+      if (bookingRoom != null) 'bookingRoom': bookingRoom?.toJsonForProtocol(),
+      if (sharers != null) 'sharers': sharers,
       'type': type.toJson(),
       'description': description,
       'quantity': quantity,
@@ -191,6 +224,9 @@ class _ChargeImpl extends Charge {
     _i7r42ton.Folio? folio,
     int? guestId,
     _inwk3jth.Guest? guest,
+    int? bookingRoomId,
+    _icgf4f53.BookingRoom? bookingRoom,
+    int? sharers,
     required _iiq5obzg.ChargeType type,
     required String description,
     required int quantity,
@@ -205,6 +241,9 @@ class _ChargeImpl extends Charge {
          folio: folio,
          guestId: guestId,
          guest: guest,
+         bookingRoomId: bookingRoomId,
+         bookingRoom: bookingRoom,
+         sharers: sharers,
          type: type,
          description: description,
          quantity: quantity,
@@ -225,6 +264,9 @@ class _ChargeImpl extends Charge {
     Object? folio = _Undefined,
     Object? guestId = _Undefined,
     Object? guest = _Undefined,
+    Object? bookingRoomId = _Undefined,
+    Object? bookingRoom = _Undefined,
+    Object? sharers = _Undefined,
     _iiq5obzg.ChargeType? type,
     String? description,
     int? quantity,
@@ -240,6 +282,11 @@ class _ChargeImpl extends Charge {
       folio: folio is _i7r42ton.Folio? ? folio : this.folio?.copyWith(),
       guestId: guestId is int? ? guestId : this.guestId,
       guest: guest is _inwk3jth.Guest? ? guest : this.guest?.copyWith(),
+      bookingRoomId: bookingRoomId is int? ? bookingRoomId : this.bookingRoomId,
+      bookingRoom: bookingRoom is _icgf4f53.BookingRoom?
+          ? bookingRoom
+          : this.bookingRoom?.copyWith(),
+      sharers: sharers is int? ? sharers : this.sharers,
       type: type ?? this.type,
       description: description ?? this.description,
       quantity: quantity ?? this.quantity,

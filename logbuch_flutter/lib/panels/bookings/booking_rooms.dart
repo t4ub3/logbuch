@@ -5,6 +5,7 @@ import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
+import 'package:logbuch_flutter/panels/bookings/outdated_shares.dart';
 import 'package:logbuch_flutter/providers/available_rooms_provider.dart';
 import 'package:logbuch_flutter/providers/bookings_provider.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
@@ -41,8 +42,9 @@ class BookingRoomsCard extends ConsumerWidget {
       for (final hold in booking.rooms ?? <BookingRoom>[]) ?hold.room,
     ]..sort((a, b) => a.roomNumber.compareTo(b.roomNumber));
     final beds = rooms.fold(0, (beds, room) => beds + room.bedAmount);
+    final shares = rooms.any((room) => room.unitType?.shared ?? false);
     // Bookings may share a room as often as they like, so this only warns.
-    final crowded = rooms.any((room) => room.unitType?.shared ?? false)
+    final crowded = shares
         ? ref.watch(crowdedRoomsProvider(booking.id!)).value ?? <Room>[]
         : <Room>[];
 
@@ -80,6 +82,7 @@ class BookingRoomsCard extends ConsumerWidget {
                       ),
                     ),
                   ),
+                if (shares) OutdatedSharesWarning(bookingId: booking.id!),
                 CardNote(
                   [
                     t.bookings.bedsInRooms(

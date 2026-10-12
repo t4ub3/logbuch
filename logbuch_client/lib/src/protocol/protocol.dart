@@ -14,6 +14,8 @@
 import 'package:logbuch_client/src/protocol/auth/app_user.dart' as _il34w39i;
 import 'package:logbuch_client/src/protocol/billing/donation.dart' as _ibol987g;
 import 'package:logbuch_client/src/protocol/billing/folio.dart' as _in6c8fr8;
+import 'package:logbuch_client/src/protocol/billing/outdated_share.dart'
+    as _ig1bbub7;
 import 'package:logbuch_client/src/protocol/bookings/booking_category.dart'
     as _i7p8ds8x;
 import 'package:logbuch_client/src/protocol/bookings/bookings.dart'
@@ -52,6 +54,7 @@ import 'billing/donation.dart' as _i373k2rw;
 import 'billing/donation_source.dart' as _i6k4nn25;
 import 'billing/folio.dart' as _i94y90vb;
 import 'billing/folio_status.dart' as _ieyyblrs;
+import 'billing/outdated_share.dart' as _ifklc0z4;
 import 'billing/payment.dart' as _ifq0dbbu;
 import 'billing/payment_method.dart' as _irhicyww;
 import 'bookings/billing_mode.dart' as _iyrhfm9w;
@@ -109,6 +112,7 @@ export 'billing/donation.dart';
 export 'billing/donation_source.dart';
 export 'billing/folio.dart';
 export 'billing/folio_status.dart';
+export 'billing/outdated_share.dart';
 export 'billing/payment.dart';
 export 'billing/payment_method.dart';
 export 'bookings/billing_mode.dart';
@@ -215,6 +219,9 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _ieyyblrs.FolioStatus) {
       return _ieyyblrs.FolioStatus.fromJson(data) as T;
+    }
+    if (t == _ifklc0z4.OutdatedShare) {
+      return _ifklc0z4.OutdatedShare.fromJson(data) as T;
     }
     if (t == _ifq0dbbu.Payment) {
       return _ifq0dbbu.Payment.fromJson(data) as T;
@@ -387,6 +394,10 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _isc.getType<_ieyyblrs.FolioStatus?>()) {
       return (data != null ? _ieyyblrs.FolioStatus.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ifklc0z4.OutdatedShare?>()) {
+      return (data != null ? _ifklc0z4.OutdatedShare.fromJson(data) : null)
+          as T;
     }
     if (t == _isc.getType<_ifq0dbbu.Payment?>()) {
       return (data != null ? _ifq0dbbu.Payment.fromJson(data) : null) as T;
@@ -748,6 +759,12 @@ class Protocol extends _isc.SerializationManager {
       return (data as List).map((e) => deserialize<_in6c8fr8.Folio>(e)).toList()
           as T;
     }
+    if (t == List<_ig1bbub7.OutdatedShare>) {
+      return (data as List)
+              .map((e) => deserialize<_ig1bbub7.OutdatedShare>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_i7p8ds8x.BookingCategory>) {
       return (data as List)
               .map((e) => deserialize<_i7p8ds8x.BookingCategory>(e))
@@ -861,6 +878,7 @@ class Protocol extends _isc.SerializationManager {
       _i6k4nn25.DonationSource => 'DonationSource',
       _i94y90vb.Folio => 'Folio',
       _ieyyblrs.FolioStatus => 'FolioStatus',
+      _ifklc0z4.OutdatedShare => 'OutdatedShare',
       _ifq0dbbu.Payment => 'Payment',
       _irhicyww.PaymentMethod => 'PaymentMethod',
       _iyrhfm9w.BillingMode => 'BillingMode',
@@ -939,6 +957,8 @@ class Protocol extends _isc.SerializationManager {
         return 'Folio';
       case _ieyyblrs.FolioStatus():
         return 'FolioStatus';
+      case _ifklc0z4.OutdatedShare():
+        return 'OutdatedShare';
       case _ifq0dbbu.Payment():
         return 'Payment';
       case _irhicyww.PaymentMethod():
@@ -1081,6 +1101,9 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'FolioStatus') {
       return deserialize<_ieyyblrs.FolioStatus>(data['data']);
+    }
+    if (dataClassName == 'OutdatedShare') {
+      return deserialize<_ifklc0z4.OutdatedShare>(data['data']);
     }
     if (dataClassName == 'Payment') {
       return deserialize<_ifq0dbbu.Payment>(data['data']);
