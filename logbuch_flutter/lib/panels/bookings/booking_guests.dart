@@ -25,6 +25,13 @@ extension GuestX on Guest {
       ageGroupOverrideId == null && contact?.birthDate == null;
 }
 
+extension GuestGroupX on GuestGroup {
+  /// The name of the group, or what the guests are called who were added
+  /// without a group.
+  String title(BuildContext context) =>
+      individual ? context.t.bookings.withoutGroup : name;
+}
+
 /// What is known about the age of [guest].
 String _age(BuildContext context, Guest guest, List<AgeGroup> ageGroups) {
   final override = ageGroups
@@ -57,7 +64,8 @@ String _guestDetails(
   ].join(' · ');
 }
 
-/// The guests of a booking in their groups, such as families.
+/// The guests of a booking in their groups, such as families, those without
+/// a group first.
 class BookingGuestsCard extends ConsumerWidget {
   const BookingGuestsCard({super.key, required this.bookingId});
 
@@ -94,7 +102,7 @@ class BookingGuestsCard extends ConsumerWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Text(
-                          '${group.name} · '
+                          '${group.title(context)} · '
                           '${t.guestCount(n: group.guests?.length ?? 0)}',
                           style: theme.textTheme.titleSmall,
                         ),
@@ -116,7 +124,8 @@ class BookingGuestsCard extends ConsumerWidget {
 }
 
 /// The overlay in which the guests of a booking and their groups are added,
-/// changed and removed. Every change is saved at once.
+/// changed and removed. A guest can be added without a group. Every change
+/// is saved at once.
 class BookingGuestsEditor extends ConsumerWidget {
   const BookingGuestsEditor({super.key, required this.bookingId});
 
@@ -143,11 +152,18 @@ class BookingGuestsEditor extends ConsumerWidget {
                 onPressed: () => _addHousehold(context, ref),
                 child: Text(t.addHousehold),
               ),
-              ElevatedButton.icon(
-                icon: const Icon(YaruIcons.plus),
-                label: Text(t.addGroup),
+              OutlinedButton(
                 onPressed: () async {
                   final dialog = _GroupDialog(bookingId: bookingId);
+                  if (await showAdminDialog(context, dialog)) refresh();
+                },
+                child: Text(t.addGroup),
+              ),
+              ElevatedButton.icon(
+                icon: const Icon(YaruIcons.plus),
+                label: Text(t.addGuest),
+                onPressed: () async {
+                  final dialog = _GuestDialog(bookingId: bookingId);
                   if (await showAdminDialog(context, dialog)) refresh();
                 },
               ),
@@ -258,7 +274,8 @@ class _HouseholdChooser extends ConsumerWidget {
   );
 }
 
-/// A group with its guests and the buttons to change both.
+/// A group with its guests and the buttons to change both. The guests
+/// without a group are shown like a group, which cannot be changed itself.
 class _GroupSection extends ConsumerWidget {
   const _GroupSection({
     required this.group,
@@ -285,34 +302,38 @@ class _GroupSection extends ConsumerWidget {
         children: [
           Expanded(
             child: Text(
-              '${group.name} · ${t.guestCount(n: guests.length)}',
+              '${group.title(context)} · ${t.guestCount(n: guests.length)}',
               overflow: TextOverflow.ellipsis,
             ),
           ),
           IconButton(
             tooltip: t.addGuest,
             icon: const Icon(YaruIcons.plus),
-            onPressed: () => edit(_GuestDialog(groupId: group.id!)),
+            onPressed: () => edit(
+              _GuestDialog(bookingId: group.bookingId, groupId: group.id!),
+            ),
           ),
-          IconButton(
-            tooltip: t.editGroup,
-            icon: const Icon(YaruIcons.pen),
-            onPressed: () =>
-                edit(_GroupDialog(bookingId: group.bookingId, group: group)),
-          ),
-          IconButton(
-            tooltip: context.t.common.delete,
-            icon: const Icon(YaruIcons.trash),
-            onPressed: () async {
-              final deleted = await confirmAndDelete(
-                context,
-                name: group.name,
-                hint: t.deleteGroupHint,
-                delete: () => endpoint.deleteGroup(group.id!),
-              );
-              if (deleted) onChanged();
-            },
-          ),
+          if (!group.individual) ...[
+            IconButton(
+              tooltip: t.editGroup,
+              icon: const Icon(YaruIcons.pen),
+              onPressed: () =>
+                  edit(_GroupDialog(bookingId: group.bookingId, group: group)),
+            ),
+            IconButton(
+              tooltip: context.t.common.delete,
+              icon: const Icon(YaruIcons.trash),
+              onPressed: () async {
+                final deleted = await confirmAndDelete(
+                  context,
+                  name: group.name,
+                  hint: t.deleteGroupHint,
+                  delete: () => endpoint.deleteGroup(group.id!),
+                );
+                if (deleted) onChanged();
+              },
+            ),
+          ],
         ],
       ),
       child: Column(
@@ -322,8 +343,13 @@ class _GroupSection extends ConsumerWidget {
               icon: guest.needsCrib ? Icons.crib : YaruIcons.user,
               title: guest.name,
               subtitle: _guestDetails(context, guest, ageGroups),
-              onEdit: () =>
-                  edit(_GuestDialog(groupId: group.id!, guest: guest)),
+              onEdit: () => edit(
+                _GuestDialog(
+                  bookingId: group.bookingId,
+                  groupId: group.id!,
+                  guest: guest,
+                ),
+              ),
               onDelete: () async {
                 final deleted = await confirmAndDelete(
                   context,
@@ -411,9 +437,12 @@ class _GroupDialogState extends ConsumerState<_GroupDialog> {
 }
 
 class _GuestDialog extends ConsumerStatefulWidget {
-  const _GuestDialog({required this.groupId, this.guest});
+  const _GuestDialog({required this.bookingId, this.groupId, this.guest});
 
-  final int groupId;
+  final int bookingId;
+
+  /// The group of the guest, or null to add a guest without a group.
+  final int? groupId;
 
   /// The guest to edit, or null to add one.
   final Guest? guest;
@@ -579,7 +608,8 @@ class _GuestDialogState extends ConsumerState<_GuestDialog> {
     final existing = _guest;
     final guest = Guest(
       id: existing?.id,
-      groupId: widget.groupId,
+      // The server puts a guest without a group into the group for those.
+      groupId: widget.groupId ?? 0,
       // The server fills in the contact it creates for a new guest.
       contactId: existing?.contactId ?? _contact?.id ?? 0,
       bookingRoomId: existing?.bookingRoomId,
@@ -590,20 +620,23 @@ class _GuestDialogState extends ConsumerState<_GuestDialog> {
       dietaryNotes: nullIfBlank(_dietaryNotes.text),
     );
 
+    final contact = _newContact
+        ? Contact(
+            firstName: _firstName.text.trim(),
+            lastName: _lastName.text.trim(),
+            birthDate: _utc(_birthDate),
+          )
+        : null;
+
     if (existing != null) {
       await endpoint.updateGuest(guest);
-    } else if (_newContact) {
-      await endpoint.addNewGuest(
-        guest,
-        Contact(
-          firstName: _firstName.text.trim(),
-          lastName: _lastName.text.trim(),
-          birthDate: _utc(_birthDate),
-        ),
-      );
-      ref.invalidate(contactsProvider);
+    } else if (widget.groupId == null) {
+      await endpoint.addWithoutGroup(widget.bookingId, guest, contact);
+    } else if (contact != null) {
+      await endpoint.addNewGuest(guest, contact);
     } else {
       await endpoint.addGuest(guest);
     }
+    if (contact != null) ref.invalidate(contactsProvider);
   }
 }

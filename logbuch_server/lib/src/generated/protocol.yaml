@@ -78,6 +78,7 @@ guest:
   - deleteGroup:
   - addGuest:
   - addNewGuest:
+  - addWithoutGroup:
   - updateGuest:
   - deleteGuest:
   - assign:

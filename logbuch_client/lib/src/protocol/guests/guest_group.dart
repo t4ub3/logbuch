@@ -27,8 +27,10 @@ abstract class GuestGroup
     this.payerId,
     this.payer,
     int? sortOrder,
+    bool? individual,
     this.guests,
-  }) : sortOrder = sortOrder ?? 0;
+  }) : sortOrder = sortOrder ?? 0,
+       individual = individual ?? false;
 
   factory GuestGroup({
     int? id,
@@ -38,6 +40,7 @@ abstract class GuestGroup
     int? payerId,
     _imbxrfja.Contact? payer,
     int? sortOrder,
+    bool? individual,
     List<_inwk3jth.Guest>? guests,
   }) = _GuestGroupImpl;
 
@@ -58,6 +61,9 @@ abstract class GuestGroup
               jsonSerialization['payer'],
             ),
       sortOrder: jsonSerialization['sortOrder'] as int?,
+      individual: jsonSerialization['individual'] == null
+          ? null
+          : _isc.BoolJsonExtension.fromJson(jsonSerialization['individual']),
       guests: jsonSerialization['guests'] == null
           ? null
           : _i7rf0d0e.Protocol().deserialize<List<_inwk3jth.Guest>>(
@@ -84,6 +90,10 @@ abstract class GuestGroup
 
   int sortOrder;
 
+  /// Holds the guests who were added to the booking without a group. A
+  /// booking has at most one such group, and its name is empty.
+  bool individual;
+
   List<_inwk3jth.Guest>? guests;
 
   /// Returns a shallow copy of this [GuestGroup]
@@ -97,6 +107,7 @@ abstract class GuestGroup
     int? payerId,
     _imbxrfja.Contact? payer,
     int? sortOrder,
+    bool? individual,
     List<_inwk3jth.Guest>? guests,
   });
   @override
@@ -110,6 +121,7 @@ abstract class GuestGroup
       if (payerId != null) 'payerId': payerId,
       if (payer != null) 'payer': payer?.toJson(),
       'sortOrder': sortOrder,
+      'individual': individual,
       if (guests != null)
         'guests': guests?.toJson(valueToJson: (v) => v.toJson()),
     };
@@ -126,6 +138,7 @@ abstract class GuestGroup
       if (payerId != null) 'payerId': payerId,
       if (payer != null) 'payer': payer?.toJsonForProtocol(),
       'sortOrder': sortOrder,
+      'individual': individual,
       if (guests != null)
         'guests': guests?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
     };
@@ -148,6 +161,7 @@ class _GuestGroupImpl extends GuestGroup {
     int? payerId,
     _imbxrfja.Contact? payer,
     int? sortOrder,
+    bool? individual,
     List<_inwk3jth.Guest>? guests,
   }) : super._(
          id: id,
@@ -157,6 +171,7 @@ class _GuestGroupImpl extends GuestGroup {
          payerId: payerId,
          payer: payer,
          sortOrder: sortOrder,
+         individual: individual,
          guests: guests,
        );
 
@@ -172,6 +187,7 @@ class _GuestGroupImpl extends GuestGroup {
     Object? payerId = _Undefined,
     Object? payer = _Undefined,
     int? sortOrder,
+    bool? individual,
     Object? guests = _Undefined,
   }) {
     return GuestGroup(
@@ -184,6 +200,7 @@ class _GuestGroupImpl extends GuestGroup {
       payerId: payerId is int? ? payerId : this.payerId,
       payer: payer is _imbxrfja.Contact? ? payer : this.payer?.copyWith(),
       sortOrder: sortOrder ?? this.sortOrder,
+      individual: individual ?? this.individual,
       guests: guests is List<_inwk3jth.Guest>?
           ? guests
           : this.guests?.map((e0) => e0.copyWith()).toList(),

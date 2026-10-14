@@ -6,14 +6,21 @@ import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:logbuch_server/src/generated/serverpod.dart';
 import 'package:logbuch_server/src/guests/kitchen_overview.dart';
 
-/// The guests of a booking, in groups such as families.
+/// The guests of a booking, in groups such as families. Guests who were
+/// added without a group are in a group of their own kind, which is
+/// [GuestGroup.individual].
 class GuestEndpoint extends AppEndpoint {
   /// The groups of the booking with their guests and the contacts of those.
+  /// The guests without a group come first.
   Future<List<GuestGroup>> getByBooking(Session session, int bookingId) async {
     return GuestGroup.db.find(
       session,
       where: (t) => t.bookingId.equals(bookingId),
-      orderByList: (t) => [t.sortOrder.asc(), t.id.asc()],
+      orderByList: (t) => [
+        t.individual.desc(),
+        t.sortOrder.asc(),
+        t.id.asc(),
+      ],
       include: GuestGroup.include(
         payer: Contact.include(),
         guests: Guest.includeList(
@@ -94,19 +101,30 @@ class GuestEndpoint extends AppEndpoint {
     });
   }
 
+  /// Adds a group. The group of the guests without one is only made by
+  /// [addWithoutGroup].
   Future<GuestGroup> addGroup(Session session, GuestGroup group) async {
     requireAdmin(session);
     return await GuestGroup.db.insertRow(
       session,
-      group.copyWith(name: requireName(group.name)),
+      group.copyWith(name: requireName(group.name), individual: false),
     );
   }
 
+  /// Changes a group. The group of the guests without one stays that and
+  /// keeps its empty name.
   Future<GuestGroup> updateGroup(Session session, GuestGroup group) async {
     requireAdmin(session);
+    final stored = await GuestGroup.db.findById(session, group.id!);
+    if (stored == null) {
+      throw ValidationException(reason: ValidationError.notFound);
+    }
     return await GuestGroup.db.updateRow(
       session,
-      group.copyWith(name: requireName(group.name)),
+      group.copyWith(
+        name: stored.individual ? '' : requireName(group.name),
+        individual: stored.individual,
+      ),
     );
   }
 
@@ -145,16 +163,81 @@ class GuestEndpoint extends AppEndpoint {
     });
   }
 
+  /// Adds a guest to the booking without a group, into the group of the
+  /// booking for such guests, which comes with the first of them. With
+  /// [newContact] the guest is not a contact yet, and [newContact] is
+  /// created along with the guest; otherwise [Guest.contactId] names the
+  /// contact.
+  Future<Guest> addWithoutGroup(
+    Session session,
+    int bookingId,
+    Guest guest,
+    Contact? newContact,
+  ) async {
+    requireAdmin(session);
+    final validated = newContact == null ? null : validatedContact(newContact);
+    return session.db.transaction((transaction) async {
+      final booking = await Booking.db.findById(
+        session,
+        bookingId,
+        transaction: transaction,
+      );
+      if (booking == null) {
+        throw ValidationException(reason: ValidationError.notFound);
+      }
+      final group =
+          await GuestGroup.db.findFirstRow(
+            session,
+            where: (t) =>
+                t.bookingId.equals(bookingId) & t.individual.equals(true),
+            transaction: transaction,
+          ) ??
+          await GuestGroup.db.insertRow(
+            session,
+            GuestGroup(bookingId: bookingId, name: '', individual: true),
+            transaction: transaction,
+          );
+      var added = guest.copyWith(groupId: group.id);
+      if (validated != null) {
+        final contact = await Contact.db.insertRow(
+          session,
+          validated,
+          transaction: transaction,
+        );
+        added = added.copyWith(contactId: contact.id);
+      }
+      await _validate(session, added, transaction: transaction);
+      return Guest.db.insertRow(session, added, transaction: transaction);
+    });
+  }
+
   Future<Guest> updateGuest(Session session, Guest guest) async {
     requireAdmin(session);
     await _validate(session, guest);
     return await Guest.db.updateRow(session, guest);
   }
 
-  /// Removes the guest from the booking. The contact stays.
+  /// Removes the guest from the booking. The contact stays. The group of
+  /// the guests without one goes with the last of them.
   Future<void> deleteGuest(Session session, int id) async {
     requireAdmin(session);
-    await Guest.db.deleteWhere(session, where: (t) => t.id.equals(id));
+    await session.db.transaction((transaction) async {
+      final deleted = await Guest.db.deleteWhere(
+        session,
+        where: (t) => t.id.equals(id),
+        transaction: transaction,
+      );
+      for (final guest in deleted) {
+        await GuestGroup.db.deleteWhere(
+          session,
+          where: (t) =>
+              t.id.equals(guest.groupId) &
+              t.individual.equals(true) &
+              t.guests.none(),
+          transaction: transaction,
+        );
+      }
+    });
   }
 
   /// Puts the guests into a room that their booking holds, or takes them out

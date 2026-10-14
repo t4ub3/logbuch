@@ -115,6 +115,44 @@ void main() {
       expect(inCard('Guests', find.text('Felix Wagner')), findsOneWidget);
     });
 
+    testWidgets('get a guest without a group', (tester) async {
+      final client = filledClient();
+      await _pumpBooking(tester, client, edit: 'Guests');
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Add guest'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('New contact'));
+      await tester.pumpAndSettle();
+      await tester.enterText(field('First name'), 'Felix');
+      await tester.enterText(field('Last name'), 'Wagner');
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      expect(client.guest.newContacts.single.firstName, 'Felix');
+      final group = client.guest.groups.first;
+      expect(group.individual, isTrue);
+      expect(group.guests!.single.contact!.firstName, 'Felix');
+      // The guests without a group come first, under a heading that cannot
+      // be changed itself.
+      final heading = inOverlay(find.text('Without a group · 1 guest'));
+      expect(
+        tester.getTopLeft(heading).dy,
+        lessThan(
+          tester.getTopLeft(inOverlay(find.text('Weber family · 3 guests'))).dy,
+        ),
+      );
+      expect(inOverlay(find.text('Felix Wagner')), findsOneWidget);
+      expect(find.byTooltip('Edit group'), findsOneWidget);
+      expect(find.byTooltip('Add guest'), findsNWidgets(2));
+
+      await tester.tap(find.text('Close'));
+      await tester.pumpAndSettle();
+      expect(
+        inCard('Guests', find.text('Without a group · 1 guest')),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('get a household as a group', (tester) async {
       final client = filledClient();
       await _pumpBooking(tester, client, edit: 'Guests');
@@ -143,6 +181,7 @@ void main() {
       expect(find.byTooltip('Edit'), findsNothing);
       expect(find.text('Add household'), findsNothing);
       expect(find.text('New group'), findsNothing);
+      expect(find.text('Add guest'), findsNothing);
     });
   });
 

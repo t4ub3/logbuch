@@ -169,7 +169,8 @@ class _Translations$bookings$de extends Translations$bookings$en {
 	@override String get guests => 'Gäste';
 	@override String get assignment => 'Verteilung';
 	@override String get price => 'Preis';
-	@override String get noGroups => 'Noch keine Gäste. Beginnen Sie mit einer Gruppe, zum Beispiel einer Familie.';
+	@override String get noGroups => 'Noch keine Gäste. Fügen Sie sie einzeln hinzu oder als Gruppe, zum Beispiel als Familie.';
+	@override String get withoutGroup => 'Ohne Gruppe';
 	@override String get addGroup => 'Neue Gruppe';
 	@override String get editGroup => 'Gruppe bearbeiten';
 	@override String get payer => 'Zahlt für die Gruppe';
@@ -915,7 +916,8 @@ extension on TranslationsDe {
 			'bookings.guests' => 'Gäste',
 			'bookings.assignment' => 'Verteilung',
 			'bookings.price' => 'Preis',
-			'bookings.noGroups' => 'Noch keine Gäste. Beginnen Sie mit einer Gruppe, zum Beispiel einer Familie.',
+			'bookings.noGroups' => 'Noch keine Gäste. Fügen Sie sie einzeln hinzu oder als Gruppe, zum Beispiel als Familie.',
+			'bookings.withoutGroup' => 'Ohne Gruppe',
 			'bookings.addGroup' => 'Neue Gruppe',
 			'bookings.editGroup' => 'Gruppe bearbeiten',
 			'bookings.payer' => 'Zahlt für die Gruppe',

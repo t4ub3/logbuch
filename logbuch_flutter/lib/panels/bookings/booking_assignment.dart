@@ -273,7 +273,7 @@ class _Unassigned extends StatelessWidget {
         for (final MapEntry(key: group, value: guests) in waiting.entries) ...[
           _Dragged(
             guestIds: canEdit ? [for (final guest in guests) guest.id!] : null,
-            label: '${group.name} (${guests.length})',
+            label: '${group.title(context)} (${guests.length})',
             child: Padding(
               padding: const EdgeInsets.only(top: 8, bottom: 4),
               child: Row(
@@ -282,7 +282,7 @@ class _Unassigned extends StatelessWidget {
                   if (canEdit) const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      '${group.name} (${guests.length})',
+                      '${group.title(context)} (${guests.length})',
                       style: theme.textTheme.labelLarge,
                       overflow: TextOverflow.ellipsis,
                     ),

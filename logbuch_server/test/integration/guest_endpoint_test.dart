@@ -152,6 +152,133 @@ void main() {
       expect(await endpoints.contact.getAll(sessionBuilder), hasLength(1));
     });
 
+    group('when guests are added without a group', () {
+      late Guest marie;
+      late Guest jonas;
+
+      setUp(() async {
+        marie = await endpoints.guest.addWithoutGroup(
+          sessionBuilder,
+          booking.id!,
+          Guest(groupId: 0, contactId: lead.id!),
+          null,
+        );
+        jonas = await endpoints.guest.addWithoutGroup(
+          sessionBuilder,
+          booking.id!,
+          Guest(groupId: 0, contactId: 0, dietaryNotes: 'No nuts'),
+          Contact(firstName: 'Jonas', lastName: 'Weber'),
+        );
+      });
+
+      test('then they share one group of the booking, listed first', () async {
+        await endpoints.guest.addGuest(
+          sessionBuilder,
+          Guest(groupId: family.id!, contactId: jonas.contactId),
+        );
+
+        final groups = await endpoints.guest.getByBooking(
+          sessionBuilder,
+          booking.id!,
+        );
+        expect(groups.map((g) => (g.name, g.individual)), [
+          ('', true),
+          ('Weber family', false),
+        ]);
+        expect(groups.first.guests!.map((g) => g.contact!.firstName), [
+          'Marie',
+          'Jonas',
+        ]);
+        expect(marie.groupId, jonas.groupId);
+        expect(await endpoints.contact.getAll(sessionBuilder), hasLength(2));
+      });
+
+      test('then the kitchen names no group for them', () async {
+        final overview = await endpoints.guest.kitchenOverview(
+          sessionBuilder,
+          booking.id!,
+        );
+        expect(overview.dietaryNeeds.single.guestName, 'Jonas Weber');
+        expect(overview.dietaryNeeds.single.groupName, isNull);
+      });
+
+      test('then their group is neither made nor changed by hand', () async {
+        final made = await endpoints.guest.addGroup(
+          sessionBuilder,
+          GuestGroup(bookingId: booking.id!, name: 'Others', individual: true),
+        );
+        expect(made.individual, isFalse);
+
+        final groups = await endpoints.guest.getByBooking(
+          sessionBuilder,
+          booking.id!,
+        );
+        final changed = await endpoints.guest.updateGroup(
+          sessionBuilder,
+          groups.first.copyWith(name: 'Renamed', individual: false),
+        );
+        expect((changed.name, changed.individual), ('', true));
+        await expectLater(
+          endpoints.guest.updateGroup(
+            sessionBuilder,
+            family.copyWith(name: ' ', individual: true),
+          ),
+          throwsValidation(ValidationError.nameRequired),
+        );
+      });
+
+      test('then their group goes with the last of them', () async {
+        await endpoints.guest.deleteGuest(sessionBuilder, marie.id!);
+        var groups = await endpoints.guest.getByBooking(
+          sessionBuilder,
+          booking.id!,
+        );
+        expect(groups.first.guests!.single.id, jonas.id);
+
+        await endpoints.guest.deleteGuest(sessionBuilder, jonas.id!);
+        groups = await endpoints.guest.getByBooking(
+          sessionBuilder,
+          booking.id!,
+        );
+        expect(groups.map((g) => g.name), ['Weber family']);
+
+        // The next guest without a group gets a new one.
+        await endpoints.guest.addWithoutGroup(
+          sessionBuilder,
+          booking.id!,
+          Guest(groupId: 0, contactId: lead.id!),
+          null,
+        );
+        expect(await guestsOf(booking), hasLength(1));
+      });
+
+      test('then a viewer cannot add another', () async {
+        await expectLater(
+          endpoints.guest.addWithoutGroup(
+            sessionBuilder.asViewer,
+            booking.id!,
+            Guest(groupId: 0, contactId: lead.id!),
+            null,
+          ),
+          throwsValidation(ValidationError.adminRequired),
+        );
+      });
+    });
+
+    test('when adding a guest without a group to a booking that is not there '
+        'then nothing is stored', () async {
+      await expectLater(
+        endpoints.guest.addWithoutGroup(
+          sessionBuilder,
+          booking.id! + 1000,
+          Guest(groupId: 0, contactId: 0),
+          Contact(firstName: 'Jonas', lastName: 'Weber'),
+        ),
+        throwsValidation(ValidationError.notFound),
+      );
+      expect(await endpoints.contact.getAll(sessionBuilder), hasLength(1));
+    });
+
     group('when the booking has a guest', () {
       late Guest guest;
 

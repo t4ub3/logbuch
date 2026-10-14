@@ -2,7 +2,8 @@
 class: DietaryNeed
 fields:
   guestName: String
-  groupName: String
+  ### Null for a guest who was added without a group.
+  groupName: String?
   ### Null if the age of the guest is not known.
   ageGroupName: String?
   notes: String

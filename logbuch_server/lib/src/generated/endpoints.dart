@@ -1545,6 +1545,37 @@ class Endpoints extends _is.EndpointDispatch {
                     params['contact'],
                   ),
         ),
+        'addWithoutGroup': _is.MethodConnector(
+          name: 'addWithoutGroup',
+          params: {
+            'bookingId': _is.ParameterDescription(
+              name: 'bookingId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'guest': _is.ParameterDescription(
+              name: 'guest',
+              type: _is.getType<_iju6pcvn.Guest>(),
+              nullable: false,
+            ),
+            'newContact': _is.ParameterDescription(
+              name: 'newContact',
+              type: _is.getType<_i4e319y1.Contact?>(),
+              nullable: true,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['guest'] as _i2qdn6vg.GuestEndpoint)
+                  .addWithoutGroup(
+                    session,
+                    params['bookingId'],
+                    params['guest'],
+                    params['newContact'],
+                  ),
+        ),
         'updateGuest': _is.MethodConnector(
           name: 'updateGuest',
           params: {

@@ -1157,6 +1157,13 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'int',
           columnDefault: '0',
         ),
+        _isp.ColumnDefinition(
+          name: 'individual',
+          columnType: _isp.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+          columnDefault: 'false',
+        ),
       ],
       foreignKeys: [
         _isp.ForeignKeyDefinition(

@@ -855,7 +855,9 @@ class EndpointGreeting extends _isc.EndpointRef {
       );
 }
 
-/// The guests of a booking, in groups such as families.
+/// The guests of a booking, in groups such as families. Guests who were
+/// added without a group are in a group of their own kind, which is
+/// [GuestGroup.individual].
 /// {@category Endpoint}
 class EndpointGuest extends EndpointApp {
   EndpointGuest(_isc.EndpointCaller caller) : super(caller);
@@ -864,6 +866,7 @@ class EndpointGuest extends EndpointApp {
   String get name => 'guest';
 
   /// The groups of the booking with their guests and the contacts of those.
+  /// The guests without a group come first.
   _ida.Future<List<_ihpk2u4j.GuestGroup>> getByBooking(int bookingId) =>
       caller.callServerEndpoint<List<_ihpk2u4j.GuestGroup>>(
         'guest',
@@ -895,6 +898,8 @@ class EndpointGuest extends EndpointApp {
     },
   );
 
+  /// Adds a group. The group of the guests without one is only made by
+  /// [addWithoutGroup].
   _ida.Future<_ihpk2u4j.GuestGroup> addGroup(_ihpk2u4j.GuestGroup group) =>
       caller.callServerEndpoint<_ihpk2u4j.GuestGroup>(
         'guest',
@@ -902,6 +907,8 @@ class EndpointGuest extends EndpointApp {
         {'group': group},
       );
 
+  /// Changes a group. The group of the guests without one stays that and
+  /// keeps its empty name.
   _ida.Future<_ihpk2u4j.GuestGroup> updateGroup(_ihpk2u4j.GuestGroup group) =>
       caller.callServerEndpoint<_ihpk2u4j.GuestGroup>(
         'guest',
@@ -939,6 +946,25 @@ class EndpointGuest extends EndpointApp {
     },
   );
 
+  /// Adds a guest to the booking without a group, into the group of the
+  /// booking for such guests, which comes with the first of them. With
+  /// [newContact] the guest is not a contact yet, and [newContact] is
+  /// created along with the guest; otherwise [Guest.contactId] names the
+  /// contact.
+  _ida.Future<_i44zmmsa.Guest> addWithoutGroup(
+    int bookingId,
+    _i44zmmsa.Guest guest,
+    _izv2jndr.Contact? newContact,
+  ) => caller.callServerEndpoint<_i44zmmsa.Guest>(
+    'guest',
+    'addWithoutGroup',
+    {
+      'bookingId': bookingId,
+      'guest': guest,
+      'newContact': newContact,
+    },
+  );
+
   _ida.Future<_i44zmmsa.Guest> updateGuest(_i44zmmsa.Guest guest) =>
       caller.callServerEndpoint<_i44zmmsa.Guest>(
         'guest',
@@ -946,7 +972,8 @@ class EndpointGuest extends EndpointApp {
         {'guest': guest},
       );
 
-  /// Removes the guest from the booking. The contact stays.
+  /// Removes the guest from the booking. The contact stays. The group of
+  /// the guests without one goes with the last of them.
   _ida.Future<void> deleteGuest(int id) => caller.callServerEndpoint<void>(
     'guest',
     'deleteGuest',

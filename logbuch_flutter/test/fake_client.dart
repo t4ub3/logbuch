@@ -388,6 +388,42 @@ class FakeGuests extends Fake implements EndpointGuest {
     return added;
   }
 
+  /// Puts the guest into the group of the booking for guests without one,
+  /// first in the list, as the server does.
+  @override
+  Future<Guest> addWithoutGroup(
+    int bookingId,
+    Guest guest,
+    Contact? newContact,
+  ) async {
+    if (newContact != null) newContacts.add(newContact);
+    var group = groups
+        .where((group) => group.bookingId == bookingId && group.individual)
+        .firstOrNull;
+    if (group == null) {
+      group = GuestGroup(
+        id: _nextId++,
+        bookingId: bookingId,
+        name: '',
+        individual: true,
+        guests: [],
+      );
+      groups = [group, ...groups];
+    }
+    final added = guest.copyWith(
+      id: _nextId++,
+      groupId: group.id,
+      contact: newContact?.copyWith(id: _nextId++),
+    );
+    groups = [
+      for (final other in groups)
+        other.id == group.id
+            ? other.copyWith(guests: [...?other.guests, added])
+            : other,
+    ];
+    return added;
+  }
+
   @override
   Future<void> assign(List<int> guestIds, int? bookingRoomId) async {
     groups = [

@@ -44,7 +44,7 @@ KitchenOverview buildKitchenOverview({
         DietaryNeed(
           guestName: '${contact?.firstName ?? ''} ${contact?.lastName ?? ''}'
               .trim(),
-          groupName: group.name,
+          groupName: group.individual ? null : group.name,
           ageGroupName: ageGroup?.name,
           notes: notes,
         ),

@@ -96,7 +96,7 @@ class _Overview extends StatelessWidget {
                         Text(
                           [
                             need.guestName,
-                            need.groupName,
+                            ?need.groupName,
                             ?need.ageGroupName,
                           ].join(' · '),
                           style: theme.textTheme.bodySmall,

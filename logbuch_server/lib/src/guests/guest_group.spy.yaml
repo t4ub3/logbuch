@@ -7,4 +7,7 @@ fields:
   ### Pays for the group if the booking is billed per group.
   payer: Contact?, relation(optional, onDelete=SetNull)
   sortOrder: int, default=0
+  ### Holds the guests who were added to the booking without a group. A
+  ### booking has at most one such group, and its name is empty.
+  individual: bool, default=false
   guests: List<Guest>?, relation(name=group_guests)

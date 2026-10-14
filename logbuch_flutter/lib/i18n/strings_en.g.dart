@@ -316,8 +316,11 @@ class Translations$bookings$en {
 	/// en: 'Price'
 	String get price => 'Price';
 
-	/// en: 'No guests yet. Start with a group, such as a family.'
-	String get noGroups => 'No guests yet. Start with a group, such as a family.';
+	/// en: 'No guests yet. Add them one by one, or as a group such as a family.'
+	String get noGroups => 'No guests yet. Add them one by one, or as a group such as a family.';
+
+	/// en: 'Without a group'
+	String get withoutGroup => 'Without a group';
 
 	/// en: 'New group'
 	String get addGroup => 'New group';
@@ -1786,7 +1789,8 @@ extension on Translations {
 			'bookings.guests' => 'Guests',
 			'bookings.assignment' => 'Assignment',
 			'bookings.price' => 'Price',
-			'bookings.noGroups' => 'No guests yet. Start with a group, such as a family.',
+			'bookings.noGroups' => 'No guests yet. Add them one by one, or as a group such as a family.',
+			'bookings.withoutGroup' => 'Without a group',
 			'bookings.addGroup' => 'New group',
 			'bookings.editGroup' => 'Edit group',
 			'bookings.payer' => 'Pays for the group',

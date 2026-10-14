@@ -2580,6 +2580,43 @@ class _GuestEndpoint {
     });
   }
 
+  _ida.Future<_iju6pcvn.Guest> addWithoutGroup(
+    _ist.TestSessionBuilder sessionBuilder,
+    int bookingId,
+    _iju6pcvn.Guest guest,
+    _i4e319y1.Contact? newContact,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'guest',
+            method: 'addWithoutGroup',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'guest',
+          methodName: 'addWithoutGroup',
+          parameters: _ist.testObjectToJson({
+            'bookingId': bookingId,
+            'guest': guest,
+            'newContact': newContact,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iju6pcvn.Guest>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _ida.Future<_iju6pcvn.Guest> updateGuest(
     _ist.TestSessionBuilder sessionBuilder,
     _iju6pcvn.Guest guest,

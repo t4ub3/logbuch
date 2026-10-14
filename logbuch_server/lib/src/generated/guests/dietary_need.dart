@@ -17,14 +17,14 @@ abstract class DietaryNeed
     implements _is.SerializableModel, _is.ProtocolSerialization {
   DietaryNeed._({
     required this.guestName,
-    required this.groupName,
+    this.groupName,
     this.ageGroupName,
     required this.notes,
   });
 
   factory DietaryNeed({
     required String guestName,
-    required String groupName,
+    String? groupName,
     String? ageGroupName,
     required String notes,
   }) = _DietaryNeedImpl;
@@ -32,7 +32,7 @@ abstract class DietaryNeed
   factory DietaryNeed.fromJson(Map<String, dynamic> jsonSerialization) {
     return DietaryNeed(
       guestName: jsonSerialization['guestName'] as String,
-      groupName: jsonSerialization['groupName'] as String,
+      groupName: jsonSerialization['groupName'] as String?,
       ageGroupName: jsonSerialization['ageGroupName'] as String?,
       notes: jsonSerialization['notes'] as String,
     );
@@ -40,7 +40,8 @@ abstract class DietaryNeed
 
   String guestName;
 
-  String groupName;
+  /// Null for a guest who was added without a group.
+  String? groupName;
 
   /// Null if the age of the guest is not known.
   String? ageGroupName;
@@ -61,7 +62,7 @@ abstract class DietaryNeed
     return {
       '__className__': 'DietaryNeed',
       'guestName': guestName,
-      'groupName': groupName,
+      if (groupName != null) 'groupName': groupName,
       if (ageGroupName != null) 'ageGroupName': ageGroupName,
       'notes': notes,
     };
@@ -72,7 +73,7 @@ abstract class DietaryNeed
     return {
       '__className__': 'DietaryNeed',
       'guestName': guestName,
-      'groupName': groupName,
+      if (groupName != null) 'groupName': groupName,
       if (ageGroupName != null) 'ageGroupName': ageGroupName,
       'notes': notes,
     };
@@ -89,7 +90,7 @@ class _Undefined {}
 class _DietaryNeedImpl extends DietaryNeed {
   _DietaryNeedImpl({
     required String guestName,
-    required String groupName,
+    String? groupName,
     String? ageGroupName,
     required String notes,
   }) : super._(
@@ -105,13 +106,13 @@ class _DietaryNeedImpl extends DietaryNeed {
   @override
   DietaryNeed copyWith({
     String? guestName,
-    String? groupName,
+    Object? groupName = _Undefined,
     Object? ageGroupName = _Undefined,
     String? notes,
   }) {
     return DietaryNeed(
       guestName: guestName ?? this.guestName,
-      groupName: groupName ?? this.groupName,
+      groupName: groupName is String? ? groupName : this.groupName,
       ageGroupName: ageGroupName is String? ? ageGroupName : this.ageGroupName,
       notes: notes ?? this.notes,
     );
