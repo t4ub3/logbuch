@@ -570,6 +570,9 @@ class Translations$bookings$en {
 	/// en: 'The confirmation could not be opened: {error}'
 	String openConfirmationFailed({required Object error}) => 'The confirmation could not be opened: ${error}';
 
+	/// en: 'The booking is no longer shown and frees its rooms. A booking with an invoice or a payment cannot be deleted; cancel it instead.'
+	String get deleteBookingHint => 'The booking is no longer shown and frees its rooms. A booking with an invoice or a payment cannot be deleted; cancel it instead.';
+
 	/// en: '{beds} in {rooms}'
 	String bedsInRooms({required Object beds, required Object rooms}) => '${beds} in ${rooms}';
 }
@@ -1205,6 +1208,9 @@ class Translations$admin$errors$en {
 
 	/// en: 'This is invoiced and can no longer be changed.'
 	String get alreadyInvoiced => 'This is invoiced and can no longer be changed.';
+
+	/// en: 'A booking with an invoice or a payment cannot be deleted. Cancel it instead.'
+	String get bookingBilled => 'A booking with an invoice or a payment cannot be deleted. Cancel it instead.';
 
 	/// en: 'There is nothing to invoice.'
 	String get nothingToInvoice => 'There is nothing to invoice.';
@@ -1886,6 +1892,7 @@ extension on Translations {
 			'bookings.noHouseholdsYet' => 'There are no households yet. Create them under Contacts, Households.',
 			'bookings.confirmation' => 'Confirmation',
 			'bookings.openConfirmationFailed' => ({required Object error}) => 'The confirmation could not be opened: ${error}',
+			'bookings.deleteBookingHint' => 'The booking is no longer shown and frees its rooms. A booking with an invoice or a payment cannot be deleted; cancel it instead.',
 			'bookings.bedsInRooms' => ({required Object beds, required Object rooms}) => '${beds} in ${rooms}',
 			'contacts.empty' => 'No contacts',
 			'contacts.people' => 'People',
@@ -1958,6 +1965,7 @@ extension on Translations {
 			'admin.errors.ownRole' => 'You cannot change your own role.',
 			'admin.errors.roomNotHeld' => 'The booking does not hold this room.',
 			'admin.errors.alreadyInvoiced' => 'This is invoiced and can no longer be changed.',
+			'admin.errors.bookingBilled' => 'A booking with an invoice or a payment cannot be deleted. Cancel it instead.',
 			'admin.errors.nothingToInvoice' => 'There is nothing to invoice.',
 			'admin.errors.pricingIncomplete' => 'Parts of the booking cannot be priced yet. Its price says what is missing.',
 			'admin.errors.notOverpaid' => 'This is more than was overpaid.',

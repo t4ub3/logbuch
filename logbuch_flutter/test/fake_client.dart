@@ -298,6 +298,24 @@ class FakeBookings extends Fake implements EndpointBooking {
     return booking;
   }
 
+  /// The ids passed to [delete].
+  final deleted = <int>[];
+
+  /// What [delete] rejects with, if anything.
+  ValidationError? deleteError;
+
+  @override
+  Future<void> delete(int id) async {
+    if (deleteError case final reason?) {
+      throw ValidationException(reason: reason);
+    }
+    deleted.add(id);
+    bookings = [
+      for (final booking in bookings)
+        if (booking.id != id) booking,
+    ];
+  }
+
   @override
   Future<ByteData> getConfirmationPdf(int bookingId) async =>
       ByteData.sublistView(

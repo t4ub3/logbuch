@@ -517,6 +517,7 @@ class EndpointBooking extends EndpointApp {
   @override
   String get name => 'booking';
 
+  /// The bookings that were not deleted.
   _ida.Future<List<_iey0gn1f.Booking>> getAll() =>
       caller.callServerEndpoint<List<_iey0gn1f.Booking>>(
         'booking',
@@ -524,6 +525,7 @@ class EndpointBooking extends EndpointApp {
         {},
       );
 
+  /// Null if there is no such booking or it was deleted.
   _ida.Future<_iey0gn1f.Booking?> getById(int id) =>
       caller.callServerEndpoint<_iey0gn1f.Booking?>(
         'booking',
@@ -549,6 +551,15 @@ class EndpointBooking extends EndpointApp {
         'update',
         {'booking': booking},
       );
+
+  /// Deletes the booking, which stays in the database with the time it was
+  /// deleted. It is no longer shown anywhere and holds no rooms. A booking
+  /// with an invoice or a payment cannot be deleted, only cancelled.
+  _ida.Future<void> delete(int id) => caller.callServerEndpoint<void>(
+    'booking',
+    'delete',
+    {'id': id},
+  );
 
   /// The confirmation of the booking for its lead, as a PDF.
   ///

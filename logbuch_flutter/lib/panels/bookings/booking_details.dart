@@ -4,6 +4,7 @@ import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/components/open_file.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
+import 'package:logbuch_flutter/panels/admin/admin_widgets.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_assignment.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_billing.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
@@ -13,8 +14,10 @@ import 'package:logbuch_flutter/panels/bookings/booking_guests.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_kitchen.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_price.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_rooms.dart';
+import 'package:logbuch_flutter/providers/bookings_provider.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
+import 'package:logbuch_flutter/providers/dashboard_provider.dart';
 import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:yaru/yaru.dart';
 
@@ -134,6 +137,26 @@ Future<void> _openConfirmation(
   }
 }
 
+/// Asks whether the booking of [tab] should be deleted and, once it is,
+/// closes its tab. The server keeps it, flagged as deleted.
+Future<void> _deleteBooking(
+  BuildContext context,
+  WidgetRef ref,
+  BookingTab tab,
+) async {
+  final booking = tab.booking!;
+  final deleted = await confirmAndDelete(
+    context,
+    name: booking.title,
+    hint: context.t.bookings.deleteBookingHint,
+    delete: () => ref.read(serverpodClientProvider).booking.delete(booking.id!),
+  );
+  if (!deleted) return;
+  ref.invalidate(bookingsProvider);
+  ref.invalidate(dashboardProvider);
+  ref.read(tabsProvider.notifier).close(tab);
+}
+
 /// How far the booking of [tab] has come and what was agreed on: its dates,
 /// its lead and so on.
 class _OverviewCard extends ConsumerWidget {
@@ -146,6 +169,7 @@ class _OverviewCard extends ConsumerWidget {
     final t = context.t.bookings;
     final booking = tab.booking!;
     final lead = booking.lead;
+    final canEdit = ref.watch(canEditProvider);
 
     return BookingCard(
       title: t.overview,
@@ -156,8 +180,14 @@ class _OverviewCard extends ConsumerWidget {
             label: Text(t.confirmation),
             onPressed: () => _openConfirmation(context, ref, booking),
           ),
+        if (canEdit)
+          TextButton.icon(
+            icon: const Icon(YaruIcons.trash),
+            label: Text(context.t.common.delete),
+            onPressed: () => _deleteBooking(context, ref, tab),
+          ),
       ],
-      onEdit: ref.watch(canEditProvider)
+      onEdit: canEdit
           ? () => showBookingOverlay(
               context,
               ref,

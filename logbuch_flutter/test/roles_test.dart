@@ -55,8 +55,9 @@ void main() {
       await pumpApp(tester, BookingDetails(tab: tab), client);
       expect(find.text('Class trip'), findsOneWidget);
       expect(inCard('Rooms', find.text('Room 101')), findsOneWidget);
-      // No card can be opened for editing.
+      // No card can be opened for editing, and the booking not deleted.
       expect(find.byTooltip('Edit'), findsNothing);
+      expect(find.text('Delete'), findsNothing);
     });
   });
 

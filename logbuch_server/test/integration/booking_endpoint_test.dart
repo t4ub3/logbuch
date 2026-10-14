@@ -320,6 +320,76 @@ void main() {
           throwsValidation(ValidationError.inUse),
         );
       });
+
+      group('and it is deleted', () {
+        setUp(() async {
+          await endpoints.booking.delete(sessionBuilder, camp.id!);
+        });
+
+        test('then it is no longer there', () async {
+          expect(await endpoints.booking.getAll(sessionBuilder), isEmpty);
+          expect(
+            await endpoints.booking.getById(sessionBuilder, camp.id!),
+            isNull,
+          );
+        });
+
+        test('then it is kept in the database, flagged as deleted', () async {
+          final stored = await Booking.db.findById(
+            sessionBuilder.build(),
+            camp.id!,
+          );
+          expect(stored?.title, 'Camp');
+          expect(stored?.deletedAt, isNotNull);
+        });
+
+        test('then the room is free', () async {
+          expect(await freeRooms(12, 16), ['101', '102']);
+          final choir = await addOctober('Choir', 13, 15);
+          final updated = await endpoints.booking.setRooms(
+            sessionBuilder,
+            choir.id!,
+            [room101.id!],
+          );
+          expect(updated.rooms, hasLength(1));
+        });
+
+        test('then it can be neither changed nor deleted again', () async {
+          final notFound = throwsValidation(ValidationError.notFound);
+          await expectLater(
+            endpoints.booking.update(sessionBuilder, camp),
+            notFound,
+          );
+          await expectLater(
+            endpoints.booking.setRooms(sessionBuilder, camp.id!, []),
+            notFound,
+          );
+          await expectLater(
+            endpoints.billing.getFolios(sessionBuilder, camp.id!),
+            notFound,
+          );
+          await expectLater(
+            endpoints.booking.delete(sessionBuilder, camp.id!),
+            notFound,
+          );
+        });
+      });
+
+      test('then a viewer cannot delete it', () async {
+        await expectLater(
+          endpoints.booking.delete(sessionBuilder.asViewer, camp.id!),
+          throwsValidation(ValidationError.adminRequired),
+        );
+        expect(await endpoints.booking.getAll(sessionBuilder), hasLength(1));
+      });
+
+      test('then updating it cannot delete it', () async {
+        final updated = await endpoints.booking.update(
+          sessionBuilder,
+          camp.copyWith(deletedAt: DateTime.utc(2026, 10, 1)),
+        );
+        expect(updated.deletedAt, isNull);
+      });
     });
 
     group('when asking for the confirmation of a booking', () {
@@ -562,6 +632,53 @@ void main() {
         );
 
         expect(price.total, 20000);
+      });
+
+      test('when one of them is deleted '
+          'then the other pays in full again', () async {
+        final camp = await addWithHall('Camp', 12, 16);
+        final choir = await addWithHall('Choir', 12, 16);
+        await endpoints.booking.delete(sessionBuilder, choir.id!);
+
+        final price = await endpoints.pricing.calculate(
+          sessionBuilder,
+          camp.id!,
+        );
+
+        expect(price.total, 20000);
+      });
+
+      test('when a booking is invoiced then it cannot be deleted', () async {
+        final camp = await addWithHall('Camp', 12, 16);
+        await invoice(camp);
+
+        await expectLater(
+          endpoints.booking.delete(sessionBuilder, camp.id!),
+          throwsValidation(ValidationError.bookingBilled),
+        );
+      });
+
+      test('when a booking has a payment then it cannot be deleted', () async {
+        final camp = await addWithHall('Camp', 12, 16);
+        final folios = await endpoints.billing.getFolios(
+          sessionBuilder,
+          camp.id!,
+        );
+        await endpoints.billing.addPayment(
+          sessionBuilder,
+          Payment(
+            folioId: folios.single.id!,
+            payerId: folios.single.payerId,
+            amount: 5000,
+            date: DateTime.utc(2026, 10, 1),
+            method: PaymentMethod.bankTransfer,
+          ),
+        );
+
+        await expectLater(
+          endpoints.booking.delete(sessionBuilder, camp.id!),
+          throwsValidation(ValidationError.bookingBilled),
+        );
       });
 
       test('when more than two bookings hold it in the same night '

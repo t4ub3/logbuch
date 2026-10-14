@@ -1,3 +1,4 @@
+import 'package:logbuch_server/src/bookings/deleted_bookings.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:logbuch_server/src/generated/serverpod.dart';
 import 'package:logbuch_server/src/pricing/price_calculation.dart';
@@ -22,13 +23,13 @@ class PricingData {
   final BookingPrice price;
 
   /// Reads the booking and prices it, see [calculatePrice]. Null if there
-  /// is no such booking.
+  /// is no such booking or it was deleted.
   static Future<PricingData?> load(
     Session session,
     int bookingId, {
     Transaction? transaction,
   }) async {
-    final booking = await Booking.db.findById(
+    final booking = await findBooking(
       session,
       bookingId,
       include: Booking.include(
@@ -90,7 +91,8 @@ class PricingData {
 }
 
 /// The holds of other bookings, with those bookings, on the rooms of
-/// [booking] that bookings share. Cancelled bookings hold nothing.
+/// [booking] that bookings share. Cancelled and deleted bookings hold
+/// nothing.
 ///
 /// [booking] must come with the rooms it holds and their unit types.
 Future<List<BookingRoom>> sharedHolds(
@@ -108,7 +110,8 @@ Future<List<BookingRoom>> sharedHolds(
     where: (t) =>
         t.roomId.inSet(shared) &
         t.bookingId.notEquals(booking.id) &
-        t.booking.status.notEquals(BookingStatus.cancelled),
+        t.booking.status.notEquals(BookingStatus.cancelled) &
+        t.booking.deletedAt.equals(null),
     include: BookingRoom.include(booking: Booking.include()),
     transaction: transaction,
   );

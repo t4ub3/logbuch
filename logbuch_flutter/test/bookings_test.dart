@@ -184,6 +184,45 @@ void main() {
       expect(find.text('Confirmation'), findsNothing);
     });
 
+    testWidgets('delete the booking once asked, and close its tab', (
+      tester,
+    ) async {
+      final client = filledClient();
+      final booking = client.booking.bookings.first;
+      await _openTab(tester, client, booking);
+
+      await tester.tap(inCard('Overview', find.text('Delete')));
+      await tester.pumpAndSettle();
+      expect(find.text('Delete “Class trip”?'), findsOneWidget);
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Delete'));
+      await tester.pumpAndSettle();
+
+      expect(client.booking.deleted, [booking.id]);
+      expect(find.byType(BookingDetails), findsNothing);
+    });
+
+    testWidgets('keep a booking that cannot be deleted, and say why', (
+      tester,
+    ) async {
+      final client = filledClient();
+      client.booking.deleteError = ValidationError.bookingBilled;
+      await _openTab(tester, client, client.booking.bookings.first);
+
+      await tester.tap(inCard('Overview', find.text('Delete')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Delete'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+          'A booking with an invoice or a payment cannot be deleted. '
+          'Cancel it instead.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.byType(BookingDetails), findsOneWidget);
+    });
+
     testWidgets('say when a booking is cancelled', (tester) async {
       final client = filledClient();
       final tab = BookingTab(booking: client.booking.bookings.last);

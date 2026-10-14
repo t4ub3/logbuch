@@ -208,6 +208,7 @@
         "noHouseholdsYet": "There are no households yet. Create them under Contacts, Households.",
         "confirmation": "Confirmation",
         "openConfirmationFailed": "The confirmation could not be opened: {error}",
+        "deleteBookingHint": "The booking is no longer shown and frees its rooms. A booking with an invoice or a payment cannot be deleted; cancel it instead.",
         "bedsInRooms": "{beds} in {rooms}"
     },
     "contacts": {
@@ -294,6 +295,7 @@
             "ownRole": "You cannot change your own role.",
             "roomNotHeld": "The booking does not hold this room.",
             "alreadyInvoiced": "This is invoiced and can no longer be changed.",
+            "bookingBilled": "A booking with an invoice or a payment cannot be deleted. Cancel it instead.",
             "nothingToInvoice": "There is nothing to invoice.",
             "pricingIncomplete": "Parts of the booking cannot be priced yet. Its price says what is missing.",
             "notOverpaid": "This is more than was overpaid.",

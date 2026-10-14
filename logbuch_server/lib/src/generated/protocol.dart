@@ -412,6 +412,12 @@ class Protocol extends _is.DatabaseSerializationManager {
           isNullable: true,
           dartType: 'String?',
         ),
+        _isp.ColumnDefinition(
+          name: 'deletedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
       ],
       foreignKeys: [
         _isp.ForeignKeyDefinition(

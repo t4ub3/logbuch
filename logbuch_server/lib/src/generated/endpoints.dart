@@ -837,6 +837,25 @@ class Endpoints extends _is.EndpointDispatch {
                     params['booking'],
                   ),
         ),
+        'delete': _is.MethodConnector(
+          name: 'delete',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['booking'] as _i7f5j1eo.BookingEndpoint).delete(
+                    session,
+                    params['id'],
+                  ),
+        ),
         'getConfirmationPdf': _is.MethodConnector(
           name: 'getConfirmationPdf',
           params: {

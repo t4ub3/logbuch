@@ -208,6 +208,7 @@
         "noHouseholdsYet": "Es gibt noch keine Haushalte. Sie werden unter Kontakte, Haushalte angelegt.",
         "confirmation": "Bestätigung",
         "openConfirmationFailed": "Die Bestätigung konnte nicht geöffnet werden: {error}",
+        "deleteBookingHint": "Die Buchung wird nicht mehr angezeigt und gibt ihre Zimmer frei. Eine Buchung mit Rechnung oder Zahlung kann nicht gelöscht werden; sie kann stattdessen storniert werden.",
         "bedsInRooms": "{beds} in {rooms}"
     },
     "contacts": {
@@ -294,6 +295,7 @@
             "ownRole": "Die eigene Rolle kann nicht geändert werden.",
             "roomNotHeld": "Die Buchung hat dieses Zimmer nicht.",
             "alreadyInvoiced": "Das ist bereits in Rechnung gestellt und kann nicht mehr geändert werden.",
+            "bookingBilled": "Eine Buchung mit Rechnung oder Zahlung kann nicht gelöscht werden. Sie kann stattdessen storniert werden.",
             "nothingToInvoice": "Es gibt nichts abzurechnen.",
             "pricingIncomplete": "Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht beim Preis.",
             "notOverpaid": "Das ist mehr, als überzahlt wurde.",

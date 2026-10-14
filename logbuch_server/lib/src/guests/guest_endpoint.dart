@@ -1,4 +1,5 @@
 import 'package:logbuch_server/src/auth/roles.dart';
+import 'package:logbuch_server/src/bookings/deleted_bookings.dart';
 import 'package:logbuch_server/src/common/today.dart';
 import 'package:logbuch_server/src/common/validation.dart';
 import 'package:logbuch_server/src/contacts/contact_endpoint.dart';
@@ -38,7 +39,7 @@ class GuestEndpoint extends AppEndpoint {
     Session session,
     int bookingId,
   ) async {
-    final booking = await Booking.db.findById(session, bookingId);
+    final booking = await findBooking(session, bookingId);
     if (booking == null) {
       throw ValidationException(reason: ValidationError.notFound);
     }
@@ -242,7 +243,7 @@ class GuestEndpoint extends AppEndpoint {
     requireAdmin(session);
     final validated = newContact == null ? null : validatedContact(newContact);
     return session.db.transaction((transaction) async {
-      final booking = await Booking.db.findById(
+      final booking = await findBooking(
         session,
         bookingId,
         transaction: transaction,

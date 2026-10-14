@@ -65,7 +65,18 @@ void main() {
         sessionBuilder,
         Guest(groupId: group.id!, contactId: lead.id!),
       );
-      // Cancelled bookings and bookings far away take no part.
+      // Cancelled and deleted bookings and bookings far away take no part.
+      final deleted = await endpoints.booking.add(
+        sessionBuilder,
+        Booking(
+          title: 'Deleted',
+          arrival: yesterday,
+          departure: inThreeDays,
+          leadId: lead.id!,
+          status: BookingStatus.confirmed,
+        ),
+      );
+      await endpoints.booking.delete(sessionBuilder, deleted.id!);
       await endpoints.booking.add(
         sessionBuilder,
         Booking(

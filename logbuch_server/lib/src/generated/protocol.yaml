@@ -35,6 +35,7 @@ booking:
   - getById:
   - add:
   - update:
+  - delete:
   - getConfirmationPdf:
   - availableRooms:
   - crowdedRooms:

@@ -86,6 +86,7 @@ String? validationMessage(BuildContext context, Object error) {
     ValidationError.adminRequired => t.adminRequired,
     ValidationError.ownRole => t.ownRole,
     ValidationError.alreadyInvoiced => t.alreadyInvoiced,
+    ValidationError.bookingBilled => t.bookingBilled,
     ValidationError.nothingToInvoice => t.nothingToInvoice,
     ValidationError.pricingIncomplete => t.pricingIncomplete,
     ValidationError.notOverpaid => t.notOverpaid,

@@ -1,4 +1,5 @@
 import 'package:logbuch_server/src/auth/roles.dart';
+import 'package:logbuch_server/src/bookings/deleted_bookings.dart';
 import 'package:logbuch_server/src/common/today.dart';
 import 'package:logbuch_server/src/dashboard/dashboard.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
@@ -18,6 +19,7 @@ class DashboardEndpoint extends AppEndpoint {
       session,
       where: (t) =>
           t.status.notEquals(BookingStatus.cancelled) &
+          notDeleted(t) &
           (((t.departure >= today) & (t.arrival <= lastDay)) |
               (t.status.equals(BookingStatus.option) &
                   (t.optionExpiresAt <= warnUntil))),

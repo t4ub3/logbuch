@@ -23,6 +23,7 @@ values:
   - adminRequired
   - ownRole
   - alreadyInvoiced
+  - bookingBilled
   - nothingToInvoice
   - pricingIncomplete
   - notOverpaid

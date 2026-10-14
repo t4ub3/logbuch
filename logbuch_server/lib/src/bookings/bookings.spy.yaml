@@ -15,3 +15,6 @@ fields:
   expectedGuestCount: int?
   notes: String?
   rooms: List<BookingRoom>?, relation(name=booking_rooms)
+  ### When the booking was deleted. A deleted booking is kept, but is no
+  ### longer shown and holds no rooms.
+  deletedAt: DateTime?

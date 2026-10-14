@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:logbuch_server/src/auth/roles.dart';
 import 'package:logbuch_server/src/bookings/confirmation_pdf.dart';
+import 'package:logbuch_server/src/bookings/deleted_bookings.dart';
 import 'package:logbuch_server/src/common/today.dart';
 import 'package:logbuch_server/src/common/validation.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
@@ -12,12 +13,14 @@ import 'package:logbuch_server/src/pricing/pricing_data.dart';
 import 'package:logbuch_server/src/rooms/room_endpoint.dart';
 
 class BookingEndpoint extends AppEndpoint {
+  /// The bookings that were not deleted.
   Future<List<Booking>> getAll(Session session) async {
-    return Booking.db.find(session, include: _details());
+    return Booking.db.find(session, where: notDeleted, include: _details());
   }
 
+  /// Null if there is no such booking or it was deleted.
   Future<Booking?> getById(Session session, int id) async {
-    return Booking.db.findById(session, id, include: _details());
+    return findBooking(session, id, include: _details());
   }
 
   /// Creates a booking without rooms; those are set with [setRooms]. Its
@@ -49,12 +52,15 @@ class BookingEndpoint extends AppEndpoint {
     requireAdmin(session);
     final validated = _validated(booking);
     await session.db.transaction((transaction) async {
-      final stored = await Booking.db.findById(
+      final stored = await findBooking(
         session,
         booking.id!,
         transaction: transaction,
       );
-      if (stored != null && stored.billingMode != validated.billingMode) {
+      if (stored == null) {
+        throw ValidationException(reason: ValidationError.notFound);
+      }
+      if (stored.billingMode != validated.billingMode) {
         final invoiced = await Folio.db.count(
           session,
           where: (t) =>
@@ -79,6 +85,44 @@ class BookingEndpoint extends AppEndpoint {
       await Booking.db.updateRow(session, validated, transaction: transaction);
     });
     return (await getById(session, booking.id!))!;
+  }
+
+  /// Deletes the booking, which stays in the database with the time it was
+  /// deleted. It is no longer shown anywhere and holds no rooms. A booking
+  /// with an invoice or a payment cannot be deleted, only cancelled.
+  Future<void> delete(Session session, int id) async {
+    requireAdmin(session);
+    await session.db.transaction((transaction) async {
+      // Not while its folios are invoiced or paid at the same time.
+      await Booking.db.lockRows(
+        session,
+        where: (t) => t.id.equals(id),
+        lockMode: LockMode.forUpdate,
+        transaction: transaction,
+      );
+      final booking = await findBooking(session, id, transaction: transaction);
+      if (booking == null) {
+        throw ValidationException(reason: ValidationError.notFound);
+      }
+      final invoiced = await Folio.db.count(
+        session,
+        where: (t) => t.bookingId.equals(id) & t.invoiceNumber.notEquals(null),
+        transaction: transaction,
+      );
+      final payments = await Payment.db.count(
+        session,
+        where: (t) => t.folio.bookingId.equals(id),
+        transaction: transaction,
+      );
+      if (invoiced + payments > 0) {
+        throw ValidationException(reason: ValidationError.bookingBilled);
+      }
+      await Booking.db.updateRow(
+        session,
+        booking.copyWith(deletedAt: DateTime.now().toUtc()),
+        transaction: transaction,
+      );
+    });
   }
 
   /// The confirmation of the booking for its lead, as a PDF.
@@ -153,7 +197,7 @@ class BookingEndpoint extends AppEndpoint {
   /// hold during one of its nights. Sharing is not limited, so this is only
   /// to warn that it gets crowded.
   Future<List<Room>> crowdedRooms(Session session, int bookingId) async {
-    final booking = await Booking.db.findById(
+    final booking = await findBooking(
       session,
       bookingId,
       include: Booking.include(
@@ -182,7 +226,7 @@ class BookingEndpoint extends AppEndpoint {
     requireAdmin(session);
     final wanted = roomIds.toSet();
     await session.db.transaction((transaction) async {
-      final booking = await Booking.db.findById(
+      final booking = await findBooking(
         session,
         bookingId,
         transaction: transaction,
@@ -241,7 +285,8 @@ class BookingEndpoint extends AppEndpoint {
     if (booking.expectedGuestCount case final guests? when guests < 0) {
       throw ValidationException(reason: ValidationError.invalidGuestCount);
     }
-    return booking.copyWith(title: title);
+    // Bookings are only deleted with [delete].
+    return booking.copyWith(title: title, deletedAt: null);
   }
 
   /// Fails unless the rooms are free during the nights of [booking]. The
@@ -308,7 +353,7 @@ class BookingEndpoint extends AppEndpoint {
 
   /// The rooms, by id, that bookings hold during the nights from [arrival]
   /// to [departure]. A room is free again on the day its guests depart, and
-  /// cancelled bookings hold nothing. A room of a shared unit type is never
+  /// cancelled and deleted bookings hold nothing. A room of a shared unit type is never
   /// taken, as any number of bookings may hold it.
   Future<Map<int, Room>> _takenRooms(
     Session session,
@@ -323,6 +368,7 @@ class BookingEndpoint extends AppEndpoint {
       where: (t) {
         var taken =
             t.booking.status.notEquals(BookingStatus.cancelled) &
+            t.booking.deletedAt.equals(null) &
             t.room.unitType.shared.equals(false) &
             (t.booking.arrival < departure) &
             (t.booking.departure > arrival);

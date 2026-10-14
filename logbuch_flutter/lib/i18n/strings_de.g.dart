@@ -259,6 +259,7 @@ class _Translations$bookings$de extends Translations$bookings$en {
 	@override String get noHouseholdsYet => 'Es gibt noch keine Haushalte. Sie werden unter Kontakte, Haushalte angelegt.';
 	@override String get confirmation => 'Bestätigung';
 	@override String openConfirmationFailed({required Object error}) => 'Die Bestätigung konnte nicht geöffnet werden: ${error}';
+	@override String get deleteBookingHint => 'Die Buchung wird nicht mehr angezeigt und gibt ihre Zimmer frei. Eine Buchung mit Rechnung oder Zahlung kann nicht gelöscht werden; sie kann stattdessen storniert werden.';
 	@override String bedsInRooms({required Object beds, required Object rooms}) => '${beds} in ${rooms}';
 }
 
@@ -587,6 +588,7 @@ class _Translations$admin$errors$de extends Translations$admin$errors$en {
 	@override String get ownRole => 'Die eigene Rolle kann nicht geändert werden.';
 	@override String get roomNotHeld => 'Die Buchung hat dieses Zimmer nicht.';
 	@override String get alreadyInvoiced => 'Das ist bereits in Rechnung gestellt und kann nicht mehr geändert werden.';
+	@override String get bookingBilled => 'Eine Buchung mit Rechnung oder Zahlung kann nicht gelöscht werden. Sie kann stattdessen storniert werden.';
 	@override String get nothingToInvoice => 'Es gibt nichts abzurechnen.';
 	@override String get pricingIncomplete => 'Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht beim Preis.';
 	@override String get notOverpaid => 'Das ist mehr, als überzahlt wurde.';
@@ -1013,6 +1015,7 @@ extension on TranslationsDe {
 			'bookings.noHouseholdsYet' => 'Es gibt noch keine Haushalte. Sie werden unter Kontakte, Haushalte angelegt.',
 			'bookings.confirmation' => 'Bestätigung',
 			'bookings.openConfirmationFailed' => ({required Object error}) => 'Die Bestätigung konnte nicht geöffnet werden: ${error}',
+			'bookings.deleteBookingHint' => 'Die Buchung wird nicht mehr angezeigt und gibt ihre Zimmer frei. Eine Buchung mit Rechnung oder Zahlung kann nicht gelöscht werden; sie kann stattdessen storniert werden.',
 			'bookings.bedsInRooms' => ({required Object beds, required Object rooms}) => '${beds} in ${rooms}',
 			'contacts.empty' => 'Keine Kontakte',
 			'contacts.people' => 'Personen',
@@ -1085,6 +1088,7 @@ extension on TranslationsDe {
 			'admin.errors.ownRole' => 'Die eigene Rolle kann nicht geändert werden.',
 			'admin.errors.roomNotHeld' => 'Die Buchung hat dieses Zimmer nicht.',
 			'admin.errors.alreadyInvoiced' => 'Das ist bereits in Rechnung gestellt und kann nicht mehr geändert werden.',
+			'admin.errors.bookingBilled' => 'Eine Buchung mit Rechnung oder Zahlung kann nicht gelöscht werden. Sie kann stattdessen storniert werden.',
 			'admin.errors.nothingToInvoice' => 'Es gibt nichts abzurechnen.',
 			'admin.errors.pricingIncomplete' => 'Teile der Buchung können noch nicht berechnet werden. Was fehlt, steht beim Preis.',
 			'admin.errors.notOverpaid' => 'Das ist mehr, als überzahlt wurde.',

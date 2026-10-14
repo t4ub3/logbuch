@@ -35,6 +35,7 @@ enum ValidationError implements _is.SerializableModel {
   adminRequired,
   ownRole,
   alreadyInvoiced,
+  bookingBilled,
   nothingToInvoice,
   pricingIncomplete,
   notOverpaid,
@@ -87,6 +88,8 @@ enum ValidationError implements _is.SerializableModel {
         return ValidationError.ownRole;
       case 'alreadyInvoiced':
         return ValidationError.alreadyInvoiced;
+      case 'bookingBilled':
+        return ValidationError.bookingBilled;
       case 'nothingToInvoice':
         return ValidationError.nothingToInvoice;
       case 'pricingIncomplete':

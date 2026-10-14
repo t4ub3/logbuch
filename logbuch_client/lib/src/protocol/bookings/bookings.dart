@@ -42,6 +42,7 @@ abstract class Booking
     this.expectedGuestCount,
     this.notes,
     this.rooms,
+    this.deletedAt,
   }) : createdAt = createdAt ?? DateTime.now(),
        status = status ?? _ilk1qg37.BookingStatus.inquiry,
        billingMode = billingMode ?? _ikjlxdwh.BillingMode.single;
@@ -66,6 +67,7 @@ abstract class Booking
     int? expectedGuestCount,
     String? notes,
     List<_icgf4f53.BookingRoom>? rooms,
+    DateTime? deletedAt,
   }) = _BookingImpl;
 
   factory Booking.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -127,6 +129,9 @@ abstract class Booking
           : _i7rf0d0e.Protocol().deserialize<List<_icgf4f53.BookingRoom>>(
               jsonSerialization['rooms'],
             ),
+      deletedAt: jsonSerialization['deletedAt'] == null
+          ? null
+          : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['deletedAt']),
     );
   }
 
@@ -171,6 +176,10 @@ abstract class Booking
 
   List<_icgf4f53.BookingRoom>? rooms;
 
+  /// When the booking was deleted. A deleted booking is kept, but is no
+  /// longer shown and holds no rooms.
+  DateTime? deletedAt;
+
   /// Returns a shallow copy of this [Booking]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -194,6 +203,7 @@ abstract class Booking
     int? expectedGuestCount,
     String? notes,
     List<_icgf4f53.BookingRoom>? rooms,
+    DateTime? deletedAt,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -218,6 +228,7 @@ abstract class Booking
       if (expectedGuestCount != null) 'expectedGuestCount': expectedGuestCount,
       if (notes != null) 'notes': notes,
       if (rooms != null) 'rooms': rooms?.toJson(valueToJson: (v) => v.toJson()),
+      if (deletedAt != null) 'deletedAt': deletedAt?.toJson(),
     };
   }
 
@@ -246,6 +257,7 @@ abstract class Booking
       if (notes != null) 'notes': notes,
       if (rooms != null)
         'rooms': rooms?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
+      if (deletedAt != null) 'deletedAt': deletedAt?.toJson(),
     };
   }
 
@@ -278,6 +290,7 @@ class _BookingImpl extends Booking {
     int? expectedGuestCount,
     String? notes,
     List<_icgf4f53.BookingRoom>? rooms,
+    DateTime? deletedAt,
   }) : super._(
          id: id,
          createdAt: createdAt,
@@ -298,6 +311,7 @@ class _BookingImpl extends Booking {
          expectedGuestCount: expectedGuestCount,
          notes: notes,
          rooms: rooms,
+         deletedAt: deletedAt,
        );
 
   /// Returns a shallow copy of this [Booking]
@@ -324,6 +338,7 @@ class _BookingImpl extends Booking {
     Object? expectedGuestCount = _Undefined,
     Object? notes = _Undefined,
     Object? rooms = _Undefined,
+    Object? deletedAt = _Undefined,
   }) {
     return Booking(
       id: id is int? ? id : this.id,
@@ -359,6 +374,7 @@ class _BookingImpl extends Booking {
       rooms: rooms is List<_icgf4f53.BookingRoom>?
           ? rooms
           : this.rooms?.map((e0) => e0.copyWith()).toList(),
+      deletedAt: deletedAt is DateTime? ? deletedAt : this.deletedAt,
     );
   }
 }
