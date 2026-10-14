@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logbuch_flutter/components/app_logo.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/components/inset_divider.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
@@ -76,26 +77,7 @@ class MenuComponent extends ConsumerWidget {
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text.rich(
-            TextSpan(
-              children: [
-                const TextSpan(text: 'Log'),
-                TextSpan(
-                  text: '|',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                const TextSpan(text: 'Buch'),
-              ],
-            ),
-            style: Theme.of(
-              context,
-            ).textTheme.headlineMedium?.copyWith(fontFamily: 'Libron'),
-          ),
-        ),
+        const Padding(padding: EdgeInsets.all(24), child: AppLogo()),
         const InsetDivider(),
         Expanded(
           child: ListView(
