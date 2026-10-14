@@ -88,6 +88,10 @@
             "one": "{n} Bett ausgewählt",
             "other": "{n} Betten ausgewählt"
         },
+        "roomsSelected": {
+            "one": "{selected} von {n} Zimmer ausgewählt",
+            "other": "{selected} von {n} Zimmern ausgewählt"
+        },
         "guestsExpected": {
             "one": "{n} Gast erwartet",
             "other": "{n} Gäste erwartet"

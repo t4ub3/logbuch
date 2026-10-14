@@ -3,6 +3,7 @@ import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
+import 'package:logbuch_flutter/components/panel_padding.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_extensions.dart';
 import 'package:logbuch_flutter/providers/bookings_provider.dart';
 import 'package:logbuch_flutter/providers/bookings_view_provider.dart';
@@ -29,7 +30,7 @@ class BookingsMonthView extends ConsumerWidget {
         Expanded(
           child: switch (bookings) {
             AsyncData(:final value) => Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+              padding: panelContentPadding,
               child: _MonthGrid(
                 month: month,
                 firstWeekday: startOfWeek.firstDayOfWeekIndex,
@@ -58,7 +59,7 @@ class MonthHeader extends ConsumerWidget {
     final notifier = ref.read(displayedMonthProvider.notifier);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: panelToolbarPadding,
       child: Row(
         children: [
           IconButton(

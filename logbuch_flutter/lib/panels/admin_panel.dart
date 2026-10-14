@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/components/inset_divider.dart';
+import 'package:logbuch_flutter/components/panel_padding.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/age_groups_section.dart';
 import 'package:logbuch_flutter/panels/admin/booking_categories_section.dart';
@@ -80,7 +81,10 @@ class AdminPanel extends ConsumerWidget {
         // The groups do not fit next to each other in a narrow window.
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.all(8),
+          // The sections of the group follow closely below.
+          padding: sections.length > 1
+              ? panelBarPadding.copyWith(bottom: 12)
+              : panelBarPadding,
           child: SegmentedButton<AdminGroup>(
             segments: [
               for (final group in AdminGroup.values)
@@ -101,7 +105,7 @@ class AdminPanel extends ConsumerWidget {
         if (sections.length > 1)
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+            padding: panelBarPadding.copyWith(top: 0),
             child: Row(
               spacing: 8,
               children: [
@@ -114,7 +118,7 @@ class AdminPanel extends ConsumerWidget {
               ],
             ),
           ),
-        const InsetDivider(),
+        const InsetDivider(indent: panelGap),
         Expanded(
           child: switch (section) {
             AdminSection.buildings => const BuildingsSection(),

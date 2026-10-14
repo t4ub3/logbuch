@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logbuch_flutter/components/panel_padding.dart';
 
 /// Shows a list for the given [value], with loading and error states.
-/// [onRetry] is called from the error state and by pull-to-refresh.
+/// [onRetry] is called from the error state and by pull-to-refresh. The list
+/// keeps the gap to the edges that all panels have.
 class AsyncListView<T> extends StatelessWidget {
   const AsyncListView({
     super.key,
@@ -27,6 +29,7 @@ class AsyncListView<T> extends StatelessWidget {
       AsyncData(:final value) => RefreshIndicator(
         onRefresh: onRetry,
         child: ListView.builder(
+          padding: panelListPadding,
           itemCount: value.length,
           itemBuilder: (context, index) => itemBuilder(context, value[index]),
         ),

@@ -158,6 +158,10 @@ class _Translations$bookings$de extends Translations$bookings$en {
 		one: '${n} Bett ausgewählt',
 		other: '${n} Betten ausgewählt',
 	);
+	@override String roomsSelected({required num n, required Object selected}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n,
+		one: '${selected} von ${n} Zimmer ausgewählt',
+		other: '${selected} von ${n} Zimmern ausgewählt',
+	);
 	@override String guestsExpected({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n,
 		one: '${n} Gast erwartet',
 		other: '${n} Gäste erwartet',
@@ -906,6 +910,7 @@ extension on TranslationsDe {
 			'bookings.roomsNeedDates' => 'Bitte zuerst den Zeitraum der Buchung festlegen, um Zimmer auszuwählen.',
 			'bookings.noFreeRooms' => 'In diesem Zeitraum sind keine Zimmer frei.',
 			'bookings.selectedBeds' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, one: '${n} Bett ausgewählt', other: '${n} Betten ausgewählt', ), 
+			'bookings.roomsSelected' => ({required num n, required Object selected}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, one: '${selected} von ${n} Zimmer ausgewählt', other: '${selected} von ${n} Zimmern ausgewählt', ), 
 			'bookings.guestsExpected' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('de'))(n, one: '${n} Gast erwartet', other: '${n} Gäste erwartet', ), 
 			'bookings.guests' => 'Gäste',
 			'bookings.assignment' => 'Verteilung',

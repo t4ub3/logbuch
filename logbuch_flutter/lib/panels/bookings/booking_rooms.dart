@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
+import 'package:logbuch_flutter/panels/admin/rooms_section.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_card.dart';
 import 'package:logbuch_flutter/panels/bookings/outdated_shares.dart';
 import 'package:logbuch_flutter/providers/available_rooms_provider.dart';
@@ -106,8 +107,9 @@ class BookingRoomsCard extends ConsumerWidget {
 }
 
 /// The overlay in which the booking of [tab] takes its rooms: those that
-/// are free during its nights, with a checkbox each. The booking must have
-/// dates.
+/// are free during its nights, with a checkbox each. They are listed by
+/// building, which can be expanded to show them and has a checkbox for all
+/// of them. The booking must have dates.
 class BookingRoomsEditor extends ConsumerStatefulWidget {
   const BookingRoomsEditor({super.key, required this.tab});
 
@@ -124,6 +126,10 @@ class _BookingRoomsEditorState extends ConsumerState<BookingRoomsEditor> {
 
   /// The ids of the checked rooms; differs from [_held] until saved.
   late Set<int> _selected = {for (final hold in _held) hold.roomId};
+
+  /// The ids of the buildings whose rooms are shown, null for the rooms in
+  /// no building. A house with many rooms starts with none of them shown.
+  Set<int?> _expanded = {};
   bool _saving = false;
   Object? _error;
 
@@ -175,8 +181,7 @@ class _BookingRoomsEditorState extends ConsumerState<BookingRoomsEditor> {
         room.id!: room,
       for (final room in available) room.id!: room,
     };
-    return rooms.values.toList()
-      ..sort((a, b) => a.roomNumber.compareTo(b.roomNumber));
+    return rooms.values.toList()..sort(compareByBuilding);
   }
 
   Widget _buildRooms(BuildContext context, List<Room> rooms) {
@@ -185,6 +190,11 @@ class _BookingRoomsEditorState extends ConsumerState<BookingRoomsEditor> {
     final beds = rooms
         .where((room) => _selected.contains(room.id))
         .fold(0, (beds, room) => beds + room.bedAmount);
+    // Rooms follow each other building by building.
+    final byBuilding = <int?, List<Room>>{};
+    for (final room in rooms) {
+      byBuilding.putIfAbsent(room.buildingId, () => []).add(room);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -194,15 +204,29 @@ class _BookingRoomsEditorState extends ConsumerState<BookingRoomsEditor> {
               ? Center(child: Text(t.bookings.noFreeRooms))
               : ListView(
                   children: [
-                    for (final room in rooms)
-                      YaruCheckboxListTile(
-                        value: _selected.contains(room.id),
-                        onChanged: _saving
-                            ? null
-                            : (checked) => _select(room, checked ?? false),
-                        title: Text(t.rooms.room(number: room.roomNumber)),
-                        subtitle: Text(_roomDetails(context, room)),
-                      ),
+                    for (final MapEntry(key: buildingId, value: rooms)
+                        in byBuilding.entries) ...[
+                      _buildingTile(context, rooms),
+                      if (_expanded.contains(buildingId))
+                        for (final room in rooms)
+                          YaruCheckboxListTile(
+                            value: _selected.contains(room.id),
+                            onChanged: _saving
+                                ? null
+                                : (checked) =>
+                                      _select([room], checked ?? false),
+                            // Below the name of the building.
+                            contentPadding:
+                                const EdgeInsetsDirectional.fromSTEB(
+                                  44,
+                                  8,
+                                  12,
+                                  8,
+                                ),
+                            title: Text(t.rooms.room(number: room.roomNumber)),
+                            subtitle: Text(_roomDetails(context, room)),
+                          ),
+                    ],
                   ],
                 ),
         ),
@@ -228,12 +252,44 @@ class _BookingRoomsEditorState extends ConsumerState<BookingRoomsEditor> {
     );
   }
 
-  void _select(Room room, bool selected) {
+  /// The heading of a building, which shows or hides its [rooms] and says
+  /// how many of them are checked. Its checkbox checks the rooms if some of
+  /// them are not checked yet, and unchecks them all otherwise.
+  Widget _buildingTile(BuildContext context, List<Room> rooms) {
+    final buildingId = rooms.first.buildingId;
+    final expanded = _expanded.contains(buildingId);
+    final count = rooms.where((room) => _selected.contains(room.id)).length;
+    final all = count == rooms.length;
+
+    return YaruListTile(
+      leading: YaruCheckbox(
+        tristate: true,
+        value: all ? true : (count == 0 ? false : null),
+        onChanged: _saving ? null : (_) => _select(rooms, !all),
+      ),
+      title: Text(
+        rooms.first.building?.name ?? context.t.admin.rooms.noBuilding,
+        style: Theme.of(context).textTheme.titleSmall,
+      ),
+      subtitle: Text(
+        context.t.bookings.roomsSelected(n: rooms.length, selected: count),
+      ),
+      trailing: Icon(expanded ? YaruIcons.pan_down : YaruIcons.pan_end),
+      onTap: () => setState(() {
+        _expanded = expanded
+            ? _expanded.difference({buildingId})
+            : {..._expanded, buildingId};
+      }),
+    );
+  }
+
+  void _select(Iterable<Room> rooms, bool selected) {
+    final ids = {for (final room in rooms) room.id!};
     setState(() {
       _selected = {
         for (final id in _selected)
-          if (id != room.id) id,
-        if (selected) room.id!,
+          if (!ids.contains(id)) id,
+        if (selected) ...ids,
       };
     });
   }

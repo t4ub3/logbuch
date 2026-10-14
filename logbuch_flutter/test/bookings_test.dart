@@ -49,6 +49,13 @@ Future<void> _openTab(
   await tester.pumpAndSettle();
 }
 
+/// The checkbox for all rooms of the building called [name] in the overlay
+/// of the rooms.
+Finder _buildingCheckbox(String name) => find.descendant(
+  of: find.widgetWithText(YaruListTile, name),
+  matching: find.byType(YaruCheckbox),
+);
+
 void main() {
   group('booking details', () {
     testWidgets('show the booking with its lead', (tester) async {
@@ -231,6 +238,11 @@ void main() {
 
       await editCard(tester, 'Rooms');
 
+      // The rooms of a building are only shown once it is expanded.
+      expect(inOverlay(find.text('Room 101')), findsNothing);
+      expect(find.text('1 of 2 rooms selected'), findsOneWidget);
+      await tester.tap(find.text('No building'));
+      await tester.pump();
       expect(inOverlay(find.text('Room 101')), findsOneWidget);
       expect(inOverlay(find.text('Room 103')), findsOneWidget);
       // Room 102 is neither free nor held by the booking.
@@ -243,6 +255,13 @@ void main() {
       await tester.tap(inOverlay(find.text('Room 103')));
       await tester.pump();
       expect(find.text('6 beds selected · 5 guests expected'), findsOneWidget);
+      expect(find.text('2 of 2 rooms selected'), findsOneWidget);
+
+      // Collapsing the building keeps what is checked.
+      await tester.tap(find.text('No building'));
+      await tester.pump();
+      expect(find.text('Room 103'), findsNothing);
+      expect(find.text('6 beds selected · 5 guests expected'), findsOneWidget);
 
       await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
       await tester.pumpAndSettle();
@@ -253,6 +272,60 @@ void main() {
       expect(inCard('Rooms', find.text('Room 101')), findsOneWidget);
     });
 
+    testWidgets('checks and unchecks the rooms of a building at once', (
+      tester,
+    ) async {
+      final client = filledClient();
+      final room102 = client.room.rooms.last.copyWith(active: true);
+      final room104 = room102.copyWith(id: 4, roomNumber: '104', bedAmount: 2);
+      client.room.rooms = [client.room.rooms.first, room102, room104];
+      client.booking.available = client.room.rooms;
+      await _openTab(tester, client, client.booking.bookings.first);
+      await editCard(tester, 'Rooms');
+      bool? building(String name) =>
+          tester.widget<YaruCheckbox>(_buildingCheckbox(name)).value;
+
+      // The rooms are listed by building, those without one last.
+      expect(
+        tester.getTopLeft(find.text('Annex')).dy,
+        lessThan(tester.getTopLeft(find.text('No building')).dy),
+      );
+      expect(building('Annex'), isFalse);
+      expect(building('No building'), isTrue);
+
+      // The checkbox works while the rooms are hidden.
+      await tester.tap(_buildingCheckbox('Annex'));
+      await tester.pump();
+      expect(building('Annex'), isTrue);
+      expect(find.text('2 of 2 rooms selected'), findsOneWidget);
+      expect(find.text('7 beds selected · 5 guests expected'), findsOneWidget);
+      expect(find.text('Room 102'), findsNothing);
+
+      await tester.tap(_buildingCheckbox('Annex'));
+      await tester.pump();
+      expect(building('Annex'), isFalse);
+      expect(find.text('4 beds selected · 5 guests expected'), findsOneWidget);
+
+      // Some of the rooms are checked, so the building checks the rest.
+      await tester.tap(find.text('Annex'));
+      await tester.pump();
+      await tester.tap(inOverlay(find.text('Room 104')));
+      await tester.pump();
+      expect(building('Annex'), isNull);
+      expect(find.text('1 of 2 rooms selected'), findsOneWidget);
+      await tester.tap(_buildingCheckbox('Annex'));
+      await tester.pump();
+      expect(building('Annex'), isTrue);
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
+      await tester.pumpAndSettle();
+      expect(client.booking.bookings.first.rooms!.map((r) => r.roomId), [
+        1,
+        2,
+        4,
+      ]);
+    });
+
     testWidgets('leaves the page showing the rooms as they were saved', (
       tester,
     ) async {
@@ -260,6 +333,8 @@ void main() {
       await _openTab(tester, client, client.booking.bookings.first);
 
       await editCard(tester, 'Rooms');
+      await tester.tap(find.text('No building'));
+      await tester.pump();
       await tester.tap(inOverlay(find.text('Room 101')));
       await tester.pump();
       await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
@@ -284,6 +359,8 @@ void main() {
       await _openTab(tester, client, client.booking.bookings.first);
 
       await editCard(tester, 'Rooms');
+      await tester.tap(find.text('No building'));
+      await tester.pump();
       await tester.tap(inOverlay(find.text('Room 101')));
       await tester.pump();
       await tester.tap(find.text('Cancel'));

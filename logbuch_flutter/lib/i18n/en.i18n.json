@@ -88,6 +88,10 @@
             "one": "{n} bed selected",
             "other": "{n} beds selected"
         },
+        "roomsSelected": {
+            "one": "{selected} of {n} room selected",
+            "other": "{selected} of {n} rooms selected"
+        },
         "guestsExpected": {
             "one": "{n} guest expected",
             "other": "{n} guests expected"

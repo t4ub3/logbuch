@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
+import 'package:logbuch_flutter/components/panel_padding.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
 import 'package:logbuch_flutter/panels/admin/admin_widgets.dart';
@@ -166,7 +167,7 @@ class _PriceListsSectionState extends ConsumerState<PriceListsSection> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.all(8),
+          padding: panelToolbarPadding,
           child: Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -570,6 +571,13 @@ class _PriceEditorState extends State<_PriceEditor> {
     final t = context.t.admin.priceLists;
     final theme = Theme.of(context);
     final entered = _entered();
+    final message = switch (_error) {
+      final error? =>
+        validationMessage(context, error) ??
+            context.t.common.saveFailed(error: error),
+      null when entered == null => t.invalid,
+      null => null,
+    };
 
     Widget cell(PriceKind kind, int id, [int ageGroupId = 0]) => _PriceCell(
       controller: _cell(context, (kind, id, ageGroupId)),
@@ -581,11 +589,16 @@ class _PriceEditorState extends State<_PriceEditor> {
       children: [
         Expanded(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(kYaruPagePadding),
+            padding: panelListPadding,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 24,
               children: [
+                // In line with the titles of the tables.
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(t.hint, style: theme.textTheme.bodySmall),
+                ),
                 if (widget.unitTypes.isNotEmpty)
                   _PriceTable(
                     title: t.lodging,
@@ -645,42 +658,35 @@ class _PriceEditorState extends State<_PriceEditor> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: Row(
-            children: [
-              Expanded(
-                child: switch (_error) {
-                  final error? => Text(
-                    validationMessage(context, error) ??
-                        context.t.common.saveFailed(error: error),
+        if (!widget.readOnly || message != null)
+          Padding(
+            padding: panelContentPadding,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    message ?? '',
                     style: TextStyle(color: theme.colorScheme.error),
                   ),
-                  null when entered == null => Text(
-                    t.invalid,
-                    style: TextStyle(color: theme.colorScheme.error),
+                ),
+                if (!widget.readOnly) ...[
+                  const SizedBox(width: 16),
+                  TextButton(
+                    onPressed: _dirty && !_saving ? _discard : null,
+                    child: Text(context.t.common.discard),
                   ),
-                  null => Text(t.hint, style: theme.textTheme.bodySmall),
-                },
-              ),
-              if (!widget.readOnly) ...[
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: _dirty && !_saving ? _discard : null,
-                  child: Text(context.t.common.discard),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton.icon(
-                  icon: const Icon(YaruIcons.save),
-                  label: Text(context.t.common.save),
-                  onPressed: _dirty && !_saving && entered != null
-                      ? () => _save(entered)
-                      : null,
-                ),
+                  const SizedBox(width: 12),
+                  ElevatedButton.icon(
+                    icon: const Icon(YaruIcons.save),
+                    label: Text(context.t.common.save),
+                    onPressed: _dirty && !_saving && entered != null
+                        ? () => _save(entered)
+                        : null,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
-        ),
       ],
     );
   }

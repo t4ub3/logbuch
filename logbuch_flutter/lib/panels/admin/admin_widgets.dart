@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/components/async_list_view.dart';
+import 'package:logbuch_flutter/components/panel_padding.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
@@ -47,12 +48,12 @@ class AdminListSection<T> extends ConsumerWidget {
       children: [
         if (canEdit || toolbar != null)
           Padding(
-            padding: const EdgeInsets.all(8),
+            padding: panelToolbarPadding,
             child: Row(
               children: [
                 Expanded(child: toolbar ?? const SizedBox.shrink()),
                 if (canEdit) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 16),
                   ElevatedButton.icon(
                     icon: const Icon(YaruIcons.plus),
                     label: Text(addLabel),

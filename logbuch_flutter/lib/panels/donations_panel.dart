@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/components/inset_divider.dart';
+import 'package:logbuch_flutter/components/panel_padding.dart';
 import 'package:logbuch_flutter/components/open_file.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
@@ -41,7 +42,7 @@ class _DonationsPanelState extends ConsumerState<DonationsPanel> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: panelBarPadding,
           child: Row(
             children: [
               IconButton(
@@ -67,7 +68,7 @@ class _DonationsPanelState extends ConsumerState<DonationsPanel> {
                   onPressed: _createReceipts,
                   child: Text(t.donations.createReceipts),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 ElevatedButton.icon(
                   icon: const Icon(YaruIcons.plus),
                   label: Text(t.donations.add),
@@ -80,7 +81,7 @@ class _DonationsPanelState extends ConsumerState<DonationsPanel> {
             ],
           ),
         ),
-        const InsetDivider(),
+        const InsetDivider(indent: panelGap),
         Expanded(
           child: switch ((
             ref.watch(donationsProvider(_year)),
@@ -112,7 +113,7 @@ class _DonationsPanelState extends ConsumerState<DonationsPanel> {
     final theme = Theme.of(context);
 
     return ListView(
-      padding: const EdgeInsets.all(kYaruPagePadding),
+      padding: const EdgeInsets.all(panelGap),
       children: [
         if (receipts.isNotEmpty) ...[
           YaruSection(

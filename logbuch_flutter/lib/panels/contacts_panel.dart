@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logbuch_flutter/components/inset_divider.dart';
+import 'package:logbuch_flutter/components/panel_padding.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/contacts/contacts_section.dart';
 import 'package:logbuch_flutter/panels/contacts/households_section.dart';
@@ -30,7 +31,7 @@ class _ContactsPanelState extends State<ContactsPanel> {
         // The views do not fit next to each other in a narrow window.
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.all(8),
+          padding: panelBarPadding,
           child: SegmentedButton<_ContactsView>(
             segments: [
               ButtonSegment(
@@ -55,7 +56,7 @@ class _ContactsPanelState extends State<ContactsPanel> {
                 setState(() => _view = selection.single),
           ),
         ),
-        const InsetDivider(),
+        const InsetDivider(indent: panelGap),
         Expanded(
           child: switch (_view) {
             _ContactsView.people => const ContactsSection(),

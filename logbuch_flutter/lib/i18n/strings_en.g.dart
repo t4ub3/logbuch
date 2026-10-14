@@ -295,6 +295,12 @@ class Translations$bookings$en {
 		other: '${n} beds selected',
 	);
 
+	/// en: '(one) {{selected} of {n} room selected} (other) {{selected} of {n} rooms selected}'
+	String roomsSelected({required num n, required Object selected}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		one: '${selected} of ${n} room selected',
+		other: '${selected} of ${n} rooms selected',
+	);
+
 	/// en: '(one) {{n} guest expected} (other) {{n} guests expected}'
 	String guestsExpected({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 		one: '${n} guest expected',
@@ -1775,6 +1781,7 @@ extension on Translations {
 			'bookings.roomsNeedDates' => 'Set the dates of the booking to choose its rooms.',
 			'bookings.noFreeRooms' => 'No rooms are free for these dates.',
 			'bookings.selectedBeds' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} bed selected', other: '${n} beds selected', ), 
+			'bookings.roomsSelected' => ({required num n, required Object selected}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${selected} of ${n} room selected', other: '${selected} of ${n} rooms selected', ), 
 			'bookings.guestsExpected' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} guest expected', other: '${n} guests expected', ), 
 			'bookings.guests' => 'Guests',
 			'bookings.assignment' => 'Assignment',

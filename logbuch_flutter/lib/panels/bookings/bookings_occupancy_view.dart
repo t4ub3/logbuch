@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_client/logbuch_client.dart';
+import 'package:logbuch_flutter/components/panel_padding.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/rooms_section.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_extensions.dart';
@@ -145,6 +146,7 @@ class _OccupancyGrid extends StatelessWidget {
     final divider = theme.dividerColor;
 
     return SingleChildScrollView(
+      padding: panelContentPadding,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -5,6 +5,7 @@ import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:logbuch_client/logbuch_client.dart';
+import 'package:logbuch_flutter/components/panel_padding.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/bookings/booking_extensions.dart';
 import 'package:logbuch_flutter/providers/bookings_provider.dart';
@@ -57,7 +58,7 @@ class _YearHeader extends ConsumerWidget {
     final notifier = ref.read(displayedYearProvider.notifier);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: panelToolbarPadding,
       child: Row(
         children: [
           IconButton(
@@ -127,7 +128,7 @@ class _YearGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final grid = Padding(
-          padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+          padding: panelContentPadding,
           child: Column(
             children: [
               _buildWeekdayHeader(context),
@@ -146,7 +147,7 @@ class _YearGrid extends StatelessWidget {
         // squeezing the days.
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: SizedBox(width: minWidth + 16, child: grid),
+          child: SizedBox(width: minWidth + 2 * panelGap, child: grid),
         );
       },
     );

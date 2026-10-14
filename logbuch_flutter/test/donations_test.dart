@@ -191,6 +191,7 @@ void main() {
       'Anreise ab 15 Uhr.',
     );
     await tester.ensureVisible(find.widgetWithText(ElevatedButton, 'Save'));
+    await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(ElevatedButton, 'Save'));
     await tester.pumpAndSettle();
 

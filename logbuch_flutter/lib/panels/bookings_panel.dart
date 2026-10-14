@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logbuch_flutter/providers/tabs_provider.dart';
 import 'package:logbuch_flutter/components/inset_divider.dart';
+import 'package:logbuch_flutter/components/panel_padding.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logbuch_flutter/panels/bookings/bookings_agenda_view.dart';
@@ -21,55 +22,51 @@ class BookingsPanel extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          mainAxisAlignment: .spaceBetween,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Center(
-                child: SegmentedButton<BookingsView>(
-                  segments: [
-                    ButtonSegment(
-                      value: BookingsView.agenda,
-                      label: Text(context.t.bookings.agenda),
-                      icon: const Icon(Icons.view_agenda),
-                    ),
-                    ButtonSegment(
-                      value: BookingsView.month,
-                      label: Text(context.t.bookings.month),
-                      icon: const Icon(Icons.calendar_view_month),
-                    ),
-                    ButtonSegment(
-                      value: BookingsView.year,
-                      label: Text(context.t.bookings.year),
-                      icon: const Icon(Icons.calendar_today),
-                    ),
-                    ButtonSegment(
-                      value: BookingsView.occupancy,
-                      label: Text(context.t.bookings.occupancy),
-                      icon: const Icon(Icons.bed),
-                    ),
-                  ],
-                  selected: {view},
-                  showSelectedIcon: false,
-                  onSelectionChanged: (selection) => ref
-                      .read(selectedBookingsViewProvider.notifier)
-                      .select(selection.single),
-                ),
+        Padding(
+          padding: panelBarPadding,
+          child: Row(
+            mainAxisAlignment: .spaceBetween,
+            spacing: 16,
+            children: [
+              SegmentedButton<BookingsView>(
+                segments: [
+                  ButtonSegment(
+                    value: BookingsView.agenda,
+                    label: Text(context.t.bookings.agenda),
+                    icon: const Icon(Icons.view_agenda),
+                  ),
+                  ButtonSegment(
+                    value: BookingsView.month,
+                    label: Text(context.t.bookings.month),
+                    icon: const Icon(Icons.calendar_view_month),
+                  ),
+                  ButtonSegment(
+                    value: BookingsView.year,
+                    label: Text(context.t.bookings.year),
+                    icon: const Icon(Icons.calendar_today),
+                  ),
+                  ButtonSegment(
+                    value: BookingsView.occupancy,
+                    label: Text(context.t.bookings.occupancy),
+                    icon: const Icon(Icons.bed),
+                  ),
+                ],
+                selected: {view},
+                showSelectedIcon: false,
+                onSelectionChanged: (selection) => ref
+                    .read(selectedBookingsViewProvider.notifier)
+                    .select(selection.single),
               ),
-            ),
-            if (ref.watch(canEditProvider))
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton.icon(
+              if (ref.watch(canEditProvider))
+                ElevatedButton.icon(
                   icon: Icon(YaruIcons.plus),
                   onPressed: () => openBookingTab(context),
                   label: Text(context.t.bookings.newBooking),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
-        const InsetDivider(),
+        const InsetDivider(indent: panelGap),
         Expanded(
           child: switch (view) {
             BookingsView.agenda => const BookingsAgendaView(),
