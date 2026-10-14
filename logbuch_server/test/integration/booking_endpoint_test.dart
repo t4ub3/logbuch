@@ -81,6 +81,18 @@ void main() {
         expect(fetched?.rooms, isEmpty);
       });
 
+      test('then its lead is its guest, without a group', () async {
+        final added = await addOctober('Summer camp', 12, 16);
+
+        final groups = await endpoints.guest.getByBooking(
+          sessionBuilder,
+          added.id!,
+        );
+        expect(groups.single.individual, isTrue);
+        expect(groups.single.guests!.single.contactId, lead.id);
+        expect(groups.single.guests!.single.bookingRoomId, isNull);
+      });
+
       test('with only an arrival then it is rejected', () async {
         await expectLater(
           endpoints.booking.add(
@@ -418,12 +430,25 @@ void main() {
       late Room hall;
       late UnitPrice hallPrice;
 
-      Future<Booking> addWithHall(String title, int arrival, int departure) {
-        return addOctober(title, arrival, departure).then(
-          (added) => endpoints.booking.setRooms(sessionBuilder, added.id!, [
-            hall.id!,
-          ]),
+      /// A booking that only uses the hall, so that its lead, who is its
+      /// guest at first, does not stay.
+      Future<Booking> addWithHall(
+        String title,
+        int arrival,
+        int departure,
+      ) async {
+        final added = await addOctober(title, arrival, departure);
+        final groups = await endpoints.guest.getByBooking(
+          sessionBuilder,
+          added.id!,
         );
+        await endpoints.guest.deleteGuest(
+          sessionBuilder,
+          groups.single.guests!.single.id!,
+        );
+        return endpoints.booking.setRooms(sessionBuilder, added.id!, [
+          hall.id!,
+        ]);
       }
 
       Future<List<String>> crowded(Booking booking) async => [

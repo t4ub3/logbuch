@@ -116,6 +116,13 @@ void main() {
 
       expect(group.name, 'Familie Weber');
       expect(await guestNames(booking, 'Familie Weber'), ['Marie', 'Jonas']);
+      // Marie, the lead, was a guest without a group until then, and that
+      // group went with her.
+      final groups = await endpoints.guest.getByBooking(
+        sessionBuilder,
+        booking.id!,
+      );
+      expect(groups.map((g) => g.name), ['Familie Weber']);
     });
 
     test('when one of its members is a guest of the booking already '

@@ -843,6 +843,21 @@ class DemoData {
     ]);
   }
 
+  /// Puts the lead of [booking], who came with it as a guest without a
+  /// group, into the room of the unit type [type] that the booking holds,
+  /// if it holds one.
+  Future<void> _leadInto(Booking booking, String type) async {
+    final groups = await endpoints.guest.getByBooking(session, booking.id!);
+    final lead = [
+      for (final group in groups) ...?group.guests,
+    ].where((guest) => guest.contactId == booking.leadId).firstOrNull;
+    final hold = booking.rooms
+        ?.where((hold) => hold.room?.unitType?.name == type)
+        .firstOrNull;
+    if (lead == null || hold == null) return;
+    await endpoints.guest.assign(session, [lead.id!], hold.id);
+  }
+
   Future<GuestGroup> _group(
     Booking booking,
     String name, {
@@ -987,7 +1002,8 @@ class DemoData {
     await _addPlannedBookings(workshop, musicSchool, scouts);
   }
 
-  /// In the house right now: families who each pay for themselves.
+  /// In the house right now: families who each pay for themselves, and the
+  /// pastor who leads it in a single room.
   Future<void> _addFamilyRetreat(Organization parish) async {
     final pastor = await _adult('Annette Graf', organization: parish);
     var booking = await _book(
@@ -1010,7 +1026,9 @@ class DemoData {
     booking = await _hold(booking, [
       (type: 'Neubau', count: 6, minBeds: 1),
       (type: 'Haupthaus', count: 1, minBeds: 3),
+      (type: 'Einzelzimmer', count: 1, minBeds: 1),
     ]);
+    await _leadInto(booking, 'Einzelzimmer');
 
     // All families but the grandparents come, each as its household.
     for (final family in _families.where((f) => f.children.isNotEmpty)) {
@@ -1031,7 +1049,11 @@ class DemoData {
     // sleep in a crib.
     final beds = _Beds(booking);
     final groups = [
-      ...await endpoints.guest.getByBooking(session, booking.id!),
+      for (final group in await endpoints.guest.getByBooking(
+        session,
+        booking.id!,
+      ))
+        if (!group.individual) group,
     ];
     groups.sort((a, b) => b.guests!.length.compareTo(a.guests!.length));
     for (final (index, group) in groups.indexed) {
@@ -1385,10 +1407,11 @@ class DemoData {
       ),
     );
     if (band != null) {
-      await _hold(band, [
+      final held = await _hold(band, [
         (type: 'Schlafbungalow', count: 1, minBeds: 4),
         (type: 'Hauptbungalow', count: 1, minBeds: 0),
       ]);
+      await _leadInto(held, 'Schlafbungalow');
     }
 
     final party = await _book(
@@ -1403,7 +1426,10 @@ class DemoData {
       ),
     );
     if (party != null) {
-      await _hold(party, [(type: 'Hauptbungalow', count: 1, minBeds: 0)]);
+      final held = await _hold(party, [
+        (type: 'Hauptbungalow', count: 1, minBeds: 0),
+      ]);
+      await _leadInto(held, 'Hauptbungalow');
     }
   }
 

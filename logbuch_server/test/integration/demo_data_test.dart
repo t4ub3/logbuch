@@ -150,14 +150,17 @@ void main() {
       final guests = [for (final group in groups) ...?group.guests];
 
       expect(price.problems, isEmpty);
-      expect(guests, hasLength(28));
+      // The families and the pastor who leads them, without a group.
+      expect(guests, hasLength(29));
+      expect(groups.first.individual, isTrue);
+      expect(groups.first.guests!.single.contactId, retreat.leadId);
       expect(guests.where((guest) => guest.bookingRoomId == null), isEmpty);
       expect(guests.where((guest) => guest.needsCrib), hasLength(2));
-      // Every family is billed on its own, and the lead for what belongs
-      // to the booking as a whole.
+      // Every family is billed on its own, and the lead for her stay and
+      // what belongs to the booking as a whole.
       expect(
         await endpoints.billing.getFolios(sessionBuilder, retreat.id!),
-        hasLength(groups.length + 1),
+        hasLength(groups.length),
       );
     });
 

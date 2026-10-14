@@ -148,7 +148,8 @@ void main() {
         throwsValidation(ValidationError.nameRequired),
       );
 
-      expect(await guestsOf(booking), isEmpty);
+      // Only the lead, who came with the booking.
+      expect(await guestsOf(booking), hasLength(1));
       expect(await endpoints.contact.getAll(sessionBuilder), hasLength(1));
     });
 
@@ -157,12 +158,8 @@ void main() {
       late Guest jonas;
 
       setUp(() async {
-        marie = await endpoints.guest.addWithoutGroup(
-          sessionBuilder,
-          booking.id!,
-          Guest(groupId: 0, contactId: lead.id!),
-          null,
-        );
+        // The lead came with the booking.
+        marie = (await guestsOf(booking)).single;
         jonas = await endpoints.guest.addWithoutGroup(
           sessionBuilder,
           booking.id!,
@@ -172,9 +169,10 @@ void main() {
       });
 
       test('then they share one group of the booking, listed first', () async {
-        await endpoints.guest.addGuest(
+        await endpoints.guest.addNewGuest(
           sessionBuilder,
-          Guest(groupId: family.id!, contactId: jonas.contactId),
+          Guest(groupId: family.id!, contactId: 0),
+          Contact(firstName: 'Lena', lastName: 'Weber'),
         );
 
         final groups = await endpoints.guest.getByBooking(
@@ -190,7 +188,66 @@ void main() {
           'Jonas',
         ]);
         expect(marie.groupId, jonas.groupId);
-        expect(await endpoints.contact.getAll(sessionBuilder), hasLength(2));
+        expect(await endpoints.contact.getAll(sessionBuilder), hasLength(3));
+      });
+
+      test('then one who is added to a group joins it, keeping what is known '
+          'about them', () async {
+        await endpoints.guest.assign(sessionBuilder, [
+          marie.id!,
+        ], booking.rooms!.single.id);
+        await endpoints.guest.updateGuest(
+          sessionBuilder,
+          (await guestsOf(booking)).first.copyWith(dietaryNotes: 'Vegan'),
+        );
+
+        final joined = await endpoints.guest.addGuest(
+          sessionBuilder,
+          Guest(groupId: family.id!, contactId: lead.id!, needsCrib: true),
+        );
+
+        expect(joined.id, marie.id);
+        expect(joined.groupId, family.id);
+        expect(joined.bookingRoomId, booking.rooms!.single.id);
+        expect(joined.dietaryNotes, 'Vegan');
+        expect(joined.needsCrib, isTrue);
+        final groups = await endpoints.guest.getByBooking(
+          sessionBuilder,
+          booking.id!,
+        );
+        expect(groups.map((g) => g.guests!.length), [1, 1]);
+      });
+
+      test('then nobody is a guest twice', () async {
+        await endpoints.guest.addGuest(
+          sessionBuilder,
+          Guest(groupId: family.id!, contactId: lead.id!),
+        );
+
+        await expectLater(
+          endpoints.guest.addGuest(
+            sessionBuilder,
+            Guest(groupId: family.id!, contactId: lead.id!),
+          ),
+          throwsValidation(ValidationError.alreadyGuest),
+        );
+        await expectLater(
+          endpoints.guest.addWithoutGroup(
+            sessionBuilder,
+            booking.id!,
+            Guest(groupId: 0, contactId: jonas.contactId),
+            null,
+          ),
+          throwsValidation(ValidationError.alreadyGuest),
+        );
+        await expectLater(
+          endpoints.guest.addGuest(
+            sessionBuilder,
+            Guest(groupId: marie.groupId, contactId: jonas.contactId),
+          ),
+          throwsValidation(ValidationError.alreadyGuest),
+        );
+        expect(await guestsOf(booking), hasLength(2));
       });
 
       test('then the kitchen names no group for them', () async {

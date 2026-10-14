@@ -299,7 +299,7 @@
             "notOverpaid": "Das ist mehr, als überzahlt wurde.",
             "alreadyReceipted": "Diese Spende steht auf einer Bestätigung und kann nicht mehr geändert werden.",
             "operatorIncomplete": "Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen.",
-            "alreadyGuest": "Aus diesem Haushalt kann niemand hinzugefügt werden: Er hat keine Mitglieder, oder alle sind bereits Gäste der Buchung.",
+            "alreadyGuest": "Bereits Gast der Buchung. Ein Haushalt kann nur hinzugefügt werden, solange eines seiner Mitglieder noch kein Gast ist.",
             "notConfirmed": "Eine Bestätigung gibt es nur für Buchungen, die ein Angebot haben oder bestätigt sind."
         },
         "buildings": {

@@ -531,7 +531,8 @@ class EndpointBooking extends EndpointApp {
         {'id': id},
       );
 
-  /// Creates a booking without rooms; those are set with [setRooms].
+  /// Creates a booking without rooms; those are set with [setRooms]. Its
+  /// lead is its first guest, without a group.
   _ida.Future<_iey0gn1f.Booking> add(_iey0gn1f.Booking booking) =>
       caller.callServerEndpoint<_iey0gn1f.Booking>(
         'booking',
@@ -884,8 +885,9 @@ class EndpointGuest extends EndpointApp {
       );
 
   /// Adds the members of a household to the booking, as a new group named
-  /// after the household. Members who are guests of the booking already are
-  /// left out, so that nobody is there twice.
+  /// after the household. Members who are guests of the booking without a
+  /// group join it; those who are in another group are left out, so that
+  /// nobody is there twice.
   _ida.Future<_ihpk2u4j.GuestGroup> addHousehold(
     int bookingId,
     int householdId,
@@ -924,7 +926,10 @@ class EndpointGuest extends EndpointApp {
     {'id': id},
   );
 
-  /// Adds a contact to a group as a guest.
+  /// Adds a contact to a group as a guest. A contact who is a guest of the
+  /// booking without a group, such as its lead, joins the group instead and
+  /// keeps what is known about them where [guest] says nothing else. A
+  /// contact is never a guest of a booking twice.
   _ida.Future<_i44zmmsa.Guest> addGuest(_i44zmmsa.Guest guest) =>
       caller.callServerEndpoint<_i44zmmsa.Guest>(
         'guest',
@@ -950,7 +955,7 @@ class EndpointGuest extends EndpointApp {
   /// booking for such guests, which comes with the first of them. With
   /// [newContact] the guest is not a contact yet, and [newContact] is
   /// created along with the guest; otherwise [Guest.contactId] names the
-  /// contact.
+  /// contact, who must not be a guest of the booking yet.
   _ida.Future<_i44zmmsa.Guest> addWithoutGroup(
     int bookingId,
     _i44zmmsa.Guest guest,

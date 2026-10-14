@@ -592,7 +592,7 @@ class _Translations$admin$errors$de extends Translations$admin$errors$en {
 	@override String get notOverpaid => 'Das ist mehr, als überzahlt wurde.';
 	@override String get alreadyReceipted => 'Diese Spende steht auf einer Bestätigung und kann nicht mehr geändert werden.';
 	@override String get operatorIncomplete => 'Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen.';
-	@override String get alreadyGuest => 'Aus diesem Haushalt kann niemand hinzugefügt werden: Er hat keine Mitglieder, oder alle sind bereits Gäste der Buchung.';
+	@override String get alreadyGuest => 'Bereits Gast der Buchung. Ein Haushalt kann nur hinzugefügt werden, solange eines seiner Mitglieder noch kein Gast ist.';
 	@override String get notConfirmed => 'Eine Bestätigung gibt es nur für Buchungen, die ein Angebot haben oder bestätigt sind.';
 }
 
@@ -1090,7 +1090,7 @@ extension on TranslationsDe {
 			'admin.errors.notOverpaid' => 'Das ist mehr, als überzahlt wurde.',
 			'admin.errors.alreadyReceipted' => 'Diese Spende steht auf einer Bestätigung und kann nicht mehr geändert werden.',
 			'admin.errors.operatorIncomplete' => 'Die Angaben zum Träger sind unvollständig. Bitte unter Verwaltung, Träger ergänzen.',
-			'admin.errors.alreadyGuest' => 'Aus diesem Haushalt kann niemand hinzugefügt werden: Er hat keine Mitglieder, oder alle sind bereits Gäste der Buchung.',
+			'admin.errors.alreadyGuest' => 'Bereits Gast der Buchung. Ein Haushalt kann nur hinzugefügt werden, solange eines seiner Mitglieder noch kein Gast ist.',
 			'admin.errors.notConfirmed' => 'Eine Bestätigung gibt es nur für Buchungen, die ein Angebot haben oder bestätigt sind.',
 			'admin.buildings.empty' => 'Keine Gebäude',
 			'admin.buildings.add' => 'Neues Gebäude',

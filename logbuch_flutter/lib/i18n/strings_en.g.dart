@@ -1221,8 +1221,8 @@ class Translations$admin$errors$en {
 	/// en: 'The details of the operator are incomplete. Fill them in under Admin, Operator.'
 	String get operatorIncomplete => 'The details of the operator are incomplete. Fill them in under Admin, Operator.';
 
-	/// en: 'Nobody in this household can be added: it has no members, or all of them are guests of the booking already.'
-	String get alreadyGuest => 'Nobody in this household can be added: it has no members, or all of them are guests of the booking already.';
+	/// en: 'Already a guest of the booking. A household can only be added while one of its members is not a guest yet.'
+	String get alreadyGuest => 'Already a guest of the booking. A household can only be added while one of its members is not a guest yet.';
 
 	/// en: 'A confirmation is only available for a booking that is an option or confirmed.'
 	String get notConfirmed => 'A confirmation is only available for a booking that is an option or confirmed.';
@@ -1963,7 +1963,7 @@ extension on Translations {
 			'admin.errors.notOverpaid' => 'This is more than was overpaid.',
 			'admin.errors.alreadyReceipted' => 'This donation is on a receipt and can no longer be changed.',
 			'admin.errors.operatorIncomplete' => 'The details of the operator are incomplete. Fill them in under Admin, Operator.',
-			'admin.errors.alreadyGuest' => 'Nobody in this household can be added: it has no members, or all of them are guests of the booking already.',
+			'admin.errors.alreadyGuest' => 'Already a guest of the booking. A household can only be added while one of its members is not a guest yet.',
 			'admin.errors.notConfirmed' => 'A confirmation is only available for a booking that is an option or confirmed.',
 			'admin.buildings.empty' => 'No buildings',
 			'admin.buildings.add' => 'New building',

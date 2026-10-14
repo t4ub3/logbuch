@@ -6,6 +6,7 @@ import 'package:logbuch_server/src/common/today.dart';
 import 'package:logbuch_server/src/common/validation.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:logbuch_server/src/generated/serverpod.dart';
+import 'package:logbuch_server/src/guests/individual_guests.dart';
 import 'package:logbuch_server/src/pricing/price_calculation.dart';
 import 'package:logbuch_server/src/pricing/pricing_data.dart';
 import 'package:logbuch_server/src/rooms/room_endpoint.dart';
@@ -19,10 +20,25 @@ class BookingEndpoint extends AppEndpoint {
     return Booking.db.findById(session, id, include: _details());
   }
 
-  /// Creates a booking without rooms; those are set with [setRooms].
+  /// Creates a booking without rooms; those are set with [setRooms]. Its
+  /// lead is its first guest, without a group.
   Future<Booking> add(Session session, Booking booking) async {
     requireAdmin(session);
-    final added = await Booking.db.insertRow(session, _validated(booking));
+    final validated = _validated(booking);
+    final added = await session.db.transaction((transaction) async {
+      final added = await Booking.db.insertRow(
+        session,
+        validated,
+        transaction: transaction,
+      );
+      final group = await individualGroup(session, added.id!, transaction);
+      await Guest.db.insertRow(
+        session,
+        Guest(groupId: group.id!, contactId: added.leadId),
+        transaction: transaction,
+      );
+      return added;
+    });
     return (await getById(session, added.id!))!;
   }
 

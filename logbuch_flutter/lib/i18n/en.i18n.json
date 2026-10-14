@@ -299,7 +299,7 @@
             "notOverpaid": "This is more than was overpaid.",
             "alreadyReceipted": "This donation is on a receipt and can no longer be changed.",
             "operatorIncomplete": "The details of the operator are incomplete. Fill them in under Admin, Operator.",
-            "alreadyGuest": "Nobody in this household can be added: it has no members, or all of them are guests of the booking already.",
+            "alreadyGuest": "Already a guest of the booking. A household can only be added while one of its members is not a guest yet.",
             "notConfirmed": "A confirmation is only available for a booking that is an option or confirmed."
         },
         "buildings": {

@@ -4,6 +4,7 @@ import 'package:logbuch_server/src/common/validation.dart';
 import 'package:logbuch_server/src/contacts/contact_endpoint.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:logbuch_server/src/generated/serverpod.dart';
+import 'package:logbuch_server/src/guests/individual_guests.dart';
 import 'package:logbuch_server/src/guests/kitchen_overview.dart';
 
 /// The guests of a booking, in groups such as families. Guests who were
@@ -50,8 +51,9 @@ class GuestEndpoint extends AppEndpoint {
   }
 
   /// Adds the members of a household to the booking, as a new group named
-  /// after the household. Members who are guests of the booking already are
-  /// left out, so that nobody is there twice.
+  /// after the household. Members who are guests of the booking without a
+  /// group join it; those who are in another group are left out, so that
+  /// nobody is there twice.
   Future<GuestGroup> addHousehold(
     Session session,
     int bookingId,
@@ -73,14 +75,24 @@ class GuestEndpoint extends AppEndpoint {
       final guests = await Guest.db.find(
         session,
         where: (t) => t.group.bookingId.equals(bookingId),
+        include: Guest.include(group: GuestGroup.include()),
         transaction: transaction,
       );
-      final present = {for (final guest in guests) guest.contactId};
-      final added = [
+      final present = {for (final guest in guests) guest.contactId: guest};
+      final members = [
         for (final member in household.members ?? <HouseholdMember>[])
-          if (!present.contains(member.contactId)) member.contactId,
+          member.contactId,
       ];
-      if (added.isEmpty) {
+      final added = [
+        for (final contactId in members)
+          if (!present.containsKey(contactId)) contactId,
+      ];
+      final joining = [
+        for (final contactId in members)
+          if (present[contactId] case final guest? when guest.group!.individual)
+            guest,
+      ];
+      if (added.isEmpty && joining.isEmpty) {
         throw ValidationException(reason: ValidationError.alreadyGuest);
       }
 
@@ -97,6 +109,15 @@ class GuestEndpoint extends AppEndpoint {
         ],
         transaction: transaction,
       );
+      await Guest.db.update(
+        session,
+        [for (final guest in joining) guest.copyWith(groupId: group.id)],
+        columns: (t) => [t.groupId],
+        transaction: transaction,
+      );
+      for (final groupId in {for (final guest in joining) guest.groupId}) {
+        await deleteIfEmptyIndividual(session, groupId, transaction);
+      }
       return group;
     });
   }
@@ -135,11 +156,55 @@ class GuestEndpoint extends AppEndpoint {
     await GuestGroup.db.deleteWhere(session, where: (t) => t.id.equals(id));
   }
 
-  /// Adds a contact to a group as a guest.
+  /// Adds a contact to a group as a guest. A contact who is a guest of the
+  /// booking without a group, such as its lead, joins the group instead and
+  /// keeps what is known about them where [guest] says nothing else. A
+  /// contact is never a guest of a booking twice.
   Future<Guest> addGuest(Session session, Guest guest) async {
     requireAdmin(session);
-    await _validate(session, guest);
-    return await Guest.db.insertRow(session, guest);
+    return session.db.transaction((transaction) async {
+      final group = await GuestGroup.db.findById(
+        session,
+        guest.groupId,
+        transaction: transaction,
+      );
+      if (group == null) {
+        throw ValidationException(reason: ValidationError.notFound);
+      }
+      final present = await guestOfBooking(
+        session,
+        group.bookingId,
+        guest.contactId,
+        transaction,
+      );
+      if (present == null) {
+        await _validate(session, guest, transaction: transaction);
+        return Guest.db.insertRow(session, guest, transaction: transaction);
+      }
+      if (!present.group!.individual || group.individual) {
+        throw ValidationException(reason: ValidationError.alreadyGuest);
+      }
+      final joined = Guest(
+        id: present.id,
+        groupId: group.id!,
+        contactId: present.contactId,
+        bookingRoomId: guest.bookingRoomId ?? present.bookingRoomId,
+        needsCrib: guest.needsCrib || present.needsCrib,
+        ageGroupOverrideId:
+            guest.ageGroupOverrideId ?? present.ageGroupOverrideId,
+        arrivalOverride: guest.arrivalOverride ?? present.arrivalOverride,
+        departureOverride: guest.departureOverride ?? present.departureOverride,
+        dietaryNotes: guest.dietaryNotes ?? present.dietaryNotes,
+      );
+      await _validate(session, joined, transaction: transaction);
+      final updated = await Guest.db.updateRow(
+        session,
+        joined,
+        transaction: transaction,
+      );
+      await deleteIfEmptyIndividual(session, present.groupId, transaction);
+      return updated;
+    });
   }
 
   /// Adds a guest who is not a contact yet. [contact] is created along with
@@ -167,7 +232,7 @@ class GuestEndpoint extends AppEndpoint {
   /// booking for such guests, which comes with the first of them. With
   /// [newContact] the guest is not a contact yet, and [newContact] is
   /// created along with the guest; otherwise [Guest.contactId] names the
-  /// contact.
+  /// contact, who must not be a guest of the booking yet.
   Future<Guest> addWithoutGroup(
     Session session,
     int bookingId,
@@ -185,18 +250,17 @@ class GuestEndpoint extends AppEndpoint {
       if (booking == null) {
         throw ValidationException(reason: ValidationError.notFound);
       }
-      final group =
-          await GuestGroup.db.findFirstRow(
-            session,
-            where: (t) =>
-                t.bookingId.equals(bookingId) & t.individual.equals(true),
-            transaction: transaction,
-          ) ??
-          await GuestGroup.db.insertRow(
-            session,
-            GuestGroup(bookingId: bookingId, name: '', individual: true),
-            transaction: transaction,
-          );
+      if (validated == null &&
+          await guestOfBooking(
+                session,
+                bookingId,
+                guest.contactId,
+                transaction,
+              ) !=
+              null) {
+        throw ValidationException(reason: ValidationError.alreadyGuest);
+      }
+      final group = await individualGroup(session, bookingId, transaction);
       var added = guest.copyWith(groupId: group.id);
       if (validated != null) {
         final contact = await Contact.db.insertRow(
@@ -228,14 +292,7 @@ class GuestEndpoint extends AppEndpoint {
         transaction: transaction,
       );
       for (final guest in deleted) {
-        await GuestGroup.db.deleteWhere(
-          session,
-          where: (t) =>
-              t.id.equals(guest.groupId) &
-              t.individual.equals(true) &
-              t.guests.none(),
-          transaction: transaction,
-        );
+        await deleteIfEmptyIndividual(session, guest.groupId, transaction);
       }
     });
   }
