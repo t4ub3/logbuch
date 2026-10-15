@@ -13,6 +13,7 @@ user:
   - me:
   - getAll:
   - setRole:
+  - delete:
 billing:
   - getFolios:
   - addCharge:

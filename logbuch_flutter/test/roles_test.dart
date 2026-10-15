@@ -80,6 +80,27 @@ void main() {
     expect(client.user.users.last.role, UserRole.viewer);
   });
 
+  testWidgets('an admin deletes another user, but not themselves', (
+    tester,
+  ) async {
+    final client = filledClient();
+    await pumpApp(tester, const AdminPanel(), client);
+
+    await open(tester, 'Organisation');
+    await open(tester, 'Users');
+
+    // Only the other user can be deleted.
+    expect(find.byTooltip('Delete'), findsOneWidget);
+    await tester.tap(find.byTooltip('Delete'));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete “new@example.com”?'), findsOneWidget);
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Delete'));
+    await tester.pumpAndSettle();
+
+    expect(client.user.users.map((user) => user.email), ['me@example.com']);
+    expect(find.text('new@example.com'), findsNothing);
+  });
+
   group('the role gate', () {
     testWidgets('keeps a user without a role waiting', (tester) async {
       await pumpApp(

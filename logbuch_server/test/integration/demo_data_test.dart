@@ -1,7 +1,7 @@
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:test/test.dart';
 
-import '../../tool/demo_data.dart';
+import 'package:logbuch_server/src/demo/demo_data.dart';
 import 'roles.dart';
 
 void main() {
@@ -14,8 +14,7 @@ void main() {
     final notes = <String>[];
 
     Future<void> seed() => DemoData(
-      sessionBuilder,
-      endpoints,
+      sessionBuilder.build(),
       today: today,
       log: notes.add,
     ).seed();

@@ -293,6 +293,7 @@
             "roomUnavailable": "In diesem Zeitraum nicht frei: Zimmer {name}.",
             "adminRequired": "Nur Admins können Daten ändern.",
             "ownRole": "Die eigene Rolle kann nicht geändert werden.",
+            "ownAccount": "Das eigene Konto kann nicht gelöscht werden.",
             "roomNotHeld": "Die Buchung hat dieses Zimmer nicht.",
             "alreadyInvoiced": "Das ist bereits in Rechnung gestellt und kann nicht mehr geändert werden.",
             "bookingBilled": "Eine Buchung mit Rechnung oder Zahlung kann nicht gelöscht werden. Sie kann stattdessen storniert werden.",
@@ -416,7 +417,8 @@
         "users": {
             "empty": "Keine Benutzer",
             "unknownEmail": "Keine E-Mail-Adresse",
-            "you": "Sie"
+            "you": "Sie",
+            "deleteHint": "Der Benutzer kann sich nicht mehr anmelden und wird abgemeldet. Um die App wieder zu nutzen, muss er sich neu registrieren."
         },
         "operator": {
             "hint": "Die Organisation, die das Haus betreibt. Diese Angaben stehen auf Rechnungen und Zuwendungsbestätigungen. Bestätigungen können erst erstellt werden, wenn alle Angaben zum Finanzamt ausgefüllt sind.",

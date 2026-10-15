@@ -1203,6 +1203,9 @@ class Translations$admin$errors$en {
 	/// en: 'You cannot change your own role.'
 	String get ownRole => 'You cannot change your own role.';
 
+	/// en: 'You cannot delete your own account.'
+	String get ownAccount => 'You cannot delete your own account.';
+
 	/// en: 'The booking does not hold this room.'
 	String get roomNotHeld => 'The booking does not hold this room.';
 
@@ -1576,6 +1579,9 @@ class Translations$admin$users$en {
 
 	/// en: 'you'
 	String get you => 'you';
+
+	/// en: 'The user can no longer sign in and is signed out. To use the app again, they have to sign up anew.'
+	String get deleteHint => 'The user can no longer sign in and is signed out. To use the app again, they have to sign up anew.';
 }
 
 // Path: admin.operator
@@ -1963,6 +1969,7 @@ extension on Translations {
 			'admin.errors.roomUnavailable' => ({required Object name}) => 'Not free for these dates: room ${name}.',
 			'admin.errors.adminRequired' => 'Only admins can change data.',
 			'admin.errors.ownRole' => 'You cannot change your own role.',
+			'admin.errors.ownAccount' => 'You cannot delete your own account.',
 			'admin.errors.roomNotHeld' => 'The booking does not hold this room.',
 			'admin.errors.alreadyInvoiced' => 'This is invoiced and can no longer be changed.',
 			'admin.errors.bookingBilled' => 'A booking with an invoice or a payment cannot be deleted. Cancel it instead.',
@@ -2064,6 +2071,7 @@ extension on Translations {
 			'admin.users.empty' => 'No users',
 			'admin.users.unknownEmail' => 'No email address',
 			'admin.users.you' => 'you',
+			'admin.users.deleteHint' => 'The user can no longer sign in and is signed out. To use the app again, they have to sign up anew.',
 			'admin.operator.hint' => 'The organisation that runs the house. These details are printed on invoices and donation receipts. Receipts can only be issued once everything about the tax office is filled in.',
 			'admin.operator.street' => 'Street',
 			'admin.operator.zip' => 'Postal code',

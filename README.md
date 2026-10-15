@@ -14,7 +14,9 @@ Conventions and business rules are in [AGENTS.md](AGENTS.md).
 
 ## Show demo
 
-You can see a demo with dummy data on https://logbuch.serverpod.space/
+You can see a demo with dummy data on https://logbuch.serverpod.space/. Sign in as `admin@example.com` with the password `admin`.
+
+The demo deployment sets the environment variable `LOGBUCH_DEMO_DATA=true` (`scloud variable set LOGBUCH_DEMO_DATA true`). With it, the server adds the demo data from `lib/src/demo/` and the admin each time it starts. It only adds what is missing and keeps what is there. Never set it for a real installation.
 
 ## Running locally
 
@@ -38,7 +40,7 @@ Docker isn't needed. In development and in tests, Serverpod runs an embedded Pos
    This applies pending migrations and starts the server on `localhost:8080`. It also launches the Flutter app and watches for changes: it regenerates code and hot reloads the server and the app. Which apps it can start is set under `flutter_apps` in `logbuch_server/pubspec.yaml`.
 
 3. Sign up in the app. The verification code is printed in the server log. The first user to sign up becomes admin; anyone after that waits until an admin gives them a role.
-4. Optional, to add demo data to the development database: `serverpod run seed` in `logbuch_server`. Running it again adds nothing new.
+4. Optional, to add demo data and the admin `admin@example.com` (password `admin`) to the development database: `serverpod run seed` in `logbuch_server`. Running it again adds nothing new.
 
 ## Tests
 

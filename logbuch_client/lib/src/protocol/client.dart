@@ -336,6 +336,16 @@ class EndpointUser extends _isc.EndpointRef {
       'role': role,
     },
   );
+
+  /// Deletes the user with their account, so that they can no longer sign
+  /// in, and signs them out. Admins cannot delete themselves, so there is
+  /// always one left.
+  _ida.Future<void> delete(_isc.UuidValue authUserId) =>
+      caller.callServerEndpoint<void>(
+        'user',
+        'delete',
+        {'authUserId': authUserId},
+      );
 }
 
 /// The folios of a booking: what each payer is charged, what they paid and

@@ -293,6 +293,7 @@
             "roomUnavailable": "Not free for these dates: room {name}.",
             "adminRequired": "Only admins can change data.",
             "ownRole": "You cannot change your own role.",
+            "ownAccount": "You cannot delete your own account.",
             "roomNotHeld": "The booking does not hold this room.",
             "alreadyInvoiced": "This is invoiced and can no longer be changed.",
             "bookingBilled": "A booking with an invoice or a payment cannot be deleted. Cancel it instead.",
@@ -416,7 +417,8 @@
         "users": {
             "empty": "No users",
             "unknownEmail": "No email address",
-            "you": "you"
+            "you": "you",
+            "deleteHint": "The user can no longer sign in and is signed out. To use the app again, they have to sign up anew."
         },
         "operator": {
             "hint": "The organisation that runs the house. These details are printed on invoices and donation receipts. Receipts can only be issued once everything about the tax office is filled in.",

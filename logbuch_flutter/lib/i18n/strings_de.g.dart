@@ -586,6 +586,7 @@ class _Translations$admin$errors$de extends Translations$admin$errors$en {
 	@override String roomUnavailable({required Object name}) => 'In diesem Zeitraum nicht frei: Zimmer ${name}.';
 	@override String get adminRequired => 'Nur Admins können Daten ändern.';
 	@override String get ownRole => 'Die eigene Rolle kann nicht geändert werden.';
+	@override String get ownAccount => 'Das eigene Konto kann nicht gelöscht werden.';
 	@override String get roomNotHeld => 'Die Buchung hat dieses Zimmer nicht.';
 	@override String get alreadyInvoiced => 'Das ist bereits in Rechnung gestellt und kann nicht mehr geändert werden.';
 	@override String get bookingBilled => 'Eine Buchung mit Rechnung oder Zahlung kann nicht gelöscht werden. Sie kann stattdessen storniert werden.';
@@ -767,6 +768,7 @@ class _Translations$admin$users$de extends Translations$admin$users$en {
 	@override String get empty => 'Keine Benutzer';
 	@override String get unknownEmail => 'Keine E-Mail-Adresse';
 	@override String get you => 'Sie';
+	@override String get deleteHint => 'Der Benutzer kann sich nicht mehr anmelden und wird abgemeldet. Um die App wieder zu nutzen, muss er sich neu registrieren.';
 }
 
 // Path: admin.operator
@@ -1086,6 +1088,7 @@ extension on TranslationsDe {
 			'admin.errors.roomUnavailable' => ({required Object name}) => 'In diesem Zeitraum nicht frei: Zimmer ${name}.',
 			'admin.errors.adminRequired' => 'Nur Admins können Daten ändern.',
 			'admin.errors.ownRole' => 'Die eigene Rolle kann nicht geändert werden.',
+			'admin.errors.ownAccount' => 'Das eigene Konto kann nicht gelöscht werden.',
 			'admin.errors.roomNotHeld' => 'Die Buchung hat dieses Zimmer nicht.',
 			'admin.errors.alreadyInvoiced' => 'Das ist bereits in Rechnung gestellt und kann nicht mehr geändert werden.',
 			'admin.errors.bookingBilled' => 'Eine Buchung mit Rechnung oder Zahlung kann nicht gelöscht werden. Sie kann stattdessen storniert werden.',
@@ -1187,6 +1190,7 @@ extension on TranslationsDe {
 			'admin.users.empty' => 'Keine Benutzer',
 			'admin.users.unknownEmail' => 'Keine E-Mail-Adresse',
 			'admin.users.you' => 'Sie',
+			'admin.users.deleteHint' => 'Der Benutzer kann sich nicht mehr anmelden und wird abgemeldet. Um die App wieder zu nutzen, muss er sich neu registrieren.',
 			'admin.operator.hint' => 'Die Organisation, die das Haus betreibt. Diese Angaben stehen auf Rechnungen und Zuwendungsbestätigungen. Bestätigungen können erst erstellt werden, wenn alle Angaben zum Finanzamt ausgefüllt sind.',
 			'admin.operator.street' => 'Straße',
 			'admin.operator.zip' => 'Postleitzahl',

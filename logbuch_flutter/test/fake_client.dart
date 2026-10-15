@@ -103,6 +103,14 @@ class FakeUsers extends Fake implements EndpointUser {
   Future<List<AppUser>> getAll() async => users;
 
   @override
+  Future<void> delete(UuidValue authUserId) async {
+    users = [
+      for (final user in users)
+        if (user.authUserId != authUserId) user,
+    ];
+  }
+
+  @override
   Future<AppUser> setRole(UuidValue authUserId, UserRole? role) async {
     users = [
       for (final user in users)

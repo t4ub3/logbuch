@@ -462,6 +462,24 @@ class Endpoints extends _is.EndpointDispatch {
                 params['role'],
               ),
         ),
+        'delete': _is.MethodConnector(
+          name: 'delete',
+          params: {
+            'authUserId': _is.ParameterDescription(
+              name: 'authUserId',
+              type: _is.getType<_is.UuidValue>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['user'] as _ilyd3rgd.UserEndpoint).delete(
+                session,
+                params['authUserId'],
+              ),
+        ),
       },
     );
     connectors['billing'] = _is.EndpointConnector(

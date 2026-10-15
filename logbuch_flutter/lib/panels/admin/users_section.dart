@@ -4,6 +4,7 @@ import 'package:logbuch_client/logbuch_client.dart';
 import 'package:logbuch_flutter/components/async_list_view.dart';
 import 'package:logbuch_flutter/i18n/strings.g.dart';
 import 'package:logbuch_flutter/panels/admin/admin_formats.dart';
+import 'package:logbuch_flutter/panels/admin/admin_widgets.dart';
 import 'package:logbuch_flutter/providers/client_provider.dart';
 import 'package:logbuch_flutter/providers/current_user_provider.dart';
 import 'package:logbuch_flutter/providers/status_provider.dart';
@@ -22,6 +23,7 @@ extension UserRoleLabel on UserRole? {
 }
 
 /// The accounts that signed up, with the role an admin gives each of them.
+/// An admin can delete the other accounts.
 class UsersSection extends ConsumerWidget {
   const UsersSection({super.key});
 
@@ -45,27 +47,52 @@ class UsersSection extends ConsumerWidget {
         return YaruListTile(
           leading: const Icon(YaruIcons.user),
           titleText: isMe ? '$email (${t.you})' : email,
-          // Admins cannot change their own role, so one always remains.
+          // Admins cannot change their own role or delete themselves, so
+          // one always remains.
           trailing: isMe
               ? Text(user.role.label(context))
-              : DropdownMenu<String>(
-                  key: ValueKey((user.authUserId, user.role)),
-                  initialSelection: user.role?.name ?? _noRole,
-                  requestFocusOnTap: false,
-                  onSelected: (value) => _setRole(
-                    context,
-                    ref,
-                    user,
-                    value == null || value == _noRole
-                        ? null
-                        : UserRole.values.byName(value),
-                  ),
-                  dropdownMenuEntries: [
-                    for (final UserRole? role in [null, ...UserRole.values])
-                      DropdownMenuEntry(
-                        value: role?.name ?? _noRole,
-                        label: role.label(context),
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownMenu<String>(
+                      key: ValueKey((user.authUserId, user.role)),
+                      initialSelection: user.role?.name ?? _noRole,
+                      requestFocusOnTap: false,
+                      onSelected: (value) => _setRole(
+                        context,
+                        ref,
+                        user,
+                        value == null || value == _noRole
+                            ? null
+                            : UserRole.values.byName(value),
                       ),
+                      dropdownMenuEntries: [
+                        for (final UserRole? role in [
+                          null,
+                          ...UserRole.values,
+                        ])
+                          DropdownMenuEntry(
+                            value: role?.name ?? _noRole,
+                            label: role.label(context),
+                          ),
+                      ],
+                    ),
+                    IconButton(
+                      tooltip: context.t.common.delete,
+                      icon: const Icon(YaruIcons.trash),
+                      onPressed: () async {
+                        final deleted = await confirmAndDelete(
+                          context,
+                          name: email,
+                          hint: t.deleteHint,
+                          delete: () => ref
+                              .read(serverpodClientProvider)
+                              .user
+                              .delete(user.authUserId),
+                        );
+                        if (deleted) ref.invalidate(usersProvider);
+                      },
+                    ),
                   ],
                 ),
         );

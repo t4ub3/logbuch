@@ -1,6 +1,21 @@
+import 'package:logbuch_server/src/billing/billing_endpoint.dart';
+import 'package:logbuch_server/src/bookings/booking_category_endpoint.dart';
+import 'package:logbuch_server/src/bookings/booking_endpoint.dart';
+import 'package:logbuch_server/src/contacts/contact_endpoint.dart';
+import 'package:logbuch_server/src/contacts/household_endpoint.dart';
+import 'package:logbuch_server/src/contacts/organization_endpoint.dart';
+import 'package:logbuch_server/src/donations/donation_endpoint.dart';
+import 'package:logbuch_server/src/donations/operator_endpoint.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
-
-import '../test/integration/test_tools/serverpod_test_tools.dart';
+import 'package:logbuch_server/src/guests/guest_endpoint.dart';
+import 'package:logbuch_server/src/pricing/age_group_endpoint.dart';
+import 'package:logbuch_server/src/pricing/fee_endpoint.dart';
+import 'package:logbuch_server/src/pricing/meal_plan_endpoint.dart';
+import 'package:logbuch_server/src/pricing/price_list_endpoint.dart';
+import 'package:logbuch_server/src/pricing/unit_type_endpoint.dart';
+import 'package:logbuch_server/src/rooms/building_endpoint.dart';
+import 'package:logbuch_server/src/rooms/room_endpoint.dart';
+import 'package:serverpod/serverpod.dart';
 
 /// What a night costs an adult in a room of a unit type, in cents. Nobody
 /// sleeps in the main bungalow, so it has no such price.
@@ -244,21 +259,18 @@ const _bookingCategories = [
 /// paid, as well as donations and receipts.
 ///
 /// Everything is created through the endpoints, the way the app does it, so
-/// that prices, invoice numbers and receipts follow the same rules. What is
+/// that prices, invoice numbers and receipts follow the same rules. Their
+/// methods are called directly, with a [session] that is signed in as an
+/// admin. What is
 /// in the database already is kept: records are looked up by their name
 /// before they are created, and a booking whose title exists is left as it
 /// is. Running this twice therefore adds nothing the second time.
 class DemoData {
-  DemoData(
-    this.session,
-    this.endpoints, {
-    required this.today,
-    this.log = print,
-  });
+  DemoData(this.session, {required this.today, this.log = print});
 
   /// Signed in as an admin.
-  final TestSessionBuilder session;
-  final TestEndpoints endpoints;
+  final Session session;
+  final endpoints = _Endpoints();
 
   /// The day the bookings are placed around, at midnight UTC.
   final DateTime today;
@@ -1656,4 +1668,24 @@ class _Beds {
     _free[fitting.first] = 0;
     return fitting.first;
   }
+}
+
+/// The endpoints that the demo data is created through.
+class _Endpoints {
+  final ageGroup = AgeGroupEndpoint();
+  final billing = BillingEndpoint();
+  final booking = BookingEndpoint();
+  final bookingCategory = BookingCategoryEndpoint();
+  final building = BuildingEndpoint();
+  final contact = ContactEndpoint();
+  final donation = DonationEndpoint();
+  final fee = FeeEndpoint();
+  final guest = GuestEndpoint();
+  final household = HouseholdEndpoint();
+  final mealPlan = MealPlanEndpoint();
+  final operator = OperatorEndpoint();
+  final organization = OrganizationEndpoint();
+  final priceList = PriceListEndpoint();
+  final room = RoomEndpoint();
+  final unitType = UnitTypeEndpoint();
 }

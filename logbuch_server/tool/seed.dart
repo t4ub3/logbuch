@@ -1,4 +1,5 @@
-/// Fills the development database with demo data, see [DemoData].
+/// Fills the development database with demo data and the demo admin, see
+/// [seedDemo].
 ///
 /// Run from `logbuch_server`, whether `serverpod start` is running or not:
 ///
@@ -8,31 +9,33 @@
 /// nothing.
 ///
 /// The data is created through the endpoints, so this is built like an
-/// integration test: `withServerpod` runs a server inside this process and
-/// lets the endpoints be called as an admin. Here it works on the
-/// development database instead of an empty one, and keeps what it wrote.
+/// integration test: `withServerpod` runs a server inside this process.
+/// Here it works on the development database instead of an empty one, and
+/// keeps what it wrote. A server deployed for showing the app does the
+/// same each time it starts, see [demoDataVariable].
 library;
 
 import 'dart:io';
 
+import 'package:logbuch_server/src/auth/auth_setup.dart';
+import 'package:logbuch_server/src/demo/demo_seed.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:test/test.dart';
 
-import '../test/integration/roles.dart';
 import '../test/integration/test_tools/serverpod_test_tools.dart';
-import 'demo_data.dart';
 
 void main() {
   withServerpod(
     'The demo data',
     (sessionBuilder, endpoints) {
+      setUpAll(setUpAuthServices);
+
       test('is added to the development database', () async {
         final now = DateTime.now();
-        await DemoData(
-          sessionBuilder.asAdmin,
-          endpoints,
+        await seedDemo(
+          sessionBuilder.build(),
           today: DateTime.utc(now.year, now.month, now.day),
-        ).seed();
+        );
       }, timeout: const Timeout(Duration(minutes: 10)));
     },
     ephemeralDatabase: false,

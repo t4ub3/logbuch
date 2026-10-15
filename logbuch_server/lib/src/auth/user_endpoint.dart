@@ -74,4 +74,26 @@ class UserEndpoint extends Endpoint {
       role: roleOf(updated.scopeNames),
     );
   }
+
+  /// Deletes the user with their account, so that they can no longer sign
+  /// in, and signs them out. Admins cannot delete themselves, so there is
+  /// always one left.
+  Future<void> delete(Session session, UuidValue authUserId) async {
+    requireAdmin(session);
+    if (authUserId == session.authenticated!.authUserId) {
+      throw ValidationException(reason: ValidationError.ownAccount);
+    }
+    try {
+      await AuthServices.instance.authUsers.delete(
+        session,
+        authUserId: authUserId,
+      );
+    } on AuthUserNotFoundException {
+      throw ValidationException(reason: ValidationError.notFound);
+    }
+    await session.messages.authenticationRevoked(
+      authUserId.uuid,
+      RevokedAuthenticationUser(),
+    );
+  }
 }

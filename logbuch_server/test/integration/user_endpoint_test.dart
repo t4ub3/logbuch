@@ -1,3 +1,4 @@
+import 'package:logbuch_server/src/auth/auth_setup.dart';
 import 'package:logbuch_server/src/auth/roles.dart';
 import 'package:logbuch_server/src/generated/protocol.dart';
 import 'package:serverpod/serverpod.dart';
@@ -91,6 +92,8 @@ void main() {
     final session = sessionBuilder.build();
     late AuthUser user;
 
+    setUpAll(setUpAuthServices);
+
     setUp(() async {
       user = await AuthUser.db.insertRow(
         session,
@@ -136,6 +139,41 @@ void main() {
         ),
         throwsValidation(ValidationError.ownRole),
       );
+    });
+
+    test('when an admin deletes the user then the user is gone '
+        'with their profile', () async {
+      await UserProfile.db.insertRow(
+        session,
+        UserProfile(authUserId: user.id!, email: 'gone@example.com'),
+      );
+
+      await endpoints.user.delete(sessionBuilder.asAdmin, user.id!);
+
+      expect(await endpoints.user.getAll(sessionBuilder.asAdmin), isEmpty);
+      expect(await UserProfile.db.count(session), 0);
+      await expectLater(
+        endpoints.user.delete(sessionBuilder.asAdmin, user.id!),
+        throwsValidation(ValidationError.notFound),
+      );
+    });
+
+    test('when admins delete themselves then it is rejected', () async {
+      await expectLater(
+        endpoints.user.delete(
+          sessionBuilder.asAdmin,
+          UuidValue.fromString(adminId),
+        ),
+        throwsValidation(ValidationError.ownAccount),
+      );
+    });
+
+    test('when a viewer deletes a user then it is rejected', () async {
+      await expectLater(
+        endpoints.user.delete(sessionBuilder.asViewer, user.id!),
+        throwsValidation(ValidationError.adminRequired),
+      );
+      expect(await AuthUser.db.findById(session, user.id!), isNotNull);
     });
 
     test('when a viewer gives a role then it is rejected', () async {
