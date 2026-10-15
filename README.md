@@ -18,6 +18,10 @@ You can see a demo with dummy data on https://logbuch.serverpod.space/. Sign in 
 
 The demo deployment sets the environment variable `LOGBUCH_DEMO_DATA=true` (`scloud variable set LOGBUCH_DEMO_DATA true`). With it, the server adds the demo data from `lib/src/demo/` and the admin each time it starts. It only adds what is missing and keeps what is there. Never set it for a real installation.
 
+> [!NOTE]
+> The web demo works exactly like the desktop application, except for one limitation: generated files, such as invoices, cannot currently be opened.
+
+
 ## Running locally
 
 You need the Flutter SDK (Dart `^3.12.2`) and the Serverpod CLI 4.0.3:
